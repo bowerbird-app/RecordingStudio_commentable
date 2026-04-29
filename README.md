@@ -1,6 +1,15 @@
-# GemTemplate
+# RecordingStudioCommentable
 
-Internal template for building Rails engine addons on top of RecordingStudio.
+A Rails engine that adds threaded comment feeds to any [RecordingStudio](https://github.com/bowerbird-app/RecordingStudio) recordable. Comments are modelled as child recordings, giving you full revision history, access control, and trash/restore for free.
+
+## Features
+
+- **Opt-in per recordable** — include `RecordingStudioCommentable::Commentable` in any model to enable comment feeds
+- **RecordingStudio-native** — comments are child recordings; create/update/delete go through the `record`/`revise`/`trash` API
+- **Access-control aware** — integrates with `RecordingStudioAccessible` roles (view, edit, manage) when available
+- **FlatPack UI** — all views built with FlatPack components; no raw HTML needed
+- **Service objects** — `CreateComment`, `UpdateComment`, `DestroyComment` encapsulate business logic
+- **Hook system** — lifecycle hooks (`before_initialize`, `after_initialize`, `on_configuration`, `before_service`, `after_service`, `around_service`) for host-app customisation
 
 ## What's Included
 
@@ -8,9 +17,124 @@ Internal template for building Rails engine addons on top of RecordingStudio.
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen and FlatPack default sidebar layout for authenticated pages
+- **Dummy app** (`test/dummy/`) with a working login screen, FlatPack sidebar layout, and sample Page (commentable) and Folder (not commentable) recordables
 
-## Quick Start
+## Installation
+
+Add to your host application's Gemfile:
+
+```ruby
+gem "recording_studio_commentable"
+```
+
+Run the install generator:
+
+```bash
+rails generate recording_studio_commentable:install
+rails recording_studio_commentable:install:migrations
+rails db:migrate
+```
+
+## Setup
+
+### 1. Opt a recordable into comments
+
+```ruby
+class Page < ApplicationRecord
+  include RecordingStudioCommentable::Commentable
+end
+```
+
+### 2. Register the recordable type with RecordingStudio
+
+```ruby
+# config/initializers/recording_studio.rb
+RecordingStudio.configure do |config|
+  config.recordable_types += ["Page", "RecordingStudioCommentable::Comment"]
+end
+```
+
+### 3. Mount the engine
+
+```ruby
+# config/routes.rb
+mount RecordingStudioCommentable::Engine, at: "/commentable"
+```
+
+### 4. Link to the comment feed
+
+```erb
+<%= link_to "Comments",
+      recording_studio_commentable.recording_comments_path(recording) %>
+```
+
+## Access Control
+
+When `RecordingStudioAccessible` is loaded, the following role checks apply:
+
+| Action | Required role |
+|--------|---------------|
+| View comment feed | `view` |
+| Post a comment | `edit` |
+| Edit/delete any comment | `manage` |
+| Edit own comment | always allowed (author) |
+
+If `RecordingStudioAccessible` is not loaded, access checks are skipped and all authenticated users can perform all actions.
+
+## Comment Model
+
+```
+recording_studio_commentable_comments
+  id            uuid
+  body          text (not null)
+  author_type   string (polymorphic)
+  author_id     uuid  (polymorphic)
+  recordings_count integer default 0
+  created_at    datetime
+  updated_at    datetime
+```
+
+## Service Objects
+
+```ruby
+# Create a comment under a recording
+result = RecordingStudioCommentable::Services::CreateComment.call(
+  parent_recording: recording,
+  body: "Great work!",
+  author: current_user
+)
+
+# Update via the revise pattern
+result = RecordingStudioCommentable::Services::UpdateComment.call(
+  comment_recording: comment_recording,
+  root_recording: root,
+  body: "Updated text",
+  actor: current_user
+)
+
+# Soft-delete (trash) a comment
+result = RecordingStudioCommentable::Services::DestroyComment.call(
+  comment_recording: comment_recording,
+  root_recording: root,
+  actor: current_user
+)
+```
+
+## Configuration
+
+```ruby
+RecordingStudioCommentable.configure do |config|
+  config.timeout = 5
+
+  # Lifecycle hooks
+  config.hooks.after_initialize { Rails.logger.info "Commentable ready!" }
+  config.hooks.around_service do |_service, block|
+    Sentry.with_scope { block.call }
+  end
+end
+```
+
+## Quick Start (Dummy App)
 
 ### GitHub Codespaces (Recommended)
 
@@ -24,7 +148,7 @@ Internal template for building Rails engine addons on top of RecordingStudio.
    ```
 4. Open port 3000 — you'll see the login screen
 
-The dummy app already includes FlatPack generator output (`flat_pack:install` and default sidebar layout scaffold) so authenticated pages render with the FlatPack sidebar shell by default.
+The dummy app includes FlatPack generator output and a pre-seeded Page recordable with comments enabled.
 
 ### Login Credentials
 

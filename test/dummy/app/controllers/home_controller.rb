@@ -5,5 +5,10 @@ class HomeController < ApplicationController
       recordable: @workspace,
       parent_recording_id: nil
     )
+    @page_recordings = RecordingStudio::Recording.unscoped
+      .where(root_recording_id: @root_recording&.id)
+      .where(recordable_type: "Page")
+      .where(trashed_at: nil)
+      .includes(:recordable)
   end
 end
