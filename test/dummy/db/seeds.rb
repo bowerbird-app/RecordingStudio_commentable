@@ -3,10 +3,13 @@
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
 # Create the admin user
-user = User.find_or_create_by!(email: "admin@admin.com") do |u|
-  u.password = "Password"
-  u.password_confirmation = "Password"
+user = User.find_or_initialize_by(email: "admin@admin.com")
+user.name = "Admin User"
+if user.new_record?
+  user.password = "Password"
+  user.password_confirmation = "Password"
 end
+user.save!
 
 # Create the workspace recordable
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")

@@ -3,6 +3,7 @@
 module RecordingStudioCommentable
   class ApplicationController < (defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base)
     protect_from_forgery with: :exception unless defined?(::ApplicationController)
+    helper_method :current_recording_studio_actor
 
     private
 

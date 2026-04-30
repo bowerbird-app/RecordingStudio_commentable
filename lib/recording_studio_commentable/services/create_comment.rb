@@ -38,13 +38,13 @@ module RecordingStudioCommentable
       end
 
       def build_comment
-        Comment.new(body: @body, author: @author)
+        RecordingStudioCommentable::Comment.new(body: @body, author: @author)
       end
 
       def record_comment(comment)
         if recording_studio_available?
           created_comment = nil
-          @parent_recording.record(Comment) do |c|
+          @parent_recording.record(comment.class, parent_recording: @parent_recording) do |c|
             c.body = @body
             c.author = @author
             created_comment = c

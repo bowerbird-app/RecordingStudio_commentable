@@ -1,7 +1,7 @@
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8">
   <%= render FlatPack::Breadcrumb::Component.new(items: [
-    { label: "Home", url: main_app.root_path },
-    { label: "Comments" }
+    { text: "Home", href: main_app.root_path },
+    { text: "Comments" }
   ]) %>
 
   <%= render FlatPack::PageTitle::Component.new(
@@ -10,8 +10,8 @@
     variant: :h1
   ) %>
 
-  <%= render FlatPack::Alert::Component.new(style: :success, message: notice) if notice.present? %>
-  <%= render FlatPack::Alert::Component.new(style: :error, message: alert) if alert.present? %>
+  <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
+  <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
 
   <%# Comment feed %>
   <div class="flex flex-col gap-4" id="comments">
@@ -36,7 +36,7 @@
 
     <% card.body do %>
       <%= render "form",
-            comment: Comment.new,
+            comment: RecordingStudioCommentable::Comment.new,
             url: recording_comments_path(@parent_recording) %>
     <% end %>
   <% end %>
