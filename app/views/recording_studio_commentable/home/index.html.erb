@@ -1,4 +1,9 @@
-<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-12">
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-12"
+  data-controller="scroll-anchor"
+  data-action="submit->scroll-anchor#remember"
+  data-scroll-anchor-hash-value="comment-scenarios"
+  data-scroll-anchor-offset-value="12"
+  data-scroll-anchor-storage-key-value="comment-scenarios-scroll">
   <%= render FlatPack::PageTitle::Component.new(
     title: "RecordingStudio Commentable",
     subtitle: "Threaded comment feeds for Recording Studio recordables. Include the Commentable module to opt a recordable into comments.",
@@ -11,43 +16,56 @@
     <%= render FlatPack::Badge::Component.new(text: "v#{RecordingStudioCommentable::VERSION}", style: :warning, size: :sm) %>
   </div>
 
-  <div class="grid gap-6 lg:grid-cols-2">
-    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-      <% card.header do %>
-        <%= render FlatPack::PageTitle::Component.new(
-          title: "Quick start",
-          subtitle: "Three steps to add comments to a recordable.",
-          variant: :h3,
-          class: "mb-0 pb-0"
-        ) %>
-      <% end %>
+  <div class="flex flex-col gap-4 scroll-mt-6"
+    id="comment-scenarios"
+    data-scroll-anchor-target="anchor">
+    <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
+    <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
+  </div>
 
-      <% card.body do %>
-        <ol class="space-y-3 text-sm leading-6 list-decimal pl-5">
-          <li>Include <code>RecordingStudioCommentable::Commentable</code> in your recordable model.</li>
-          <li>Add <code>recording_studio_commentable</code> to your recordable types in the RecordingStudio initializer.</li>
-          <li>Mount the engine in <code>config/routes.rb</code> and link to <code>recording_comments_path(recording)</code>.</li>
-        </ol>
-      <% end %>
-    <% end %>
+  <div class="grid gap-4 lg:grid-cols-2">
+    <% @scenario_recordings.each do |recording| %>
+      <% recordable = recording.recordable %>
+      <% is_folder = recordable.is_a?(Folder) %>
+      <% title = is_folder ? recordable.name : recordable.title %>
+      <% body = is_folder ? "Folders are visible in Recording Studio but are not commentable in this addon." : recordable.body %>
+      <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: title,
+            subtitle: is_folder ? "Folder scenario" : "Page scenario",
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
 
-    <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-      <% card.header do %>
-        <%= render FlatPack::PageTitle::Component.new(
-          title: "Access control",
-          subtitle: "Comments respect RecordingStudio access roles.",
-          variant: :h3,
-          class: "mb-0 pb-0"
-        ) %>
-      <% end %>
+        <% card.body do %>
+          <div class="space-y-4">
+            <p class="text-sm text-(--surface-muted-content-color)"><%= body %></p>
 
-      <% card.body do %>
-        <ul class="space-y-3 text-sm leading-6">
-          <li><strong>view</strong> role — read the comment feed.</li>
-          <li><strong>edit</strong> role — post new comments.</li>
-          <li><strong>manage</strong> role — edit or delete any comment.</li>
-          <li>Authors may always edit their own comments.</li>
-        </ul>
+            <div class="flex flex-wrap gap-2">
+              <%= link_to recording_comments_path(recording, return_to: root_path(anchor: "comment-scenarios")) do %>
+                <%= render FlatPack::Button::Component.new(text: "Open comment feed", style: :secondary, size: :sm) %>
+              <% end %>
+            </div>
+
+            <%= form_with model: @new_comment,
+                          url: recording_comments_path(recording),
+                          scope: :comment,
+                          local: true,
+                          class: "space-y-3" do |form| %>
+              <%= hidden_field_tag :return_to, root_path(anchor: "comment-scenarios") %>
+              <%= render FlatPack::TextArea::Component.new(
+                name: "comment[body]",
+                value: @new_comment.body,
+                label: "Leave a comment",
+                rows: 4,
+                placeholder: "Try posting as #{current_user.display_name}..."
+              ) %>
+              <%= render FlatPack::Button::Component.new(text: "Post comment", style: :primary, type: "submit") %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
   </div>

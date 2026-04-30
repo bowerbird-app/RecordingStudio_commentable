@@ -23,7 +23,5 @@ class HomeController < ApplicationController
         label = recording.recordable&.try(:name) || recording.recordable&.try(:title)
         scenario_titles.index(label) || scenario_titles.length
       end
-
-    @new_comment = RecordingStudioCommentable::Comment.new
   end
 end

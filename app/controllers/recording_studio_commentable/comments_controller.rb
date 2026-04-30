@@ -28,15 +28,13 @@ module RecordingStudioCommentable
       if result.success?
         redirect_to redirect_target(recording_comments_path(@parent_recording)),
                     notice: "Comment added."
+      elsif return_to_path
+        redirect_to redirect_target(recording_comments_path(@parent_recording)),
+                    alert: result.errors.presence&.join(", ") || result.error || "Comment could not be added."
       else
-        if return_to_path
-          redirect_to redirect_target(recording_comments_path(@parent_recording)),
-                      alert: result.errors.presence&.join(", ") || result.error || "Comment could not be added."
-        else
-          @comment = Comment.new(body: comment_params[:body])
-          @comment.errors.add(:base, result.error) if result.error
-          render :new, status: :unprocessable_entity
-        end
+        @comment = Comment.new(body: comment_params[:body])
+        @comment.errors.add(:base, result.error) if result.error
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -126,7 +124,8 @@ module RecordingStudioCommentable
     def authorize_create!
       return if authorized?(:edit)
 
-      redirect_to(redirect_target(recording_comments_path(@parent_recording)), alert: "You are not allowed to post comments here.")
+      redirect_to(redirect_target(recording_comments_path(@parent_recording)),
+                  alert: "You are not allowed to post comments here.")
     end
 
     def authorize_edit!
@@ -134,13 +133,12 @@ module RecordingStudioCommentable
       comment_recordable = @comment_recording.respond_to?(:recordable) ? @comment_recording.recordable : nil
 
       # Allow comment authors to edit their own comments
-      if comment_recordable.respond_to?(:author) && comment_recordable.author == actor
-        return
-      end
+      return if comment_recordable.respond_to?(:author) && comment_recordable.author == actor
 
       return if authorized?(:manage)
 
-      redirect_to(redirect_target(recording_comments_path(@parent_recording)), alert: "You are not allowed to edit this comment.")
+      redirect_to(redirect_target(recording_comments_path(@parent_recording)),
+                  alert: "You are not allowed to edit this comment.")
     end
 
     def authorized?(role)

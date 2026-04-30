@@ -1,17 +1,9 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: @workspace&.name || "RecordingStudio Commentable",
-    subtitle: "This root page demonstrates commentability plus access-control outcomes across folder and page scenarios.",
+    subtitle: "Use this root page for demo credentials and workspace context, then open /commentable for the seeded comment scenarios.",
     variant: :h1
   ) %>
-
-  <% if notice.present? %>
-    <%= render FlatPack::Alert::Component.new(style: :success, description: notice) %>
-  <% end %>
-
-  <% if alert.present? %>
-    <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) %>
-  <% end %>
 
   <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
     <div class="flex flex-col gap-6">
@@ -38,7 +30,7 @@
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: "Scenario matrix",
-            subtitle: "Each card posts into the real addon controller and returns here with the result.",
+            subtitle: "The seeded scenarios now live on /commentable.",
             variant: :h3,
             class: "mb-0 pb-0"
           ) %>
@@ -46,9 +38,8 @@
 
         <% card.body do %>
           <div class="space-y-4 text-sm leading-6 text-(--surface-content-color)">
-            <p>The folder should fail because it does not include <code>RecordingStudioCommentable::Commentable</code>.</p>
-            <p>The owner-only pages should allow comments only for their seeded owner.</p>
-            <p>The public page should allow both seeded users to comment.</p>
+            <p>The folder, owner-only pages, and public page scenarios are available on <code>/commentable</code>.</p>
+            <p>Use the seeded accounts here, then open the engine page to post comments and verify access outcomes.</p>
           </div>
         <% end %>
       <% end %>
@@ -75,7 +66,7 @@
             <dd class="font-mono text-xs"><%= @root_recording&.id || "Missing" %></dd>
           </div>
           <div>
-            <dt class="text-(--surface-muted-content-color)">Scenario cards</dt>
+            <dt class="text-(--surface-muted-content-color)">Scenarios on /commentable</dt>
             <dd class="font-medium"><%= @scenario_recordings.size %></dd>
           </div>
           <div>
@@ -83,59 +74,6 @@
             <dd><%= link_to "/commentable", "/commentable", class: "underline" %></dd>
           </div>
         </dl>
-      <% end %>
-    <% end %>
-  </div>
-
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Comment scenarios",
-    subtitle: "Each form submits to the mounted engine and preserves this page as the return target.",
-    variant: :h2
-  ) %>
-
-  <div class="grid gap-4 lg:grid-cols-2">
-    <% @scenario_recordings.each do |recording| %>
-      <% recordable = recording.recordable %>
-      <% is_folder = recordable.is_a?(Folder) %>
-      <% title = is_folder ? recordable.name : recordable.title %>
-      <% body = is_folder ? "Folders are visible in Recording Studio but are not commentable in this addon." : recordable.body %>
-      <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-        <% card.header do %>
-          <%= render FlatPack::PageTitle::Component.new(
-            title: title,
-            subtitle: is_folder ? "Folder scenario" : "Page scenario",
-            variant: :h3,
-            class: "mb-0 pb-0"
-          ) %>
-        <% end %>
-
-        <% card.body do %>
-          <div class="space-y-4">
-            <p class="text-sm text-(--surface-muted-content-color)"><%= body %></p>
-
-            <div class="flex flex-wrap gap-2">
-              <%= link_to recording_studio_commentable.recording_comments_path(recording) do %>
-                <%= render FlatPack::Button::Component.new(text: "Open comment feed", style: :secondary, size: :sm) %>
-              <% end %>
-            </div>
-
-            <%= form_with model: @new_comment,
-                          url: recording_studio_commentable.recording_comments_path(recording),
-                          scope: :comment,
-                          local: true,
-                          class: "space-y-3" do |form| %>
-              <%= hidden_field_tag :return_to, root_path %>
-              <%= render FlatPack::TextArea::Component.new(
-                name: "comment[body]",
-                value: @new_comment.body,
-                label: "Leave a comment",
-                rows: 4,
-                placeholder: "Try posting as #{current_user.display_name}..."
-              ) %>
-              <%= render FlatPack::Button::Component.new(text: "Post comment", style: :primary, type: "submit") %>
-            <% end %>
-          </div>
-        <% end %>
       <% end %>
     <% end %>
   </div>
