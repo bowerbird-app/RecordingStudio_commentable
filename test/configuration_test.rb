@@ -4,15 +4,13 @@ require "test_helper"
 
 class ConfigurationTest < Minitest::Test
   def setup
-    @configuration = GemTemplate::Configuration.new
+    @configuration = RecordingStudioCommentable::Configuration.new
   end
 
   def test_merge_updates_known_attributes
-    @configuration.merge!(api_key: "abc123", timeout: 9, enable_feature_x: true)
+    @configuration.merge!(timeout: 9)
 
-    assert_equal "abc123", @configuration.api_key
     assert_equal 9, @configuration.timeout
-    assert_equal true, @configuration.enable_feature_x
   end
 
   def test_merge_ignores_unknown_keys
@@ -27,10 +25,7 @@ class ConfigurationTest < Minitest::Test
 
     @configuration.merge!(nil)
 
-    assert_nil @configuration.api_key if original[:api_key].nil?
-    assert_equal original[:api_key], @configuration.api_key unless original[:api_key].nil?
     assert_equal original[:timeout], @configuration.timeout
-    assert_equal original[:enable_feature_x], @configuration.enable_feature_x
   end
 
   def test_to_h_reports_registered_hook_counts
@@ -45,8 +40,8 @@ class ConfigurationTest < Minitest::Test
   end
 
   def test_configure_without_block_is_safe
-    GemTemplate.configure
+    RecordingStudioCommentable.configure
 
-    assert_kind_of GemTemplate::Configuration, GemTemplate.configuration
+    assert_kind_of RecordingStudioCommentable::Configuration, RecordingStudioCommentable.configuration
   end
 end

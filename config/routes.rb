@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
-GemTemplate::Engine.routes.draw do
+RecordingStudioCommentable::Engine.routes.draw do
   root "home#index"
+
+  resources :recordings, only: [] do
+    resources :comments, only: %i[index new create edit update destroy]
+  end
 end

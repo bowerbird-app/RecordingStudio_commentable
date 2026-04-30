@@ -1,0 +1,26 @@
+<%# app/views/recording_studio_commentable/comments/_form.html.erb %>
+<%= form_with model: comment, url: url, local: false do |f| %>
+  <%= render FlatPack::Alert::Component.new(
+    style: :error,
+    message: comment.errors.full_messages.join(", ")
+  ) if comment.errors.any? %>
+
+  <div class="flex flex-col gap-4">
+    <%= render FlatPack::TextareaInput::Component.new(
+      form: f,
+      attribute: :body,
+      label: "Comment",
+      placeholder: "Write your comment…",
+      rows: 4
+    ) %>
+
+    <div class="flex justify-end">
+      <%= render FlatPack::Button::Component.new(
+        text: comment.new_record? ? "Post comment" : "Save changes",
+        style: :primary,
+        size: :md,
+        type: "submit"
+      ) %>
+    </div>
+  </div>
+<% end %>

@@ -1,7 +1,7 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: @workspace&.name || "Recording Studio addon template",
-    subtitle: "Use this dummy app to validate authentication, root recording setup, and addon UI wiring before you rename the engine.",
+    title: @workspace&.name || "RecordingStudio Commentable",
+    subtitle: "Use this dummy app to validate authentication, root recording setup, and the commentable addon UI.",
     variant: :h1
   ) %>
 
@@ -19,16 +19,16 @@
       <% card.body do %>
         <ol class="space-y-4 text-sm leading-6 text-[var(--surface-content-color)]">
           <li>
-            Rename the gem with <code>bin/rename_gem your_addon_name</code> once the engine structure looks right.
+            Include <code>RecordingStudioCommentable::Commentable</code> in your recordable model (e.g. <code>Page</code>).
           </li>
           <li>
-            Replace the sample migration with your addon's real tables and then run <code>rails generate gem_template:migrations</code> in the host app.
+            Register your recordable types in <code>test/dummy/config/initializers/recording_studio.rb</code>.
           </li>
           <li>
-            Register your recordable types in <code>test/dummy/config/initializers/recording_studio.rb</code> and add capabilities only where they are needed.
+            Mount the engine in routes: <code>mount RecordingStudioCommentable::Engine, at: "/commentable"</code>.
           </li>
           <li>
-            Use this dummy app to check layout, authentication, Tailwind sources, and root recording behavior before shipping the engine.
+            Link to the comment feed from any recording: <code>recording_studio_commentable.recording_comments_path(recording)</code>.
           </li>
         </ol>
       <% end %>
@@ -77,10 +77,39 @@
           <div class="space-y-3 text-sm">
             <p><strong>App home:</strong> <code>/</code></p>
             <p><strong>Recording Studio mount:</strong> <code>/recording_studio</code></p>
+            <p><strong>Commentable engine:</strong> <code>/commentable</code></p>
             <p><strong>Health check:</strong> <code>/up</code></p>
           </div>
         <% end %>
       <% end %>
     </div>
   </div>
+
+  <%# Pages with comment feeds %>
+  <% if @page_recordings.any? %>
+    <%= render FlatPack::PageTitle::Component.new(
+      title: "Pages (commentable)",
+      subtitle: "Pages that support comment feeds via RecordingStudioCommentable.",
+      variant: :h2
+    ) %>
+
+    <div class="grid gap-4 lg:grid-cols-2">
+      <% @page_recordings.each do |recording| %>
+        <% page = recording.recordable %>
+        <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+          <% card.body do %>
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="font-medium"><%= page.title %></p>
+                <p class="text-sm text-[var(--surface-muted-content-color)] mt-1"><%= page.body&.truncate(80) %></p>
+              </div>
+              <%= link_to recording_studio_commentable.recording_comments_path(recording) do %>
+                <%= render FlatPack::Button::Component.new(text: "View comments", style: :secondary, size: :sm) %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
 </div>

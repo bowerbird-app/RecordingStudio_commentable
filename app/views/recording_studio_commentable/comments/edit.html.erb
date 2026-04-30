@@ -1,0 +1,20 @@
+<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8">
+  <%= render FlatPack::Breadcrumb::Component.new(items: [
+    { label: "Home", url: main_app.root_path },
+    { label: "Comments", url: recording_comments_path(@parent_recording) },
+    { label: "Edit Comment" }
+  ]) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Edit Comment",
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+    <% card.body do %>
+      <%= render "form",
+            comment: @comment,
+            url: recording_comment_path(@parent_recording, @comment_recording) %>
+    <% end %>
+  <% end %>
+</div>

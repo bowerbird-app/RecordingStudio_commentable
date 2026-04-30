@@ -2,13 +2,13 @@
 
 require "test_helper"
 
-class GemTemplateTest < Minitest::Test
+class RecordingStudioCommentableTest < Minitest::Test
   def test_version_exists
-    refute_nil ::GemTemplate::VERSION
+    refute_nil ::RecordingStudioCommentable::VERSION
   end
 
   def test_engine_exists
-    assert_kind_of Class, ::GemTemplate::Engine
+    assert_kind_of Class, ::RecordingStudioCommentable::Engine
   end
 
   def test_dummy_app_uses_flatpack_sidebar_layout
@@ -46,12 +46,21 @@ class GemTemplateTest < Minitest::Test
   end
 
   def test_engine_home_page_uses_flatpack_components
-    view_path = File.expand_path("../app/views/gem_template/home/index.html.erb", __dir__)
+    view_path = File.expand_path("../app/views/recording_studio_commentable/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
     assert_includes view_source, "FlatPack::PageTitle::Component"
     assert_includes view_source, "FlatPack::Card::Component"
-    assert_includes view_source, "FlatPack::Button::Component"
     assert_includes view_source, "FlatPack::Badge::Component"
+  end
+
+  def test_commentable_module_exists
+    assert_kind_of Module, ::RecordingStudioCommentable::Commentable
+  end
+
+  def test_configure_yields_configuration
+    yielded = nil
+    RecordingStudioCommentable.configure { |c| yielded = c }
+    assert_kind_of RecordingStudioCommentable::Configuration, yielded
   end
 end

@@ -1,0 +1,43 @@
+<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8">
+  <%= render FlatPack::Breadcrumb::Component.new(items: [
+    { label: "Home", url: main_app.root_path },
+    { label: "Comments" }
+  ]) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Comments",
+    subtitle: "#{@comments.size} comment#{"s" if @comments.size != 1}",
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::Alert::Component.new(style: :success, message: notice) if notice.present? %>
+  <%= render FlatPack::Alert::Component.new(style: :error, message: alert) if alert.present? %>
+
+  <%# Comment feed %>
+  <div class="flex flex-col gap-4" id="comments">
+    <% if @comments.any? %>
+      <% @comments.each do |comment_recording| %>
+        <%= render "comment", comment_recording: comment_recording %>
+      <% end %>
+    <% else %>
+      <%= render "empty_state" %>
+    <% end %>
+  </div>
+
+  <%# New comment form %>
+  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+    <% card.header do %>
+      <%= render FlatPack::PageTitle::Component.new(
+        title: "Add a comment",
+        variant: :h3,
+        class: "mb-0 pb-0"
+      ) %>
+    <% end %>
+
+    <% card.body do %>
+      <%= render "form",
+            comment: Comment.new,
+            url: recording_comments_path(@parent_recording) %>
+    <% end %>
+  <% end %>
+</div>
