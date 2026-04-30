@@ -10,11 +10,11 @@ class HomeController < ApplicationController
       "Reference Folder",
       "Quinn owns this document",
       "Admin User owns this document",
-      "Publicly accessible document"
+      "Quinn and Admin User can comment"
     ]
 
     @scenario_recordings = RecordingStudio::Recording.unscoped
-      .where(root_recording_id: @root_recording&.id)
+      .where(parent_recording_id: nil)
       .where(recordable_type: ["Folder", "Page"])
       .where(trashed_at: nil)
       .includes(:recordable)

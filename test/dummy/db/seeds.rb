@@ -46,88 +46,91 @@ RecordingStudio::Recording.unscoped.find_or_create_by!(
 
 # Create a sample folder (not commentable)
 folder = Folder.find_or_create_by!(name: "Reference Folder")
-folder_recording = RecordingStudio::Recording.unscoped.find_or_create_by!(
-  root_recording_id: root_recording.id,
-  parent_recording_id: root_recording.id,
+
+# Create scenario pages
+quinn_page = Page.find_or_create_by!(title: "Quinn owns this document")
+Page.where(id: quinn_page.id).update_all(
+  body: "Only Quinn should be able to comment on this page. Admin User should be denied by explicit page access."
+)
+quinn_page.reload
+
+admin_page = Page.find_or_create_by!(title: "Admin User owns this document")
+Page.where(id: admin_page.id).update_all(
+  body: "Only Admin User should be able to comment on this page. Other seeded users should be denied by explicit page access."
+)
+admin_page.reload
+
+Page.where(title: "Publicly accessible document").update_all(title: "Quinn and Admin User can comment")
+
+public_page = Page.find_or_create_by!(title: "Quinn and Admin User can comment")
+Page.where(id: public_page.id).update_all(
+  body: "Both seeded users can comment on this page because it grants explicit access to each of them."
+)
+public_page.reload
+
+scenario_recordables = [folder, quinn_page, admin_page, public_page]
+
+scenario_root_recordings = RecordingStudio::Recording.unscoped
+  .where(recordable: scenario_recordables)
+
+recording_ids_to_remove = scenario_root_recordings.pluck(:id)
+pending_ids = recording_ids_to_remove.dup
+
+while pending_ids.any?
+  child_ids = RecordingStudio::Recording.unscoped.where(parent_recording_id: pending_ids).pluck(:id)
+  child_ids -= recording_ids_to_remove
+  break if child_ids.empty?
+
+  recording_ids_to_remove.concat(child_ids)
+  pending_ids = child_ids
+end
+
+if recording_ids_to_remove.any?
+  scoped_recordings = RecordingStudio::Recording.unscoped.where(id: recording_ids_to_remove)
+  comment_recordings = scoped_recordings.where(recordable_type: "RecordingStudioCommentable::Comment")
+
+  RecordingStudio::Event.where(recording_id: recording_ids_to_remove).delete_all
+  RecordingStudioCommentable::Comment.where(id: comment_recordings.select(:recordable_id)).delete_all
+  RecordingStudio::AccessBoundary.where(
+    id: scoped_recordings.where(recordable_type: "RecordingStudio::AccessBoundary").select(:recordable_id)
+  ).delete_all
+  scoped_recordings.delete_all
+end
+
+folder_recording = RecordingStudio::Recording.unscoped.create!(
+  parent_recording_id: nil,
   recordable: folder
 )
 
-# Create scenario pages
-quinn_page = Page.find_or_create_by!(title: "Quinn owns this document") do |p|
-  p.body = "Only Quinn should be able to comment on this page. Admin User should be denied by the access boundary."
-end
-quinn_page_recording = RecordingStudio::Recording.unscoped.find_or_create_by!(
-  root_recording_id: root_recording.id,
-  parent_recording_id: folder_recording.id,
+quinn_page_recording = RecordingStudio::Recording.unscoped.create!(
+  parent_recording_id: nil,
   recordable: quinn_page
 )
 
-admin_page = Page.find_or_create_by!(title: "Admin User owns this document") do |p|
-  p.body = "Only Admin User should be able to comment on this page. Other seeded users should be denied."
-end
-admin_page_recording = RecordingStudio::Recording.unscoped.find_or_create_by!(
-  root_recording_id: root_recording.id,
-  parent_recording_id: folder_recording.id,
+admin_page_recording = RecordingStudio::Recording.unscoped.create!(
+  parent_recording_id: nil,
   recordable: admin_page
 )
 
-public_page = Page.find_or_create_by!(title: "Publicly accessible document") do |p|
-  p.body = "Both seeded users inherit enough access to comment on this page in the demo."
-end
-public_page_recording = RecordingStudio::Recording.unscoped.find_or_create_by!(
-  root_recording_id: root_recording.id,
-  parent_recording_id: folder_recording.id,
+public_page_recording = RecordingStudio::Recording.unscoped.create!(
+  parent_recording_id: nil,
   recordable: public_page
 )
 
-scenario_recordings = [quinn_page_recording, admin_page_recording, public_page_recording]
-
-scenario_recordings.each do |recording|
-  comment_recordings = RecordingStudio::Recording.unscoped
-    .where(parent_recording_id: recording.id, recordable_type: "RecordingStudioCommentable::Comment")
-
-  RecordingStudio::Event.where(recording_id: comment_recordings.select(:id)).delete_all
-  RecordingStudioCommentable::Comment.where(id: comment_recordings.select(:recordable_id)).delete_all
-  comment_recordings.delete_all
-
-  access_recordings = RecordingStudio::Recording.unscoped
-    .where(parent_recording_id: recording.id, recordable_type: "RecordingStudio::Access")
-
-  RecordingStudio::Event.where(recording_id: access_recordings.select(:id)).delete_all
-  access_recordings.delete_all
-
-  boundary_recordings = RecordingStudio::Recording.unscoped
-    .where(parent_recording_id: recording.id, recordable_type: "RecordingStudio::AccessBoundary")
-
-  RecordingStudio::Event.where(recording_id: boundary_recordings.select(:id)).delete_all
-  RecordingStudio::AccessBoundary.where(id: boundary_recordings.select(:recordable_id)).delete_all
-  boundary_recordings.delete_all
-end
-
-[
-  [quinn_page_recording, quinn],
-  [admin_page_recording, user]
-].each do |recording, owner|
-  boundary_recording = RecordingStudio::Recording.unscoped
-    .where(parent_recording_id: recording.id, recordable_type: "RecordingStudio::AccessBoundary", trashed_at: nil)
-    .order(created_at: :desc)
-    .first
-
-  unless boundary_recording
-    boundary = RecordingStudio::AccessBoundary.create!
+{
+  folder_recording => [[user, :edit], [quinn, :edit]],
+  quinn_page_recording => [[quinn, :edit]],
+  admin_page_recording => [[user, :edit]],
+  public_page_recording => [[user, :edit], [quinn, :edit]]
+}.each do |recording, grants|
+  grants.each do |actor, role|
+    access_record = RecordingStudio::Access.find_or_create_by!(actor: actor, role: role)
     RecordingStudio::Recording.unscoped.create!(
-      root_recording_id: root_recording.id,
+      root_recording_id: recording.id,
       parent_recording_id: recording.id,
-      recordable: boundary
+      recordable: access_record
     )
   end
-
-  owner_access = RecordingStudio::Access.find_or_create_by!(actor: owner, role: :edit)
-  RecordingStudio::Recording.unscoped.find_or_create_by!(
-    root_recording_id: root_recording.id,
-    parent_recording_id: recording.id,
-    recordable: owner_access
-  )
 end
 
 puts "Seeded: admin@admin.com / Password"

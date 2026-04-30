@@ -43,4 +43,105 @@
             url: recording_comments_path(@parent_recording) %>
     <% end %>
   <% end %>
+
+  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+    <% card.header do %>
+      <%= render FlatPack::PageTitle::Component.new(
+        title: "Recording Studio structure",
+        subtitle: "Visualize the page recording, its child recordables, and the event history that drives revisions.",
+        variant: :h3,
+        class: "mb-0 pb-0"
+      ) %>
+    <% end %>
+
+    <% card.body do %>
+      <div class="flex flex-col gap-6">
+        <div class="rounded-lg border border-(--surface-border-color) p-4">
+          <p class="mb-3 text-sm font-medium">Page recording</p>
+          <dl class="space-y-2 text-sm">
+            <% @structure_parent[:recording_details].each do |label, value| %>
+              <div>
+                <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                <dd class="font-mono text-xs break-all"><%= value %></dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+
+        <div class="pl-4">
+          <p class="mb-3 text-sm font-medium">Child recordings and recordables</p>
+          <div class="flex flex-col gap-4">
+            <% @structure_children.each do |child| %>
+              <div class="rounded-lg border border-(--surface-border-color) p-4">
+                <p class="mb-3 text-sm font-medium">Child recording: <%= child[:title] %></p>
+                <dl class="space-y-2 text-sm">
+                  <% child[:recording_details].each do |label, value| %>
+                    <div>
+                      <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                      <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
+                    </div>
+                  <% end %>
+                </dl>
+
+                <div class="mt-4 pl-4">
+                  <div class="rounded-lg border border-(--surface-border-color) p-4">
+                    <p class="mb-3 text-sm font-medium">Recordable: <%= child[:recordable_title] %></p>
+                    <dl class="space-y-2 text-sm">
+                      <% child[:recordable_details].each do |label, value| %>
+                        <div>
+                          <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                          <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
+                        </div>
+                      <% end %>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <p class="mb-3 text-sm font-medium">Events</p>
+          <% if @structure_events.any? %>
+            <div class="flex flex-col gap-4">
+              <% @structure_events.each do |entry| %>
+                <div class="rounded-lg border border-(--surface-border-color) p-4">
+                  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,1fr)]">
+                    <div>
+                      <p class="mb-3 text-sm font-medium">Event: <%= entry[:title] %></p>
+                      <dl class="space-y-2 text-sm">
+                        <% entry[:details].each do |label, value| %>
+                          <div>
+                            <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                            <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
+                          </div>
+                        <% end %>
+                      </dl>
+                    </div>
+
+                    <div class="pl-4 lg:pl-0">
+                      <div class="rounded-lg border border-(--surface-border-color) p-4">
+                        <p class="mb-3 text-sm font-medium">Affected recordable: <%= entry[:recordable_title] %></p>
+                        <dl class="space-y-2 text-sm">
+                          <% entry[:recordable_details].each do |label, value| %>
+                            <div>
+                              <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                              <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
+                            </div>
+                          <% end %>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-sm text-(--surface-muted-content-color)">No events recorded for this page or its child recordings yet.</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
 </div>
