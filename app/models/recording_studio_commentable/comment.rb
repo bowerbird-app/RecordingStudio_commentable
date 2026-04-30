@@ -8,14 +8,15 @@ module RecordingStudioCommentable
   # created/updated/deleted through the Services layer, which handles the
   # RecordingStudio record/revise/trash pattern.
   #
-  # Table: recording_studio_commentable_comments
+  # Table: recording_studio_comments
   #   - id (uuid, pk)
   #   - body (text, not null)
   #   - author_type / author_id (polymorphic)
-  #   - recordings_count (integer, counter cache)
   #   - created_at / updated_at
   #
   class Comment < ApplicationRecord
+    self.table_name = "recording_studio_comments"
+
     # Polymorphic author — typically a User or service account
     belongs_to :author, polymorphic: true, optional: true
 

@@ -84,12 +84,11 @@ If `RecordingStudioAccessible` is not loaded, access checks are skipped and all 
 ## Comment Model
 
 ```
-recording_studio_commentable_comments
+recording_studio_comments
   id            uuid
   body          text (not null)
   author_type   string (polymorphic)
   author_id     uuid  (polymorphic)
-  recordings_count integer default 0
   created_at    datetime
   updated_at    datetime
 ```
