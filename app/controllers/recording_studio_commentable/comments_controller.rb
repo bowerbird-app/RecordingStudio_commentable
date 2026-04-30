@@ -26,12 +26,17 @@ module RecordingStudioCommentable
       )
 
       if result.success?
-        redirect_to recording_comments_path(@parent_recording),
+        redirect_to redirect_target(recording_comments_path(@parent_recording)),
                     notice: "Comment added."
       else
-        @comment = Comment.new(body: comment_params[:body])
-        @comment.errors.add(:base, result.error) if result.error
-        render :new, status: :unprocessable_entity
+        if return_to_path
+          redirect_to redirect_target(recording_comments_path(@parent_recording)),
+                      alert: result.errors.presence&.join(", ") || result.error || "Comment could not be added."
+        else
+          @comment = Comment.new(body: comment_params[:body])
+          @comment.errors.add(:base, result.error) if result.error
+          render :new, status: :unprocessable_entity
+        end
       end
     end
 
@@ -49,7 +54,7 @@ module RecordingStudioCommentable
       )
 
       if result.success?
-        redirect_to recording_comments_path(@parent_recording),
+        redirect_to redirect_target(recording_comments_path(@parent_recording)),
                     notice: "Comment updated."
       else
         @comment = @comment_recording.respond_to?(:recordable) ? @comment_recording.recordable : @comment_recording
@@ -66,11 +71,22 @@ module RecordingStudioCommentable
         actor: current_recording_studio_actor
       )
 
-      redirect_to recording_comments_path(@parent_recording),
+      redirect_to redirect_target(recording_comments_path(@parent_recording)),
                   notice: "Comment deleted."
     end
 
     private
+
+    def return_to_path
+      path = params[:return_to].to_s
+      return if path.blank? || !path.start_with?("/")
+
+      path
+    end
+
+    def redirect_target(default)
+      return_to_path || default
+    end
 
     # ------------------------------------------------------------------ #
     # Finders
@@ -80,14 +96,14 @@ module RecordingStudioCommentable
       @parent_recording = find_recording(params[:recording_id])
       return if @parent_recording
 
-      redirect_to(main_app.root_path, alert: "Recording not found.")
+      redirect_to(redirect_target(main_app.root_path), alert: "Recording not found.")
     end
 
     def load_comment_recording
       @comment_recording = find_recording(params[:id])
       return if @comment_recording
 
-      redirect_to(recording_comments_path(@parent_recording), alert: "Comment not found.")
+      redirect_to(redirect_target(recording_comments_path(@parent_recording)), alert: "Comment not found.")
     end
 
     # ------------------------------------------------------------------ #
@@ -98,19 +114,19 @@ module RecordingStudioCommentable
       recordable = @parent_recording.respond_to?(:recordable) ? @parent_recording.recordable : nil
       return if recordable&.class&.include?(RecordingStudioCommentable::Commentable)
 
-      redirect_to(main_app.root_path, alert: "Comments are not enabled for this resource.")
+      redirect_to(redirect_target(main_app.root_path), alert: "Comments are not enabled for this resource.")
     end
 
     def authorize_view!
       return if authorized?(:view)
 
-      redirect_to(main_app.root_path, alert: "You are not allowed to view comments here.")
+      redirect_to(redirect_target(main_app.root_path), alert: "You are not allowed to view comments here.")
     end
 
     def authorize_create!
       return if authorized?(:edit)
 
-      redirect_to(recording_comments_path(@parent_recording), alert: "You are not allowed to post comments here.")
+      redirect_to(redirect_target(recording_comments_path(@parent_recording)), alert: "You are not allowed to post comments here.")
     end
 
     def authorize_edit!
@@ -124,7 +140,7 @@ module RecordingStudioCommentable
 
       return if authorized?(:manage)
 
-      redirect_to(recording_comments_path(@parent_recording), alert: "You are not allowed to edit this comment.")
+      redirect_to(redirect_target(recording_comments_path(@parent_recording)), alert: "You are not allowed to edit this comment.")
     end
 
     def authorized?(role)

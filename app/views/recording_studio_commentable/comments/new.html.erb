@@ -1,12 +1,16 @@
+<% page_title = @parent_recording.recordable.try(:title) || @parent_recording.recordable.try(:name) || "Resource" %>
+
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8">
   <%= render FlatPack::Breadcrumb::Component.new(items: [
     { text: "Home", href: main_app.root_path },
+    { text: page_title, href: recording_comments_path(@parent_recording) },
     { text: "Comments", href: recording_comments_path(@parent_recording) },
     { text: "New Comment" }
   ]) %>
 
   <%= render FlatPack::PageTitle::Component.new(
     title: "New Comment",
+    subtitle: page_title,
     variant: :h1
   ) %>
 
