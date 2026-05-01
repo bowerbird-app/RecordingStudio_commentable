@@ -6,11 +6,13 @@ module RecordingStudioCommentable
 
     class << self
       def apply_model_extensions(target)
-        apply_extensions(target, RecordingStudioCommentable.configuration.hooks.model_extensions_for(extension_keys_for(target)))
+        apply_extensions(target,
+                         RecordingStudioCommentable.configuration.hooks.model_extensions_for(extension_keys_for(target)))
       end
 
       def apply_controller_extensions(target)
-        apply_extensions(target, RecordingStudioCommentable.configuration.hooks.controller_extensions_for(extension_keys_for(target)))
+        apply_extensions(target,
+                         RecordingStudioCommentable.configuration.hooks.controller_extensions_for(extension_keys_for(target)))
       end
 
       private
@@ -40,43 +42,41 @@ module RecordingStudioCommentable
       end
     end
 
-    initializer "recording_studio_commentable.before_initialize", before: "recording_studio_commentable.load_config" do |_app|
+    initializer "recording_studio_commentable.before_initialize",
+                before: "recording_studio_commentable.load_config" do |_app|
       RecordingStudioCommentable::Hooks.run(:before_initialize, self)
     end
 
     initializer "recording_studio_commentable.load_config" do |app|
       if app.respond_to?(:config_for)
         begin
-          yaml = begin
-            app.config_for(:recording_studio_commentable)
-          rescue StandardError
-            nil
-          end
+          yaml = app.config_for(:recording_studio_commentable)
           RecordingStudioCommentable.configuration.merge!(yaml) if yaml.respond_to?(:each)
-        rescue StandardError => _e
-          # ignore load errors; host app can provide initializer overrides
+        rescue StandardError
+          # ignore; host app can provide initializer overrides
         end
       end
 
       if app.config.respond_to?(:x) && app.config.x.respond_to?(:recording_studio_commentable)
-        xcfg = app.config.x.recording_studio_commentable
-        if xcfg.respond_to?(:to_h)
-          RecordingStudioCommentable.configuration.merge!(xcfg.to_h)
-        else
-          begin
+        begin
+          xcfg = app.config.x.recording_studio_commentable
+          if xcfg.respond_to?(:to_h)
+            RecordingStudioCommentable.configuration.merge!(xcfg.to_h)
+          elsif xcfg.respond_to?(:each_pair)
             hash = {}
-            xcfg.each_pair { |k, v| hash[k] = v } if xcfg.respond_to?(:each_pair)
-            RecordingStudioCommentable.configuration.merge!(hash) if hash&.any?
-          rescue StandardError => _e
-            # ignore
+            xcfg.each_pair { |k, v| hash[k] = v }
+            RecordingStudioCommentable.configuration.merge!(hash) if hash.any?
           end
+        rescue StandardError
+          # ignore
         end
       end
 
       RecordingStudioCommentable::Hooks.run(:on_configuration, RecordingStudioCommentable.configuration)
     end
 
-    initializer "recording_studio_commentable.after_initialize", after: "recording_studio_commentable.load_config" do |_app|
+    initializer "recording_studio_commentable.after_initialize",
+                after: "recording_studio_commentable.load_config" do |_app|
       RecordingStudioCommentable::Hooks.run(:after_initialize, self)
     end
 

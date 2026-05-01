@@ -146,9 +146,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "redirect_to commentable_home_referer_path || comments_collection_path,"
     assert_includes controller_source,
                     "@external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path"
-    assert_includes controller_source, "normalized_home_paths = [root_path, root_path.chomp(\"/\")].uniq"
-    assert_includes controller_source,
-                    'referer_uri.query.present? ? "#{referer_uri.path}?#{referer_uri.query}" : referer_uri.path'
+    assert_includes controller_source, "referer_uri.path == root_path"
     refute_includes controller_source, "layout :comments_layout"
     assert_includes layout_source, '<%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>'
     assert_includes layout_source, '<%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" %>'

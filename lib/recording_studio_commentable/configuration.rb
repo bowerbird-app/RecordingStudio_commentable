@@ -17,7 +17,7 @@ module RecordingStudioCommentable
       {
         timeout: timeout,
         rich_text_comments: rich_text_comments,
-        hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size)
+        hooks_registered: hooks.registered_events
       }
     end
 

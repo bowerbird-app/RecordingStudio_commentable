@@ -28,5 +28,11 @@ module RecordingStudioCommentable
         head :unauthorized
       end
     end
+
+    def root_recording_for(recording)
+      return recording unless recording.respond_to?(:root_recording)
+
+      recording.root_recording || recording
+    end
   end
 end

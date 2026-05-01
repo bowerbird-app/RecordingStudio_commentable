@@ -95,8 +95,7 @@ module RecordingStudioCommentable
       end
 
       def hooks_enabled?
-        defined?(RecordingStudioCommentable) &&
-          RecordingStudioCommentable.respond_to?(:configuration) &&
+        RecordingStudioCommentable.respond_to?(:configuration) &&
           RecordingStudioCommentable.configuration.respond_to?(:hooks)
       end
 

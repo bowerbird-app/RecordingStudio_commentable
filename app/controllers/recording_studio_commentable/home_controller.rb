@@ -85,12 +85,6 @@ module RecordingStudioCommentable
       recordable.try(:title) || recordable.try(:name) || recordable.class.name
     end
 
-    def root_recording_for(recording)
-      return recording unless recording.respond_to?(:root_recording)
-
-      recording.root_recording || recording
-    end
-
     def workspace_recording?(recording)
       return false unless recording
 

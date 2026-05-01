@@ -68,21 +68,26 @@ module RecordingStudioCommentable
 
     def destroy
       root = root_recording_for(@parent_recording)
-      Services::DestroyComment.call(
+      result = Services::DestroyComment.call(
         comment_recording: @comment_recording,
         root_recording: root,
         actor: current_recording_studio_actor
       )
 
-      redirect_to commentable_home_referer_path || comments_collection_path,
-                  notice: "Comment deleted."
+      if result.success?
+        redirect_to commentable_home_referer_path || comments_collection_path,
+                    notice: "Comment deleted."
+      else
+        redirect_to comments_collection_path,
+                    alert: result.error || "Could not delete the comment."
+      end
     end
 
     private
 
     def return_to_path
       path = params[:return_to].to_s
-      return if path.blank? || !path.start_with?("/")
+      return if path.blank? || !path.start_with?("/") || path.start_with?("//")
 
       path
     end
@@ -99,7 +104,7 @@ module RecordingStudioCommentable
     end
 
     def load_comment_recording
-      @comment_recording = find_recording(params[:id])
+      @comment_recording = find_comment_recording(params[:id])
       return if @comment_recording
 
       redirect_to(comments_collection_path, alert: "Comment not found.")
@@ -178,10 +183,9 @@ module RecordingStudioCommentable
       return unless request.referer.present?
 
       referer_uri = URI.parse(request.referer)
-      normalized_home_paths = [root_path, root_path.chomp("/")].uniq
-      return unless normalized_home_paths.include?(referer_uri.path)
+      return unless referer_uri.path == root_path
 
-      referer_uri.query.present? ? "#{referer_uri.path}?#{referer_uri.query}" : referer_uri.path
+      referer_uri.path
     rescue URI::InvalidURIError
       nil
     end
@@ -205,116 +209,19 @@ module RecordingStudioCommentable
         .includes(:recordable)
     end
 
-    def structure_child_recordings
-      return [] unless defined?(RecordingStudio::Recording)
-
-      RecordingStudio::Recording.unscoped
-                                .where(parent_recording: @parent_recording)
-                                .where(trashed_at: nil)
-                                .order(created_at: :asc)
-                                .includes(:recordable)
-                                .map { |recording| recording_snapshot(recording) }
-    end
-
-    def structure_events
-      return [] unless defined?(RecordingStudio::Event)
-
-      recording_ids = [@parent_recording.id] + @structure_children.map { |child| child[:recording].id }
-
-      RecordingStudio::Event
-        .where(recording_id: recording_ids)
-        .order(created_at: :asc)
-        .map do |event|
-          event_recordable = event.respond_to?(:recordable) ? event.recordable : nil
-
-          {
-            event: event,
-            title: event.action.to_s.humanize,
-            details: event_snapshot_details(event),
-            recordable_title: recordable_title(event_recordable),
-            recordable_details: event_recordable_snapshot_details(event, event_recordable)
-          }
-        end
-    end
-
-    def recording_snapshot(recording)
-      recordable = recording.respond_to?(:recordable) ? recording.recordable : nil
-
-      {
-        recording: recording,
-        title: recordable_title(recordable),
-        recording_details: recording_only_details(recording),
-        recordable_title: recordable_title(recordable),
-        recordable_details: recordable_snapshot_details(recordable)
-      }
-    end
-
     def recordable_title(recordable)
       return "Missing recordable" unless recordable
 
       recordable.try(:title) || recordable.try(:name) || recordable.class.name
     end
 
-    def recording_only_details(recording)
-      details = []
-      details << ["Recording", recording.id]
-      details << ["Recordable type", recording.recordable_type]
-      details << ["Recordable id", recording.recordable_id]
-      details << ["Parent recording", recording.parent_recording_id] if recording.parent_recording_id.present?
-      details << ["Root recording", recording.root_recording_id] if recording.root_recording_id.present?
-      details << ["Created", recording.created_at]
-      details << ["Trashed", recording.trashed_at] if recording.trashed_at.present?
-      details
-    end
+    def find_comment_recording(id)
+      return unless defined?(RecordingStudio::Recording)
+      return unless @parent_recording
 
-    def recordable_snapshot_details(recordable)
-      return [%w[Recordable Missing]] unless recordable
-
-      details = []
-      details << ["Class", recordable.class.name]
-      details << ["Id", recordable.id] if recordable.respond_to?(:id)
-      details << ["Model title", recordable.title] if recordable.respond_to?(:title) && recordable.title.present?
-      details << ["Model name", recordable.name] if recordable.respond_to?(:name) && recordable.name.present?
-      details << ["Body", recordable.body] if recordable.respond_to?(:body) && recordable.body.present?
-      if recordable.respond_to?(:author_display_name) && recordable.author_display_name.present?
-        details << ["Author",
-                    recordable.author_display_name]
-      end
-      details << ["Role", recordable.role] if recordable.respond_to?(:role) && recordable.role.present?
-      if recordable.respond_to?(:minimum_role) && recordable.minimum_role.present?
-        details << ["Minimum role",
-                    recordable.minimum_role]
-      end
-      details
-    end
-
-    def event_snapshot_details(event)
-      details = []
-      details << ["Event", event.id]
-      details << ["Action", event.action]
-      details << ["Recording", event.recording_id]
-      if event.actor.present?
-        details << ["Actor",
-                    event.actor.respond_to?(:display_name) ? event.actor.display_name : event.actor.to_s]
-      end
-      details << ["Occurred", event.occurred_at]
-      details
-    end
-
-    def event_recordable_snapshot_details(event, recordable)
-      details = []
-      details << ["Recordable type", event.recordable_type]
-      details << ["Recordable id", event.recordable_id]
-      details << ["Previous recordable type", event.previous_recordable_type] if event.previous_recordable_type.present?
-      details << ["Previous recordable id", event.previous_recordable_id] if event.previous_recordable_id.present?
-      details.concat(recordable_snapshot_details(recordable)) if recordable
-      details
-    end
-
-    def root_recording_for(recording)
-      return recording unless recording.respond_to?(:root_recording)
-
-      recording.root_recording || recording
+      RecordingStudio::Recording
+        .where(parent_recording: @parent_recording)
+        .find_by(id: id)
     end
 
     def find_recording(id)

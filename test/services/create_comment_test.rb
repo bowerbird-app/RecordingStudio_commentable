@@ -39,17 +39,13 @@ class CreateCommentTest < Minitest::Test
     end
 
     def save!
-      raise ActiveModel::ValidationError.new(self) unless valid?
+      raise ActiveModel::ValidationError, self unless valid?
 
       @persisted = true
     end
 
     def persisted?
       @persisted
-    end
-
-    def errors
-      super
     end
   end
 

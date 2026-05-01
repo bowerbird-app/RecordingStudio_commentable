@@ -112,6 +112,10 @@ module RecordingStudioCommentable
       @registry[event_name].any?
     end
 
+    def registered_events
+      @registry.transform_values(&:size)
+    end
+
     def clear!
       @mutex.synchronize do
         @registry.clear
