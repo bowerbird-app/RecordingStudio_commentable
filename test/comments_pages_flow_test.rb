@@ -5,8 +5,37 @@ require "test_helper"
 class CommentsPagesFlowTest < Minitest::Test
   def test_comments_routes_include_all_collection_page
     routes_source = read_workspace_file("config/routes.rb")
+    dummy_routes_source = read_workspace_file("test/dummy/config/routes.rb")
 
     assert_includes routes_source, "get :all, path: \"all\""
+    assert_includes dummy_routes_source, 'get "/services", to: "home#services", as: :services'
+    refute_includes dummy_routes_source, 'get "up" => "rails/health#show", as: :rails_health_check'
+  end
+
+  def test_dummy_services_page_lists_service_objects_and_sidebar_link
+    controller_source = read_workspace_file("test/dummy/app/controllers/home_controller.rb")
+    view_source = read_workspace_file("test/dummy/app/views/home/services.html.erb")
+    sidebar_source = read_workspace_file("test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb")
+
+    assert_includes controller_source, "before_action :load_service_catalog, only: :services"
+    assert_includes controller_source, "def services"
+    assert_includes controller_source, 'title: "CreateComment"'
+    assert_includes controller_source, 'title: "UpdateComment"'
+    assert_includes controller_source, 'title: "DestroyComment"'
+    assert_includes controller_source,
+                    "All service objects inherit from RecordingStudioCommentable::Services::BaseService."
+    assert_includes view_source, 'title: "Service objects"'
+    assert_includes view_source,
+                    'subtitle: "The command-style services that power comment creation, revision, and deletion in this gem."'
+    assert_includes view_source, "@service_catalog.each do |service|"
+    assert_includes view_source, "@service_features.each do |feature|"
+    assert_includes view_source, 'title: "Shared contract"'
+    assert_includes view_source, 'title: "Where to exercise them"'
+    assert_includes sidebar_source, 'label: "Services"'
+    assert_includes sidebar_source, 'href: "/services"'
+    assert_includes sidebar_source, "icon: :settings"
+    refute_includes sidebar_source, 'label: "Health"'
+    refute_includes sidebar_source, 'href: "/up"'
   end
 
   def test_engine_home_lists_comments_with_back_navigation

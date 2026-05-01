@@ -1,0 +1,97 @@
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Service objects",
+    subtitle: "The command-style services that power comment creation, revision, and deletion in this gem.",
+    variant: :h1
+  ) %>
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+    <div class="flex flex-col gap-6">
+      <% @service_catalog.each do |service| %>
+        <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+          <% card.header do %>
+            <%= render FlatPack::PageTitle::Component.new(
+              title: service[:title],
+              subtitle: service[:class_name],
+              variant: :h3,
+              class: "mb-0 pb-0"
+            ) %>
+          <% end %>
+
+          <% card.body do %>
+            <div class="space-y-4 text-sm leading-6 text-(--surface-content-color)">
+              <p><%= service[:summary] %></p>
+
+              <div>
+                <p class="mb-2 font-medium text-(--surface-content-color)">Inputs</p>
+                <div class="flex flex-wrap gap-2">
+                  <% service[:inputs].each do |input| %>
+                    <%= render FlatPack::Badge::Component.new(text: input, style: :info, size: :sm) %>
+                  <% end %>
+                </div>
+              </div>
+
+              <div>
+                <p class="mb-2 font-medium text-(--surface-content-color)">Behavior</p>
+                <ul class="space-y-2 text-sm leading-6 text-(--surface-content-color)">
+                  <% service[:behavior].each do |item| %>
+                    <li><%= item %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Shared contract",
+            subtitle: "Behavior every service object gets from BaseService.",
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+
+        <% card.body do %>
+          <ul class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
+            <% @service_features.each do |feature| %>
+              <li><%= feature %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Where to exercise them",
+            subtitle: "The dummy app paths that drive these service calls.",
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+
+        <% card.body do %>
+          <dl class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
+            <div>
+              <dt class="text-(--surface-muted-content-color)">Browse all comments</dt>
+              <dd><%= link_to "/commentable", "/commentable", class: "underline" %></dd>
+            </div>
+            <div>
+              <dt class="text-(--surface-muted-content-color)">Scenario-driven comment flows</dt>
+              <dd><%= link_to "/scenarios", scenarios_path, class: "underline" %></dd>
+            </div>
+            <div>
+              <dt class="text-(--surface-muted-content-color)">Gem guide</dt>
+              <dd>docs/RS_COMMENTABLE_GUIDE.md</dd>
+            </div>
+          </dl>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
