@@ -26,21 +26,21 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source,
                     'render partial: "comments_page", locals: comments_page_locals, layout: false if turbo_frame_request?'
     assert_includes controller_source,
-            'return main_app.scenarios_path(anchor: "comment-scenarios") if main_app.respond_to?(:scenarios_path)'
+                    'return main_app.scenarios_path(anchor: "comment-scenarios") if main_app.respond_to?(:scenarios_path)'
     assert_includes view_source, '{ text: "Back", href: @external_back_path }'
     assert_includes view_source, 'title: "Commentable"'
     assert_includes view_source, 'subtitle: "All comments"'
     assert_includes view_source, 'render "comments_page"'
     assert_includes page_partial_source, 'turbo_frame_tag "comments_page_#{page}"'
     assert_includes page_partial_source, 'class: (page.to_i > 1 ? "mt-3" : nil)'
-    assert_includes page_partial_source, 'return_to: @external_back_path'
+    assert_includes page_partial_source, "return_to: @external_back_path"
     assert_includes page_partial_source, 'controller: "infinite-scroll"'
     assert_includes page_partial_source, '"infinite-scroll-url-value": url_for(page: next_page)'
     assert_includes page_partial_source, "accessible: entry[:accessible]"
     assert_includes comment_partial_source, "parent_title.present?"
     assert_includes comment_partial_source, 'text: "Show"'
     assert_includes comment_partial_source, "local_assigns.fetch(:accessible, true)"
-    assert_includes comment_partial_source, 'url: recording_comments_path(parent_recording, return_to: return_to)'
+    assert_includes comment_partial_source, "url: recording_comments_path(parent_recording, return_to: return_to)"
     assert_includes comment_partial_source, 'data: { turbo_frame: "_top" }'
     assert_includes comment_partial_source, "Comment hidden"
     assert_includes comment_partial_source, "pointer-events-none"
@@ -62,7 +62,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source,
                     "@external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path"
     assert_includes controller_source, "normalized_home_paths = [root_path, root_path.chomp(\"/\")].uniq"
-    assert_includes controller_source, 'referer_uri.query.present? ? "#{referer_uri.path}?#{referer_uri.query}" : referer_uri.path'
+    assert_includes controller_source,
+                    'referer_uri.query.present? ? "#{referer_uri.path}?#{referer_uri.query}" : referer_uri.path'
     refute_includes controller_source, "layout :comments_layout"
     assert_includes layout_source, '<%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>'
     refute_includes layout_source, "FlatPack::SidebarLayout::Component"
@@ -97,7 +98,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source, "local_assigns[:parent_title]"
     assert_includes comment_partial_source, "local_assigns[:show_page_action]"
     assert_includes comment_partial_source,
-            "url: edit_recording_comment_path(parent_recording, comment_recording, return_to: return_to)"
+                    "url: edit_recording_comment_path(parent_recording, comment_recording, return_to: return_to)"
     assert_includes comment_partial_source,
                     "recording_comment_path(parent_recording, comment_recording, return_to: return_to)"
   end
