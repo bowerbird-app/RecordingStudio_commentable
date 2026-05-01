@@ -58,8 +58,9 @@
 
             <%= button_to recording_comment_path(parent_recording, comment_recording, return_to: return_to),
                   method: :delete,
+                  form: { data: { turbo_frame: "_top" } },
                   data: { turbo_confirm: "Delete this comment?" } do %>
-              <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm) %>
+              <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm, type: "submit") %>
             <% end %>
           <% end %>
         </div>

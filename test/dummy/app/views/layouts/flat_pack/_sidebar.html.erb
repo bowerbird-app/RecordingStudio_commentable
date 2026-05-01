@@ -22,6 +22,12 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Recordings",
+        href: "/recordings",
+        icon: :file
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Scenario",
         href: "/scenarios",
         icon: :table

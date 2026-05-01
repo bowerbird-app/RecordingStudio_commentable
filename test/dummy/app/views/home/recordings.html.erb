@@ -1,0 +1,68 @@
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Recordings",
+    subtitle: "Browse dummy RecordingStudio recordings and inspect how pages, folders, comments, and workspace nodes are structured.",
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+    <% card.body do %>
+      <div class="flex flex-wrap gap-3 text-sm leading-6 text-(--surface-content-color)">
+        <p><strong>Total recordings:</strong> <%= @recordings.size %></p>
+        <p><strong>Root workspace:</strong> <%= @workspace&.name || "Missing" %></p>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="grid gap-4 lg:grid-cols-2">
+    <% @recording_entries.each do |entry| %>
+      <% recording = entry[:recording] %>
+      <% title = entry[:title] %>
+      <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: title,
+            subtitle: recording.recordable_type,
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+
+        <% card.body do %>
+          <div class="space-y-4 text-sm leading-6 text-(--surface-content-color)">
+            <div class="flex flex-wrap gap-2">
+              <%= render FlatPack::Badge::Component.new(text: "Recording #{recording.id}", style: :info, size: :sm) %>
+              <% if recording.parent_recording_id.present? %>
+                <%= render FlatPack::Badge::Component.new(text: "Child recording", style: :warning, size: :sm) %>
+              <% else %>
+                <%= render FlatPack::Badge::Component.new(text: "Root recording", style: :success, size: :sm) %>
+              <% end %>
+            </div>
+
+            <dl class="space-y-2">
+              <div>
+                <dt class="text-(--surface-muted-content-color)">Recordable</dt>
+                <dd><%= title %></dd>
+              </div>
+              <div>
+                <dt class="text-(--surface-muted-content-color)">Parent recording</dt>
+                <dd><%= recording.parent_recording_id || "None" %></dd>
+              </div>
+              <div>
+                <dt class="text-(--surface-muted-content-color)">Root recording</dt>
+                <dd><%= recording.root_recording_id || recording.id %></dd>
+              </div>
+            </dl>
+
+            <%= render FlatPack::Button::Component.new(
+                  text: "Inspect structure",
+                  style: :secondary,
+                  size: :sm,
+                  url: recording_browser_path(recording)
+                ) %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -54,6 +54,8 @@ module RecordingStudioCommentable
         .order(created_at: :desc)
         .map do |comment_recording|
           parent_recording = root_recording_for(comment_recording.parent_recording)
+          next if workspace_recording?(parent_recording)
+
           accessible = authorized_to_view?(parent_recording)
 
           {
@@ -62,7 +64,7 @@ module RecordingStudioCommentable
             parent_title: recordable_title(parent_recording),
             accessible: accessible
           }
-        end
+        end.compact
     end
 
     def authorized_to_view?(recording)
@@ -87,6 +89,12 @@ module RecordingStudioCommentable
       return recording unless recording.respond_to?(:root_recording)
 
       recording.root_recording || recording
+    end
+
+    def workspace_recording?(recording)
+      return false unless recording
+
+      recording.recordable_type == "Workspace"
     end
 
     def scenarios_target_path

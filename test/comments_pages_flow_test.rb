@@ -8,8 +8,50 @@ class CommentsPagesFlowTest < Minitest::Test
     dummy_routes_source = read_workspace_file("test/dummy/config/routes.rb")
 
     assert_includes routes_source, "get :all, path: \"all\""
+    assert_includes dummy_routes_source, 'get "/recordings", to: "home#recordings", as: :recordings_browser'
+    assert_includes dummy_routes_source, 'get "/recordings/:id", to: "home#recording", as: :recording_browser'
     assert_includes dummy_routes_source, 'get "/services", to: "home#services", as: :services'
     refute_includes dummy_routes_source, 'get "up" => "rails/health#show", as: :rails_health_check'
+  end
+
+  def test_dummy_recordings_pages_expose_recording_structure_and_sidebar_link
+    controller_source = read_workspace_file("test/dummy/app/controllers/home_controller.rb")
+    index_view_source = read_workspace_file("test/dummy/app/views/home/recordings.html.erb")
+    detail_view_source = read_workspace_file("test/dummy/app/views/home/recording.html.erb")
+    sidebar_source = read_workspace_file("test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb")
+
+    assert_includes controller_source, "before_action :load_recording_catalog, only: :recordings"
+    assert_includes controller_source, "before_action :load_recording_detail, only: :recording"
+    assert_includes controller_source, "def recordings"
+    assert_includes controller_source, "def recording"
+    assert_includes controller_source, '.where(recordable_type: ["Folder", "Page"])'
+    assert_includes controller_source, ".where(parent_recording_id: nil)"
+    assert_includes controller_source, "@recording_entries = @recordings.map do |recording|"
+    assert_includes controller_source, "@recording_snapshot = recording_snapshot(@recording)"
+    assert_includes controller_source, "@recording_children = structure_child_recordings(@recording)"
+    assert_includes controller_source, "@recording_events = structure_events(@recording)"
+    assert_includes controller_source, "def structure_child_recordings(recording)"
+    assert_includes controller_source, "def structure_events(recording)"
+    assert_includes controller_source, ".where(parent_recording: recording)"
+    assert_includes controller_source, ".pluck(:id)"
+    assert_includes controller_source, "def recording_snapshot(recording)"
+    assert_includes index_view_source, 'title: "Recordings"'
+    assert_includes index_view_source, "@recording_entries.each do |entry|"
+    assert_includes index_view_source, 'text: "Inspect structure"'
+    assert_includes index_view_source, "url: recording_browser_path(recording)"
+    assert_includes detail_view_source, "href: recordings_browser_path"
+    assert_includes detail_view_source, 'title: "Recording"'
+    assert_includes detail_view_source, 'title: "Child recordings"'
+    assert_includes detail_view_source, 'title: "Events"'
+    assert_includes detail_view_source, 'title: "Recordable"'
+    assert_includes detail_view_source, "title: @recording_snapshot[:title]"
+    assert_includes detail_view_source, "@recording_children.each do |child|"
+    assert_includes detail_view_source, "@recording_events.each do |entry|"
+    assert_includes detail_view_source, "border-l border-(--surface-border-color)"
+    assert_includes detail_view_source, 'text: "Open child"'
+    assert_includes sidebar_source, 'label: "Recordings"'
+    assert_includes sidebar_source, 'href: "/recordings"'
+    assert_includes sidebar_source, "icon: :file"
   end
 
   def test_dummy_services_page_lists_service_objects_and_sidebar_link
@@ -52,6 +94,9 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "@comment_entries = paginated_entries(all_entries)"
     assert_includes controller_source, "@next_page = next_page_for(all_entries)"
     assert_includes controller_source, "parent_recording = root_recording_for(comment_recording.parent_recording)"
+    assert_includes controller_source, "next if workspace_recording?(parent_recording)"
+    assert_includes controller_source, "end.compact"
+    assert_includes controller_source, 'recording.recordable_type == "Workspace"'
     assert_includes controller_source,
                     'render partial: "comments_page", locals: comments_page_locals, layout: false if turbo_frame_request?'
     assert_includes controller_source,
@@ -88,6 +133,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "before_action :authorize_view!, only: %i[index all]"
     assert_includes controller_source, "def all"
     assert_includes controller_source, "redirect_to comments_collection_path,"
+    assert_includes controller_source, "redirect_to commentable_home_referer_path || comments_collection_path,"
     assert_includes controller_source,
                     "@external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path"
     assert_includes controller_source, "normalized_home_paths = [root_path, root_path.chomp(\"/\")].uniq"
@@ -134,6 +180,9 @@ class CommentsPagesFlowTest < Minitest::Test
                     "url: edit_recording_comment_path(parent_recording, comment_recording, return_to: return_to)"
     assert_includes comment_partial_source,
                     "recording_comment_path(parent_recording, comment_recording, return_to: return_to)"
+    assert_includes comment_partial_source, 'form: { data: { turbo_frame: "_top" } }'
+    assert_includes comment_partial_source,
+                    'FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm, type: "submit")'
   end
 
   private

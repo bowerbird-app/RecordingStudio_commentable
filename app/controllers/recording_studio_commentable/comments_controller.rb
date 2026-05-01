@@ -74,7 +74,7 @@ module RecordingStudioCommentable
         actor: current_recording_studio_actor
       )
 
-      redirect_to comments_collection_path,
+      redirect_to commentable_home_referer_path || comments_collection_path,
                   notice: "Comment deleted."
     end
 

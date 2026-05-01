@@ -1,0 +1,228 @@
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+  <%= render FlatPack::Breadcrumb::Component.new(items: [
+    { text: "Back", href: recordings_browser_path }
+  ]) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @recording_snapshot[:title],
+    subtitle: "Recording #{@recording.id}",
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+    <% card.header do %>
+      <%= render FlatPack::PageTitle::Component.new(
+        title: "Recording",
+        subtitle: "Top-level node details for this structure view.",
+        variant: :h3,
+        class: "mb-0 pb-0"
+      ) %>
+    <% end %>
+
+    <% card.body do %>
+      <div class="space-y-6">
+        <dl class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
+          <% @recording_snapshot[:recording_details].each do |label, value| %>
+            <div>
+              <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+              <dd class="break-all"><%= value %></dd>
+            </div>
+          <% end %>
+        </dl>
+
+        <div class="pl-4 md:pl-8 border-l border-(--surface-border-color)">
+          <%= render FlatPack::Card::Component.new(style: :outlined) do |nested_card| %>
+            <% nested_card.header do %>
+              <%= render FlatPack::PageTitle::Component.new(
+                title: "Recordable",
+                subtitle: @recording_snapshot[:recordable_title],
+                variant: :h4,
+                class: "mb-0 pb-0"
+              ) %>
+            <% end %>
+
+            <% nested_card.body do %>
+              <dl class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
+                <% @recording_snapshot[:recordable_details].each do |label, value| %>
+                  <div>
+                    <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                    <dd class="break-all"><%= value %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div class="space-y-4">
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Child recordings",
+            subtitle: "Immediate descendants, indented so the parent-child shape is visible.",
+            variant: :h4,
+            class: "mb-0 pb-0"
+          ) %>
+
+          <% if @recording_children.any? %>
+            <div class="flex flex-col gap-4 pl-4 md:pl-8 border-l border-(--surface-border-color)">
+              <% @recording_children.each do |child| %>
+                <%= render FlatPack::Card::Component.new(style: :outlined) do |child_card| %>
+                  <% child_card.header do %>
+                    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <%= render FlatPack::PageTitle::Component.new(
+                            title: child[:title],
+                            subtitle: "Recording #{child[:recording].id}",
+                            variant: :h4,
+                            class: "mb-0 pb-0"
+                          ) %>
+
+                      <%= render FlatPack::Button::Component.new(
+                            text: "Open child",
+                            style: :ghost,
+                            size: :sm,
+                            url: recording_browser_path(child[:recording])
+                          ) %>
+                    </div>
+                  <% end %>
+
+                  <% child_card.body do %>
+                    <div class="space-y-4">
+                      <dl class="space-y-2 text-sm leading-6 text-(--surface-content-color)">
+                        <% child[:recording_details].each do |label, value| %>
+                          <div>
+                            <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                            <dd class="break-all"><%= value %></dd>
+                          </div>
+                        <% end %>
+                      </dl>
+
+                      <div class="pl-4 md:pl-6 border-l border-(--surface-border-color)">
+                        <%= render FlatPack::Card::Component.new(style: :default) do |recordable_card| %>
+                          <% recordable_card.header do %>
+                            <%= render FlatPack::PageTitle::Component.new(
+                                  title: "Recordable",
+                                  subtitle: child[:recordable_title],
+                                  variant: :h5,
+                                  class: "mb-0 pb-0"
+                                ) %>
+                          <% end %>
+
+                          <% recordable_card.body do %>
+                            <dl class="space-y-2 text-sm leading-6 text-(--surface-content-color)">
+                              <% child[:recordable_details].each do |label, value| %>
+                                <div>
+                                  <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                                  <dd class="break-all"><%= value %></dd>
+                                </div>
+                              <% end %>
+                            </dl>
+                          <% end %>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-sm leading-6 text-(--surface-muted-content-color)">This recording has no active child recordings.</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+    <% card.header do %>
+      <%= render FlatPack::PageTitle::Component.new(
+        title: "Events",
+        subtitle: "Use this to verify that update, delete, and other recording actions produced the expected event trail.",
+        variant: :h3,
+        class: "mb-0 pb-0"
+      ) %>
+    <% end %>
+
+    <% card.body do %>
+      <div class="mb-4 grid gap-4 md:grid-cols-4">
+        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+          <% summary_card.body do %>
+            <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
+              <p class="text-(--surface-muted-content-color)">Child recordings</p>
+              <p class="text-lg font-medium"><%= @recording_children.size %></p>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+          <% summary_card.body do %>
+            <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
+              <p class="text-(--surface-muted-content-color)">Events in scope</p>
+              <p class="text-lg font-medium"><%= @recording_events.size %></p>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+          <% summary_card.body do %>
+            <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
+              <p class="text-(--surface-muted-content-color)">Parent recording</p>
+              <p class="break-all text-sm font-medium"><%= @recording.parent_recording_id || "None" %></p>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+          <% summary_card.body do %>
+            <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
+              <p class="text-(--surface-muted-content-color)">Root recording</p>
+              <p class="break-all text-sm font-medium"><%= @recording.root_recording_id || @recording.id %></p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @recording_events.any? %>
+        <div class="flex flex-col gap-4">
+          <% @recording_events.each do |entry| %>
+            <%= render FlatPack::Card::Component.new(style: :outlined) do |event_card| %>
+              <% event_card.header do %>
+                <%= render FlatPack::PageTitle::Component.new(
+                      title: entry[:title],
+                      subtitle: entry[:recordable_title],
+                      variant: :h4,
+                      class: "mb-0 pb-0"
+                    ) %>
+              <% end %>
+
+              <% event_card.body do %>
+                <div class="grid gap-4 lg:grid-cols-2">
+                  <dl class="space-y-2 text-sm leading-6 text-(--surface-content-color)">
+                    <% entry[:details].each do |label, value| %>
+                      <div>
+                        <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                        <dd class="break-all"><%= value %></dd>
+                      </div>
+                    <% end %>
+                  </dl>
+
+                  <div class="pl-4 md:pl-6 border-l border-(--surface-border-color)">
+                    <p class="mb-2 text-sm font-medium text-(--surface-content-color)">Event recordable snapshot</p>
+                    <dl class="space-y-2 text-sm leading-6 text-(--surface-content-color)">
+                      <% entry[:recordable_details].each do |label, value| %>
+                        <div>
+                          <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
+                          <dd class="break-all"><%= value %></dd>
+                        </div>
+                      <% end %>
+                    </dl>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm leading-6 text-(--surface-muted-content-color)">No events were found for this recording and its immediate children.</p>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

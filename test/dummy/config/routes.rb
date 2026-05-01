@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   # RecordingStudioCommentable engine — comment feeds for recordings
   mount RecordingStudioCommentable::Engine, at: "/commentable"
 
+  get "/recordings", to: "home#recordings", as: :recordings_browser
+  get "/recordings/:id", to: "home#recording", as: :recording_browser
   get "/scenarios", to: "home#scenarios", as: :scenarios
   get "/services", to: "home#services", as: :services
 

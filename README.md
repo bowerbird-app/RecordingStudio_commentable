@@ -251,4 +251,6 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 
 ## Documentation
 
+For a host-app focused walkthrough of installation, request flow, service methods, and hooks, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md).
+
 The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. Use it as background on the engine conventions; the README and dummy app are the source of truth for the Recording Studio addon workflow.
