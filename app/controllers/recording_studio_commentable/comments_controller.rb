@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "uri"
+
 module RecordingStudioCommentable
   class CommentsController < ApplicationController
     before_action :require_actor!
@@ -112,7 +114,7 @@ module RecordingStudioCommentable
       @summary_path = recording_comments_path(@parent_recording, return_to_options)
       @comments_collection_path = all_recording_comments_path(@parent_recording, return_to_options)
       @new_comment_path = new_recording_comment_path(@parent_recording, return_to_options)
-      @external_back_path = return_to_path || main_app.root_path
+      @external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path
     end
 
     # ------------------------------------------------------------------ #
@@ -170,6 +172,18 @@ module RecordingStudioCommentable
       return {} unless return_to_path.present?
 
       { return_to: return_to_path }
+    end
+
+    def commentable_home_referer_path
+      return unless request.referer.present?
+
+      referer_uri = URI.parse(request.referer)
+      normalized_home_paths = [root_path, root_path.chomp("/")].uniq
+      return unless normalized_home_paths.include?(referer_uri.path)
+
+      referer_uri.query.present? ? "#{referer_uri.path}?#{referer_uri.query}" : referer_uri.path
+    rescue URI::InvalidURIError
+      nil
     end
 
     def comments_collection_path

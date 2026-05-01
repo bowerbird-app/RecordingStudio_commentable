@@ -1,0 +1,25 @@
+<%= turbo_frame_tag "comments_page_#{page}", class: (page.to_i > 1 ? "mt-3" : nil) do %>
+  <div class="flex flex-col gap-3 mt-3">
+    <% comment_entries.each do |entry| %>
+      <%= render "recording_studio_commentable/comments/comment",
+            comment_recording: entry[:comment_recording],
+            parent_recording: entry[:parent_recording],
+            parent_title: entry[:parent_title],
+          accessible: entry[:accessible],
+            show_page_action: true,
+            return_to: @external_back_path %>
+    <% end %>
+  </div>
+
+  <% if next_page.present? %>
+    <%= turbo_frame_tag "comments_page_#{next_page}",
+          data: {
+            controller: "infinite-scroll",
+            "infinite-scroll-url-value": url_for(page: next_page)
+          } do %>
+      <div class="py-4 text-center text-sm text-(--surface-muted-content-color)">
+        <p>Loading more comments...</p>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

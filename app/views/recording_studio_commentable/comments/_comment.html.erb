@@ -1,13 +1,22 @@
 <%# app/views/recording_studio_commentable/comments/_comment.html.erb %>
 <% comment = comment_recording.respond_to?(:recordable) ? comment_recording.recordable : comment_recording %>
 <% parent_recording = local_assigns[:parent_recording] || @parent_recording %>
+<% parent_title = local_assigns[:parent_title] %>
+<% accessible = local_assigns.fetch(:accessible, true) %>
+<% show_page_action = local_assigns[:show_page_action] %>
+<% return_to = local_assigns[:return_to] || params[:return_to] %>
 <% actor = current_recording_studio_actor %>
 <% is_author = comment.respond_to?(:author) && comment.author == actor %>
 
-<%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-  <% card.body do %>
-    <div class="flex items-start gap-3">
+<div class="<%= accessible ? "" : "opacity-60" %>">
+  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+    <% card.body do %>
+      <div class="flex items-start gap-3">
       <div class="flex-1 min-w-0">
+        <% if parent_title.present? %>
+          <p class="mb-2 text-base font-semibold leading-6 text-(--surface-content-color)"><%= parent_title %></p>
+        <% end %>
+
         <div class="flex items-center gap-2 mb-2">
           <%= render FlatPack::Badge::Component.new(
             text: comment.respond_to?(:author_display_name) ? comment.author_display_name : "Anonymous",
@@ -19,22 +28,59 @@
           </span>
         </div>
 
-        <p class="text-sm leading-6 whitespace-pre-wrap"><%= comment.body %></p>
+        <% if accessible %>
+          <p class="text-sm leading-6 whitespace-pre-wrap"><%= comment.body %></p>
+        <% else %>
+          <p class="text-sm leading-6 text-(--surface-muted-content-color)">Comment hidden</p>
+        <% end %>
       </div>
 
-      <% if is_author || (defined?(RecordingStudioAccessible) && RecordingStudioAccessible.authorized?(actor: actor, recording: parent_recording, role: :manage)) %>
+      <% if accessible && (show_page_action || is_author || (defined?(RecordingStudioAccessible) && RecordingStudioAccessible.authorized?(actor: actor, recording: parent_recording, role: :manage))) %>
         <div class="flex items-center gap-2 shrink-0">
-          <%= link_to edit_recording_comment_path(parent_recording, comment_recording, return_to: params[:return_to]) do %>
-            <%= render FlatPack::Button::Component.new(text: "Edit", style: :ghost, size: :sm) %>
+          <% if show_page_action %>
+            <%= render FlatPack::Button::Component.new(
+                  text: "Show",
+                  style: :ghost,
+                  size: :sm,
+                  url: recording_comments_path(parent_recording, return_to: return_to),
+                  data: { turbo_frame: "_top" }
+                ) %>
           <% end %>
 
-          <%= button_to recording_comment_path(parent_recording, comment_recording, return_to: params[:return_to]),
-                method: :delete,
-                data: { turbo_confirm: "Delete this comment?" } do %>
-            <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm) %>
+          <% if is_author || (defined?(RecordingStudioAccessible) && RecordingStudioAccessible.authorized?(actor: actor, recording: parent_recording, role: :manage)) %>
+            <%= render FlatPack::Button::Component.new(
+                  text: "Edit",
+                  style: :ghost,
+                  size: :sm,
+                  url: edit_recording_comment_path(parent_recording, comment_recording, return_to: return_to),
+                  data: { turbo_frame: "_top" }
+                ) %>
+
+            <%= button_to recording_comment_path(parent_recording, comment_recording, return_to: return_to),
+                  method: :delete,
+                  data: { turbo_confirm: "Delete this comment?" } do %>
+              <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm) %>
+            <% end %>
           <% end %>
         </div>
+      <% elsif !accessible %>
+        <div class="flex items-center gap-2 shrink-0 pointer-events-none">
+          <% if show_page_action %>
+            <div class="opacity-60">
+              <%= render FlatPack::Button::Component.new(text: "Show", style: :ghost, size: :sm) %>
+            </div>
+          <% end %>
+
+          <div class="opacity-60">
+            <%= render FlatPack::Button::Component.new(text: "Edit", style: :ghost, size: :sm) %>
+          </div>
+
+          <div class="opacity-60">
+            <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm) %>
+          </div>
+        </div>
       <% end %>
-    </div>
+      </div>
+    <% end %>
   <% end %>
-<% end %>
+</div>

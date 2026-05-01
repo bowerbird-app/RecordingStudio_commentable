@@ -12,18 +12,14 @@
     variant: :h1
   ) %>
 
-  <div class="flex flex-col gap-5" id="comments">
-    <% if @comment_entries.any? %>
-      <% @comment_entries.each do |entry| %>
-        <div class="space-y-2">
-          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-(--surface-muted-content-color)"><%= entry[:parent_title] %></p>
-          <%= render "recording_studio_commentable/comments/comment",
-                comment_recording: entry[:comment_recording],
-                parent_recording: entry[:parent_recording] %>
-        </div>
-      <% end %>
-    <% else %>
-      <%= render "recording_studio_commentable/comments/empty_state" %>
-    <% end %>
-  </div>
+  <% if @comment_entries.any? %>
+    <div class="flex flex-col gap-3" id="comments">
+      <%= render "comments_page",
+            comment_entries: @comment_entries,
+            page: @page,
+            next_page: @next_page %>
+    </div>
+  <% else %>
+    <%= render "recording_studio_commentable/comments/empty_state" %>
+  <% end %>
 </div>
