@@ -66,6 +66,10 @@ class CommentsPagesFlowTest < Minitest::Test
                     'referer_uri.query.present? ? "#{referer_uri.path}?#{referer_uri.query}" : referer_uri.path'
     refute_includes controller_source, "layout :comments_layout"
     assert_includes layout_source, '<%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>'
+    assert_includes layout_source, '<html class="h-full overflow-hidden overscroll-none">'
+    assert_includes layout_source,
+                    '<body class="m-0 h-full overflow-hidden overscroll-none bg-[var(--surface-page-background-color)] text-[var(--surface-content-color)]">'
+    assert_includes layout_source, '<main class="h-full overflow-auto">'
     refute_includes layout_source, "FlatPack::SidebarLayout::Component"
   end
 
