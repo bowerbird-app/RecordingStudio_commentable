@@ -35,11 +35,11 @@ class EngineTest < Minitest::Test
       hook_payload = cfg
     end
 
-    xcfg = Struct.new(:recording_studio_commentable).new({ timeout: 12 })
+    xcfg = Struct.new(:recording_studio_commentable).new({ timeout: 12, rich_text_comments: true })
     app_config = Struct.new(:x).new(xcfg)
     app = Struct.new(:config) do
       def config_for(_name)
-        { timeout: 12 }
+        { timeout: 12, rich_text_comments: true }
       end
     end.new(app_config)
 
@@ -48,12 +48,14 @@ class EngineTest < Minitest::Test
     assert hook_called
     assert_equal RecordingStudioCommentable.configuration, hook_payload
     assert_equal 12, RecordingStudioCommentable.configuration.timeout
+    assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
   end
 
   def test_load_config_handles_errors_and_each_pair_fallback
     pair_config = Class.new do
       def each_pair
         yield(:timeout, 15)
+        yield(:rich_text_comments, true)
       end
     end.new
 
@@ -69,6 +71,7 @@ class EngineTest < Minitest::Test
     find_initializer("recording_studio_commentable.load_config").block.call(app)
 
     assert_equal 15, RecordingStudioCommentable.configuration.timeout
+    assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
   end
 
   def test_load_config_swallow_each_pair_errors
@@ -82,7 +85,7 @@ class EngineTest < Minitest::Test
     app_config = Struct.new(:x).new(xcfg)
     app = Struct.new(:config) do
       def config_for(_name)
-        { timeout: 5 }
+        { timeout: 5, rich_text_comments: false }
       end
     end.new(app_config)
 
@@ -90,6 +93,7 @@ class EngineTest < Minitest::Test
     find_initializer("recording_studio_commentable.load_config").block.call(app)
 
     assert_equal 5, RecordingStudioCommentable.configuration.timeout
+    assert_equal false, RecordingStudioCommentable.configuration.rich_text_comments
   end
 
   def test_apply_extension_initializers_register_active_support_on_load_callbacks

@@ -75,6 +75,17 @@ class InstallGeneratorTest < Minitest::Test
     end
   end
 
+  def test_copy_initializer_sets_rich_text_comments_default_off
+    with_temp_app do |dir|
+      generator = build_generator(dir)
+
+      generator.copy_initializer
+
+      initializer = File.read(File.join(dir, "config/initializers/recording_studio_commentable.rb"))
+      assert_includes initializer, "config.rich_text_comments = false"
+    end
+  end
+
   private
 
   def assert_tailwind_sources_present(css)

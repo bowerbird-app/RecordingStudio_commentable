@@ -29,6 +29,16 @@ rails generate recording_studio_commentable:migrations
 rails db:migrate
 ```
 
+The generated initializer keeps rich text comments off by default:
+
+```ruby
+RecordingStudioCommentable.configure do |config|
+  config.rich_text_comments = false
+end
+```
+
+Turn that flag on if you want comment forms to use FlatPack's rich text editor and render sanitized HTML in the feed.
+
 What the install generator does:
 
 - mounts the engine in your routes
@@ -90,6 +100,24 @@ From your app UI, link to the recording's comments page:
 ```
 
 The important part is that `recording` here is a `RecordingStudio::Recording` for the thing being commented on.
+
+## Comment editor mode
+
+By default, comments use a plain textarea.
+
+If you want rich text comments, enable the config flag in your initializer:
+
+```ruby
+RecordingStudioCommentable.configure do |config|
+  config.rich_text_comments = true
+end
+```
+
+What changes when this is enabled:
+
+- the new/edit comment form uses FlatPack rich text mode
+- comment bodies are stored as HTML
+- rendered comments are sanitized through `FlatPack::RichTextSanitizer` before display
 
 ## The main flow
 

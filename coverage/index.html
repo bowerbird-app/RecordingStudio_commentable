@@ -13,7 +13,7 @@
       <img src="./assets/0.13.2/loading.gif" alt="loading"/>
     </div>
     <div id="wrapper" class="hide">
-      <div class="timestamp">Generated <abbr class="timeago" title="2026-05-01T08:24:24+00:00">2026-05-01T08:24:24+00:00</abbr></div>
+      <div class="timestamp">Generated <abbr class="timeago" title="2026-05-01T09:59:22+00:00">2026-05-01T09:59:22+00:00</abbr></div>
       <ul class="group_tabs"></ul>
 
       <div id="content">
@@ -22,14 +22,14 @@
     <span class="group_name">All Files</span>
     (<span class="covered_percent">
       <span class="red">
-  39.94%
+  39.45%
 </span>
 
      </span>
      covered at
      <span class="covered_strength">
        <span class="red">
-         0.4
+         0.39
        </span>
     </span> hits/line
     )
@@ -42,20 +42,20 @@
   </div>
 
   <div class="t-line-summary">
-    <b>318</b> relevant lines,
-    <span class="green"><b>127</b> lines covered</span> and
-    <span class="red"><b>191</b> lines missed. </span>
+    <b>327</b> relevant lines,
+    <span class="green"><b>129</b> lines covered</span> and
+    <span class="red"><b>198</b> lines missed. </span>
     (<span class="red">
-  39.94%
+  39.45%
 </span>
 )
   </div>
 
   
     <div class="t-branch-summary">
-      <span><b>86</b> total branches, </span>
+      <span><b>94</b> total branches, </span>
       <span class="green"><b>0</b> branches covered</span> and
-      <span class="red"><b>86</b> branches missed.</span>
+      <span class="red"><b>94</b> branches missed.</span>
       (<span class="red">
   0.0%
 </span>
@@ -86,17 +86,17 @@
         
           <tr class="t-file">
             <td class="strong t-file__name"><a href="#6adf6b1c32f3a26a173f845ae1a67be90831d29e" class="src_link" title="lib/recording_studio_commentable.rb">lib/recording_studio_commentable.rb</a></td>
-            <td class="yellow strong cell--number t-file__coverage">85.71 %</td>
+            <td class="red strong cell--number t-file__coverage">63.64 %</td>
+            <td class="cell--number">34</td>
             <td class="cell--number">22</td>
             <td class="cell--number">14</td>
-            <td class="cell--number">12</td>
-            <td class="cell--number">2</td>
-            <td class="cell--number">0.86</td>
+            <td class="cell--number">8</td>
+            <td class="cell--number">0.64</td>
             
               <td class="red strong cell--number t-file__branch-coverage">0.00 %</td>
-              <td class="cell--number">2</td>
+              <td class="cell--number">10</td>
               <td class="cell--number">0</td>
-              <td class="cell--number">2</td>
+              <td class="cell--number">10</td>
             
           </tr>
         
@@ -118,12 +118,12 @@
         
           <tr class="t-file">
             <td class="strong t-file__name"><a href="#902b0e2bfc3da7d0fa499b7152f77d8f308008bb" class="src_link" title="lib/recording_studio_commentable/configuration.rb">lib/recording_studio_commentable/configuration.rb</a></td>
-            <td class="red strong cell--number t-file__coverage">50.00 %</td>
-            <td class="cell--number">32</td>
-            <td class="cell--number">16</td>
+            <td class="red strong cell--number t-file__coverage">47.06 %</td>
+            <td class="cell--number">34</td>
+            <td class="cell--number">17</td>
             <td class="cell--number">8</td>
-            <td class="cell--number">8</td>
-            <td class="cell--number">0.50</td>
+            <td class="cell--number">9</td>
+            <td class="cell--number">0.47</td>
             
               <td class="red strong cell--number t-file__branch-coverage">0.00 %</td>
               <td class="cell--number">4</td>
@@ -249,8 +249,8 @@
   <div class="header">
     <h3>lib/recording_studio_commentable.rb</h3>
     <h4>
-      <span class="yellow">
-  85.71%
+      <span class="red">
+  63.64%
 </span>
 
       lines covered
@@ -267,16 +267,16 @@
     
 
     <div class="t-line-summary">
-      <b>14</b> relevant lines.
-      <span class="green"><b>12</b> lines covered</span> and
-      <span class="red"><b>2</b> lines missed.</span>
+      <b>22</b> relevant lines.
+      <span class="green"><b>14</b> lines covered</span> and
+      <span class="red"><b>8</b> lines missed.</span>
     </div>
 
     
       <div class="t-branch-summary">
-          <span><b>2</b> total branches, </span>
+          <span><b>10</b> total branches, </span>
           <span class="green"><b>0</b> branches covered</span> and
-          <span class="red"><b>2</b> branches missed.</span>
+          <span class="red"><b>10</b> branches missed.</span>
       </div>
     
 
@@ -483,7 +483,7 @@
               
             
 
-            <code class="ruby">      @configuration ||= Configuration.new</code>
+            <code class="ruby">      @configuration = normalize_configuration(@configuration)</code>
           </li>
         </div>
       
@@ -565,12 +565,192 @@
               
             
 
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="22">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    private</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="23">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="24">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    def normalize_configuration(config)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="25">
+            
+
+            
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+            
+
+            <code class="ruby">      return Configuration.new unless config</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="26">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">      return config if config.respond_to?(:rich_text_comments)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="27">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="28">
+            
+
+            
+              
+            
+
+            <code class="ruby">      upgraded = Configuration.new</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="29">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">      upgraded.timeout = config.timeout if config.respond_to?(:timeout)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="30">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">      upgraded.instance_variable_set(:@hooks, config.hooks) if config.respond_to?(:hooks)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="31">
+            
+
+            
+              
+            
+
+            <code class="ruby">      upgraded</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="32">
+            
+
+            
+              
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="33">
+            
+
+            
+              
+            
+
             <code class="ruby">  end</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="22">
+          <li class="never" data-hits="" data-linenumber="34">
             
 
             
@@ -1094,7 +1274,7 @@
     <h3>lib/recording_studio_commentable/configuration.rb</h3>
     <h4>
       <span class="red">
-  50.0%
+  47.06%
 </span>
 
       lines covered
@@ -1111,9 +1291,9 @@
     
 
     <div class="t-line-summary">
-      <b>16</b> relevant lines.
+      <b>17</b> relevant lines.
       <span class="green"><b>8</b> lines covered</span> and
-      <span class="red"><b>8</b> lines missed.</span>
+      <span class="red"><b>9</b> lines missed.</span>
     </div>
 
     
@@ -1217,7 +1397,7 @@
               
             
 
-            <code class="ruby">    attr_accessor :timeout</code>
+            <code class="ruby">    attr_accessor :timeout, :rich_text_comments</code>
           </li>
         </div>
       
@@ -1281,19 +1461,19 @@
               
             
 
-            <code class="ruby">      @hooks = Hooks.new</code>
+            <code class="ruby">      @rich_text_comments = false</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="13">
+          <li class="missed" data-hits="0" data-linenumber="13">
             
 
             
               
             
 
-            <code class="ruby">    end</code>
+            <code class="ruby">      @hooks = Hooks.new</code>
           </li>
         </div>
       
@@ -1305,12 +1485,24 @@
               
             
 
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="15">
+            
+
+            
+              
+            
+
             <code class="ruby"></code>
           </li>
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="15">
+          <li class="covered" data-hits="1" data-linenumber="16">
             
               <span class="hits">1</span>
             
@@ -1324,7 +1516,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="16">
+          <li class="never" data-hits="" data-linenumber="17">
             
 
             
@@ -1336,7 +1528,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="17">
+          <li class="missed" data-hits="0" data-linenumber="18">
             
 
             
@@ -1348,18 +1540,6 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="18">
-            
-
-            
-              
-            
-
-            <code class="ruby">        hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&amp;:size)</code>
-          </li>
-        </div>
-      
-        <div>
           <li class="never" data-hits="" data-linenumber="19">
             
 
@@ -1367,7 +1547,7 @@
               
             
 
-            <code class="ruby">      }</code>
+            <code class="ruby">        rich_text_comments: rich_text_comments,</code>
           </li>
         </div>
       
@@ -1379,7 +1559,7 @@
               
             
 
-            <code class="ruby">    end</code>
+            <code class="ruby">        hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&amp;:size)</code>
           </li>
         </div>
       
@@ -1391,12 +1571,36 @@
               
             
 
+            <code class="ruby">      }</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="22">
+            
+
+            
+              
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="23">
+            
+
+            
+              
+            
+
             <code class="ruby"></code>
           </li>
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="22">
+          <li class="covered" data-hits="1" data-linenumber="24">
             
               <span class="hits">1</span>
             
@@ -1410,7 +1614,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="23">
+          <li class="missed-branch" data-hits="0" data-linenumber="25">
             
 
             
@@ -1430,7 +1634,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="24">
+          <li class="never" data-hits="" data-linenumber="26">
             
 
             
@@ -1442,7 +1646,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="25">
+          <li class="missed" data-hits="0" data-linenumber="27">
             
 
             
@@ -1454,7 +1658,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="26">
+          <li class="missed" data-hits="0" data-linenumber="28">
             
 
             
@@ -1466,7 +1670,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="27">
+          <li class="missed" data-hits="0" data-linenumber="29">
             
 
             
@@ -1478,7 +1682,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="28">
+          <li class="missed-branch" data-hits="0" data-linenumber="30">
             
 
             
@@ -1498,7 +1702,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="29">
+          <li class="never" data-hits="" data-linenumber="31">
             
 
             
@@ -1510,7 +1714,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="30">
+          <li class="never" data-hits="" data-linenumber="32">
             
 
             
@@ -1522,7 +1726,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="31">
+          <li class="never" data-hits="" data-linenumber="33">
             
 
             
@@ -1534,7 +1738,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="32">
+          <li class="never" data-hits="" data-linenumber="34">
             
 
             

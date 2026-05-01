@@ -116,12 +116,22 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source, "local_assigns.fetch(:accessible, true)"
     assert_includes comment_partial_source, "url: recording_comments_path(parent_recording, return_to: return_to)"
     assert_includes comment_partial_source, 'data: { turbo_frame: "_top" }'
+    assert_includes comment_partial_source,
+                    "RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments"
+    assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
     assert_includes comment_partial_source, "Comment hidden"
     assert_includes comment_partial_source, "pointer-events-none"
     assert_includes infinite_scroll_controller_source, "new IntersectionObserver"
     assert_includes infinite_scroll_controller_source, "this.element.src = this.urlValue"
     assert_includes application_js_source, 'import "@hotwired/turbo-rails"'
     assert_includes importmap_source, 'pin "@hotwired/turbo-rails", to: "turbo.min.js"'
+    assert_includes importmap_source,
+                    'pin_all_from FlatPack::Engine.root.join("app/javascript/flat_pack/tiptap"), under: "flat_pack/tiptap", to: "flat_pack/tiptap"'
+    assert_includes importmap_source, 'pin "flat_pack/heroicons", to: "flat_pack/heroicons.js"'
+    assert_includes importmap_source, 'TIPTAP_VERSION = "2.11.5"'
+    assert_includes importmap_source, 'pin "@tiptap/core", to: "https://esm.sh/@tiptap/core@#{TIPTAP_VERSION}"'
+    assert_includes importmap_source, 'pin "@tiptap/starter-kit", to: "https://esm.sh/@tiptap/starter-kit@#{TIPTAP_VERSION}"'
+    assert_includes importmap_source, 'pin "lowlight", to: "https://esm.sh/lowlight"'
   end
 
   def test_comments_controller_uses_plain_layout_and_internal_flow
@@ -141,6 +151,8 @@ class CommentsPagesFlowTest < Minitest::Test
                     'referer_uri.query.present? ? "#{referer_uri.path}?#{referer_uri.query}" : referer_uri.path'
     refute_includes controller_source, "layout :comments_layout"
     assert_includes layout_source, '<%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>'
+    assert_includes layout_source, '<%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" %>'
+    assert_includes layout_source, '<%= stylesheet_link_tag "flat_pack/content_editor", "data-turbo-track": "reload" %>'
     assert_includes layout_source, '<html class="h-full overflow-hidden overscroll-none">'
     assert_includes layout_source,
                     '<body class="m-0 h-full overflow-hidden overscroll-none bg-[var(--surface-page-background-color)] text-[var(--surface-content-color)]">'
@@ -168,11 +180,27 @@ class CommentsPagesFlowTest < Minitest::Test
   def test_new_comment_page_and_comment_actions_preserve_return_to_flow
     new_view_source = read_workspace_file("app/views/recording_studio_commentable/comments/new.html.erb")
     comment_partial_source = read_workspace_file("app/views/recording_studio_commentable/comments/_comment.html.erb")
+    form_partial_source = read_workspace_file("app/views/recording_studio_commentable/comments/_form.html.erb")
+    dummy_initializer_source = read_workspace_file("test/dummy/config/initializers/recording_studio_commentable.rb")
+    scenarios_view_source = read_workspace_file("test/dummy/app/views/home/scenarios.html.erb")
+    dummy_home_controller_source = read_workspace_file("test/dummy/app/controllers/home_controller.rb")
+    dummy_home_index_source = read_workspace_file("test/dummy/app/views/home/index.html.erb")
 
     assert_includes new_view_source,
                     '{ text: "Back", href: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path) }'
     assert_includes new_view_source, 'title: "Add comment"'
     assert_includes new_view_source, "recording_comments_path(@parent_recording, return_to: params[:return_to])"
+    assert_includes dummy_initializer_source, "config.rich_text_comments = true"
+    assert_includes form_partial_source,
+                    "RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments"
+    assert_includes form_partial_source, "preset: :content"
+    assert_includes form_partial_source, "format: :html"
+    assert_includes scenarios_view_source, 'text: "Open comment feed"'
+    refute_includes scenarios_view_source, 'text: "Post comment"'
+    refute_includes scenarios_view_source, "form_with model: @new_comment"
+    refute_includes dummy_home_controller_source, "@new_comment = RecordingStudioCommentable::Comment.new"
+    assert_includes dummy_home_index_source,
+                    "open the scenarios page to inspect each comment feed and verify access outcomes"
     assert_includes comment_partial_source, "local_assigns[:parent_recording] || @parent_recording"
     assert_includes comment_partial_source, "local_assigns[:parent_title]"
     assert_includes comment_partial_source, "local_assigns[:show_page_action]"

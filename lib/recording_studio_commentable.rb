@@ -12,11 +12,23 @@ require "recording_studio_commentable/services/destroy_comment"
 module RecordingStudioCommentable
   class << self
     def configuration
-      @configuration ||= Configuration.new
+      @configuration = normalize_configuration(@configuration)
     end
 
     def configure
       yield(configuration) if block_given?
+    end
+
+    private
+
+    def normalize_configuration(config)
+      return Configuration.new unless config
+      return config if config.respond_to?(:rich_text_comments)
+
+      upgraded = Configuration.new
+      upgraded.timeout = config.timeout if config.respond_to?(:timeout)
+      upgraded.instance_variable_set(:@hooks, config.hooks) if config.respond_to?(:hooks)
+      upgraded
     end
   end
 end

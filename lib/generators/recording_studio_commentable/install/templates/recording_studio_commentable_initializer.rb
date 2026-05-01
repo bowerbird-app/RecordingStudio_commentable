@@ -6,4 +6,7 @@
 RecordingStudioCommentable.configure do |config|
   # Timeout for service operations (seconds)
   # config.timeout = 5
+
+  # Enable FlatPack rich text editing for comment bodies.
+  config.rich_text_comments = false
 end

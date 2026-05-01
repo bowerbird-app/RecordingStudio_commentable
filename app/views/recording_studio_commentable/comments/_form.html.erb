@@ -1,4 +1,5 @@
 <%# app/views/recording_studio_commentable/comments/_form.html.erb %>
+<% rich_text_comments_enabled = RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments %>
 <%= form_with model: comment, url: url, local: false do |f| %>
   <%= render FlatPack::Alert::Component.new(
     style: :danger,
@@ -12,7 +13,14 @@
       label: "Comment",
       placeholder: "Write your comment…",
       error: comment.errors[:body].first,
-      rows: 4
+      rows: 4,
+      rich_text: rich_text_comments_enabled,
+      rich_text_options: {
+        preset: :content,
+        toolbar: :standard,
+        format: :html,
+        placeholder: "Write your comment…"
+      }
     ) %>
 
     <div class="flex justify-end">

@@ -4,17 +4,19 @@ require_relative "hooks"
 
 module RecordingStudioCommentable
   class Configuration
-    attr_accessor :timeout
+    attr_accessor :timeout, :rich_text_comments
     attr_reader :hooks
 
     def initialize
       @timeout = 5
+      @rich_text_comments = false
       @hooks = Hooks.new
     end
 
     def to_h
       {
         timeout: timeout,
+        rich_text_comments: rich_text_comments,
         hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size)
       }
     end

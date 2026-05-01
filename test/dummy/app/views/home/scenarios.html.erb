@@ -65,22 +65,6 @@
                 <%= render FlatPack::Button::Component.new(text: "Open comment feed", style: :secondary, size: :sm) %>
               <% end %>
             </div>
-
-            <%= form_with model: @new_comment,
-                          url: recording_studio_commentable.recording_comments_path(recording),
-                          scope: :comment,
-                          local: true,
-                          class: "space-y-3" do |form| %>
-              <%= hidden_field_tag :return_to, scenarios_path(anchor: "comment-scenarios") %>
-              <%= render FlatPack::TextArea::Component.new(
-                name: "comment[body]",
-                value: @new_comment.body,
-                label: "Leave a comment",
-                rows: 4,
-                placeholder: "Try posting as #{current_user.display_name}..."
-              ) %>
-              <%= render FlatPack::Button::Component.new(text: "Post comment", style: :primary, type: "submit") %>
-            <% end %>
           </div>
         <% end %>
       <% end %>

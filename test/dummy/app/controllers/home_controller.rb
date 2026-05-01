@@ -9,7 +9,6 @@ class HomeController < ApplicationController
   end
 
   def scenarios
-    @new_comment = RecordingStudioCommentable::Comment.new
   end
 
   def services
