@@ -1,5 +1,6 @@
 <%# app/views/recording_studio_commentable/comments/_comment.html.erb %>
 <% comment = comment_recording.respond_to?(:recordable) ? comment_recording.recordable : comment_recording %>
+<% parent_recording = local_assigns[:parent_recording] || @parent_recording %>
 <% actor = current_recording_studio_actor %>
 <% is_author = comment.respond_to?(:author) && comment.author == actor %>
 
@@ -21,13 +22,13 @@
         <p class="text-sm leading-6 whitespace-pre-wrap"><%= comment.body %></p>
       </div>
 
-      <% if is_author || (defined?(RecordingStudioAccessible) && RecordingStudioAccessible.authorized?(actor: actor, recording: @parent_recording, role: :manage)) %>
+      <% if is_author || (defined?(RecordingStudioAccessible) && RecordingStudioAccessible.authorized?(actor: actor, recording: parent_recording, role: :manage)) %>
         <div class="flex items-center gap-2 shrink-0">
-          <%= link_to edit_recording_comment_path(@parent_recording, comment_recording) do %>
+          <%= link_to edit_recording_comment_path(parent_recording, comment_recording, return_to: params[:return_to]) do %>
             <%= render FlatPack::Button::Component.new(text: "Edit", style: :ghost, size: :sm) %>
           <% end %>
 
-          <%= button_to recording_comment_path(@parent_recording, comment_recording),
+          <%= button_to recording_comment_path(parent_recording, comment_recording, return_to: params[:return_to]),
                 method: :delete,
                 data: { turbo_confirm: "Delete this comment?" } do %>
             <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm) %>

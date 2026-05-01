@@ -1,147 +1,38 @@
-<% page_title = @parent_recording.recordable.try(:title) || @parent_recording.recordable.try(:name) || "Resource" %>
-
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8">
+<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
   <%= render FlatPack::Breadcrumb::Component.new(items: [
-    { text: "Home", href: main_app.root_path },
-    { text: page_title },
-    { text: "Comments" }
+    { text: "Back", href: @external_back_path }
   ]) %>
-
-  <%= render FlatPack::PageTitle::Component.new(
-    title: page_title,
-    subtitle: "#{@comments.size} comment#{"s" if @comments.size != 1}",
-    variant: :h1
-  ) %>
 
   <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
   <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
 
-  <%# Comment feed %>
-  <div class="flex flex-col gap-4" id="comments">
-    <% if @comments.any? %>
-      <% @comments.each do |comment_recording| %>
-        <%= render "comment", comment_recording: comment_recording %>
+  <article class="flex flex-col gap-4">
+    <header class="space-y-2 border-(--surface-border-color)">
+      <%= render FlatPack::PageTitle::Component.new(
+        title: @page_title,
+        subtitle: "Commentable item",
+        variant: :h1,
+        class: "mb-0 pb-0"
+      ) %>
+    </header>
+
+    <% if @page_body.present? %>
+      <section>
+        <div class="max-w-none space-y-4 text-lg leading-8 whitespace-pre-wrap text-(--surface-content-color)">
+          <p><%= @page_body %></p>
+        </div>
+      </section>
+    <% end %>
+
+    <footer class="border-t border-(--surface-border-color) pt-6">
+      <%= link_to(@comments_count.positive? ? @comments_collection_path : @new_comment_path) do %>
+        <%= render FlatPack::Button::Component.new(
+          text: @comments_count.positive? ? "#{@comments_count} Comments" : "Add comment",
+          style: :primary,
+          size: :lg,
+          class: "w-full justify-center"
+        ) %>
       <% end %>
-    <% else %>
-      <%= render "empty_state" %>
-    <% end %>
-  </div>
-
-  <%# New comment form %>
-  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-    <% card.header do %>
-      <%= render FlatPack::PageTitle::Component.new(
-        title: "Add a comment",
-        variant: :h3,
-        class: "mb-0 pb-0"
-      ) %>
-    <% end %>
-
-    <% card.body do %>
-      <%= render "form",
-            comment: RecordingStudioCommentable::Comment.new,
-            url: recording_comments_path(@parent_recording) %>
-    <% end %>
-  <% end %>
-
-  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-    <% card.header do %>
-      <%= render FlatPack::PageTitle::Component.new(
-        title: "Recording Studio structure",
-        subtitle: "Visualize the page recording, its child recordables, and the event history that drives revisions.",
-        variant: :h3,
-        class: "mb-0 pb-0"
-      ) %>
-    <% end %>
-
-    <% card.body do %>
-      <div class="flex flex-col gap-6">
-        <div class="rounded-lg border border-(--surface-border-color) p-4">
-          <p class="mb-3 text-sm font-medium">Page recording</p>
-          <dl class="space-y-2 text-sm">
-            <% @structure_parent[:recording_details].each do |label, value| %>
-              <div>
-                <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
-                <dd class="font-mono text-xs break-all"><%= value %></dd>
-              </div>
-            <% end %>
-          </dl>
-        </div>
-
-        <div class="pl-4">
-          <p class="mb-3 text-sm font-medium">Child recordings and recordables</p>
-          <div class="flex flex-col gap-4">
-            <% @structure_children.each do |child| %>
-              <div class="rounded-lg border border-(--surface-border-color) p-4">
-                <p class="mb-3 text-sm font-medium">Child recording: <%= child[:title] %></p>
-                <dl class="space-y-2 text-sm">
-                  <% child[:recording_details].each do |label, value| %>
-                    <div>
-                      <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
-                      <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
-                    </div>
-                  <% end %>
-                </dl>
-
-                <div class="mt-4 pl-4">
-                  <div class="rounded-lg border border-(--surface-border-color) p-4">
-                    <p class="mb-3 text-sm font-medium">Recordable: <%= child[:recordable_title] %></p>
-                    <dl class="space-y-2 text-sm">
-                      <% child[:recordable_details].each do |label, value| %>
-                        <div>
-                          <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
-                          <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
-                        </div>
-                      <% end %>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        </div>
-
-        <div>
-          <p class="mb-3 text-sm font-medium">Events</p>
-          <% if @structure_events.any? %>
-            <div class="flex flex-col gap-4">
-              <% @structure_events.each do |entry| %>
-                <div class="rounded-lg border border-(--surface-border-color) p-4">
-                  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,1fr)]">
-                    <div>
-                      <p class="mb-3 text-sm font-medium">Event: <%= entry[:title] %></p>
-                      <dl class="space-y-2 text-sm">
-                        <% entry[:details].each do |label, value| %>
-                          <div>
-                            <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
-                            <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
-                          </div>
-                        <% end %>
-                      </dl>
-                    </div>
-
-                    <div class="pl-4 lg:pl-0">
-                      <div class="rounded-lg border border-(--surface-border-color) p-4">
-                        <p class="mb-3 text-sm font-medium">Affected recordable: <%= entry[:recordable_title] %></p>
-                        <dl class="space-y-2 text-sm">
-                          <% entry[:recordable_details].each do |label, value| %>
-                            <div>
-                              <dt class="text-(--surface-muted-content-color)"><%= label %></dt>
-                              <dd class="font-mono text-xs break-all whitespace-pre-wrap"><%= value %></dd>
-                            </div>
-                          <% end %>
-                        </dl>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          <% else %>
-            <p class="text-sm text-(--surface-muted-content-color)">No events recorded for this page or its child recordings yet.</p>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-  <% end %>
+    </footer>
+  </article>
 </div>

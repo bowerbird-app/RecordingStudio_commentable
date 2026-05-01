@@ -18,13 +18,19 @@
       <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Recording Studio",
         href: "/recording_studio",
-        icon: :folder
+        icon: :dashboard
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Scenario",
+        href: "/scenarios",
+        icon: :table
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Commentable",
         href: "/commentable",
-        icon: :folder
+        icon: :message_circle
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(

@@ -1,7 +1,7 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: @workspace&.name || "RecordingStudio Commentable",
-    subtitle: "Use this root page for demo credentials and workspace context, then open /commentable for the seeded comment scenarios.",
+    subtitle: "Use this root page for demo credentials and workspace context, then open /scenarios for the seeded comment scenarios.",
     variant: :h1
   ) %>
 
@@ -30,7 +30,7 @@
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: "Scenario matrix",
-            subtitle: "The seeded scenarios now live on /commentable.",
+            subtitle: "The seeded scenarios now live on /scenarios.",
             variant: :h3,
             class: "mb-0 pb-0"
           ) %>
@@ -38,8 +38,8 @@
 
         <% card.body do %>
           <div class="space-y-4 text-sm leading-6 text-(--surface-content-color)">
-            <p>The folder, owner-only pages, and public page scenarios are available on <code>/commentable</code>.</p>
-            <p>Use the seeded accounts here, then open the engine page to post comments and verify access outcomes.</p>
+            <p>The folder, owner-only pages, and public page scenarios are available on <code>/scenarios</code>.</p>
+            <p>Use the seeded accounts here, then open the scenarios page to post comments and verify access outcomes.</p>
           </div>
         <% end %>
       <% end %>
@@ -66,12 +66,12 @@
             <dd class="font-mono text-xs"><%= @root_recording&.id || "Missing" %></dd>
           </div>
           <div>
-            <dt class="text-(--surface-muted-content-color)">Scenarios on /commentable</dt>
+            <dt class="text-(--surface-muted-content-color)">Scenarios on /scenarios</dt>
             <dd class="font-medium"><%= @scenario_recordings.size %></dd>
           </div>
           <div>
-            <dt class="text-(--surface-muted-content-color)">Commentable engine</dt>
-            <dd><%= link_to "/commentable", "/commentable", class: "underline" %></dd>
+            <dt class="text-(--surface-muted-content-color)">Scenario page</dt>
+            <dd><%= link_to "/scenarios", scenarios_path, class: "underline" %></dd>
           </div>
         </dl>
       <% end %>

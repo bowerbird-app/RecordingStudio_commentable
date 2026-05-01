@@ -20,6 +20,16 @@ class RecordingStudioCommentableTest < Minitest::Test
     assert_includes controller_source, "flat_pack_sidebar"
   end
 
+  def test_engine_uses_its_own_layout_without_dummy_sidebar_shell
+    layout_path = File.expand_path("../app/views/layouts/recording_studio_commentable/application.html.erb", __dir__)
+    assert File.exist?(layout_path)
+
+    layout_source = File.read(layout_path)
+    assert_includes layout_source, 'stylesheet_link_tag "flat_pack/application"'
+    refute_includes layout_source, "FlatPack::SidebarLayout::Component"
+    refute_includes layout_source, 'render "layouts/flat_pack/top_nav"'
+  end
+
   def test_recording_studio_capabilities_are_off_by_default
     initializer_path = File.expand_path("dummy/config/initializers/recording_studio.rb", __dir__)
     initializer_source = File.read(initializer_path)
@@ -42,16 +52,42 @@ class RecordingStudioCommentableTest < Minitest::Test
 
     assert_includes view_source, "Template workflow"
     assert_includes view_source, "Workspace state"
-    assert_includes view_source, "Recording Studio mount"
+    assert_includes view_source, "/scenarios"
   end
 
-  def test_engine_home_page_uses_flatpack_components
-    view_path = File.expand_path("../app/views/recording_studio_commentable/home/index.html.erb", __dir__)
+  def test_dummy_scenarios_page_uses_flatpack_components
+    view_path = File.expand_path("dummy/app/views/home/scenarios.html.erb", __dir__)
     view_source = File.read(view_path)
 
     assert_includes view_source, "FlatPack::PageTitle::Component"
     assert_includes view_source, "FlatPack::Card::Component"
     assert_includes view_source, "FlatPack::Badge::Component"
+  end
+
+  def test_engine_home_page_lists_comments_without_dummy_sidebar_shell
+    view_path = File.expand_path("../app/views/recording_studio_commentable/home/index.html.erb", __dir__)
+    view_source = File.read(view_path)
+
+    assert_includes view_source, 'title: "Commentable"'
+    assert_includes view_source, 'subtitle: "All comments"'
+    assert_includes view_source, "recording_studio_commentable/comments/comment"
+  end
+
+  def test_dummy_routes_expose_scenarios_page
+    routes_path = File.expand_path("dummy/config/routes.rb", __dir__)
+    routes_source = File.read(routes_path)
+
+    assert_includes routes_source, 'get "/scenarios", to: "home#scenarios", as: :scenarios'
+  end
+
+  def test_dummy_sidebar_lists_scenario_and_commentable_links
+    sidebar_path = File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__)
+    sidebar_source = File.read(sidebar_path)
+
+    assert_includes sidebar_source, 'label: "Scenario"'
+    assert_includes sidebar_source, 'href: "/scenarios"'
+    assert_includes sidebar_source, 'label: "Commentable"'
+    assert_includes sidebar_source, 'href: "/commentable"'
   end
 
   def test_commentable_module_exists

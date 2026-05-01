@@ -5,16 +5,19 @@ module RecordingStudioCommentable
     before_action :require_actor!
     before_action :load_parent_recording
     before_action :require_commentable!
-    before_action :authorize_view!, only: %i[index]
+    before_action :authorize_view!, only: %i[index all]
     before_action :authorize_create!, only: %i[new create]
     before_action :load_comment_recording, only: %i[edit update destroy]
     before_action :authorize_edit!, only: %i[edit update destroy]
+    before_action :prepare_page_context
 
     def index
-      @comments = chronological_comments
-      @structure_parent = recording_snapshot(@parent_recording)
-      @structure_children = structure_child_recordings
-      @structure_events = structure_events
+      @comments_count = comments_relation.count
+    end
+
+    def all
+      @comments = comments_relation.to_a
+      @comments_count = @comments.size
     end
 
     def new
@@ -29,11 +32,8 @@ module RecordingStudioCommentable
       )
 
       if result.success?
-        redirect_to redirect_target(recording_comments_path(@parent_recording)),
+        redirect_to comments_collection_path,
                     notice: "Comment added."
-      elsif return_to_path
-        redirect_to redirect_target(recording_comments_path(@parent_recording)),
-                    alert: result.errors.presence&.join(", ") || result.error || "Comment could not be added."
       else
         @comment = Comment.new(body: comment_params[:body])
         @comment.errors.add(:base, result.error) if result.error
@@ -55,7 +55,7 @@ module RecordingStudioCommentable
       )
 
       if result.success?
-        redirect_to redirect_target(recording_comments_path(@parent_recording)),
+        redirect_to comments_collection_path,
                     notice: "Comment updated."
       else
         @comment = @comment_recording.respond_to?(:recordable) ? @comment_recording.recordable : @comment_recording
@@ -72,7 +72,7 @@ module RecordingStudioCommentable
         actor: current_recording_studio_actor
       )
 
-      redirect_to redirect_target(recording_comments_path(@parent_recording)),
+      redirect_to comments_collection_path,
                   notice: "Comment deleted."
     end
 
@@ -85,10 +85,6 @@ module RecordingStudioCommentable
       path
     end
 
-    def redirect_target(default)
-      return_to_path || default
-    end
-
     # ------------------------------------------------------------------ #
     # Finders
     # ------------------------------------------------------------------ #
@@ -97,14 +93,26 @@ module RecordingStudioCommentable
       @parent_recording = find_recording(params[:recording_id])
       return if @parent_recording
 
-      redirect_to(redirect_target(main_app.root_path), alert: "Recording not found.")
+      redirect_to(return_to_path || main_app.root_path, alert: "Recording not found.")
     end
 
     def load_comment_recording
       @comment_recording = find_recording(params[:id])
       return if @comment_recording
 
-      redirect_to(redirect_target(recording_comments_path(@parent_recording)), alert: "Comment not found.")
+      redirect_to(comments_collection_path, alert: "Comment not found.")
+    end
+
+    def prepare_page_context
+      return unless @parent_recording
+
+      @page_recordable = @parent_recording.respond_to?(:recordable) ? @parent_recording.recordable : nil
+      @page_title = recordable_title(@page_recordable)
+      @page_body = @page_recordable.try(:body).presence
+      @summary_path = recording_comments_path(@parent_recording, return_to_options)
+      @comments_collection_path = all_recording_comments_path(@parent_recording, return_to_options)
+      @new_comment_path = new_recording_comment_path(@parent_recording, return_to_options)
+      @external_back_path = return_to_path || main_app.root_path
     end
 
     # ------------------------------------------------------------------ #
@@ -115,19 +123,19 @@ module RecordingStudioCommentable
       recordable = @parent_recording.respond_to?(:recordable) ? @parent_recording.recordable : nil
       return if recordable&.class&.include?(RecordingStudioCommentable::Commentable)
 
-      redirect_to(redirect_target(main_app.root_path), alert: "Comments are not enabled for this resource.")
+      redirect_to(return_to_path || main_app.root_path, alert: "Comments are not enabled for this resource.")
     end
 
     def authorize_view!
       return if authorized?(:view)
 
-      redirect_to(redirect_target(main_app.root_path), alert: "You are not allowed to view comments here.")
+      redirect_to(return_to_path || main_app.root_path, alert: "You are not allowed to view comments here.")
     end
 
     def authorize_create!
       return if authorized?(:edit)
 
-      redirect_to(redirect_target(recording_comments_path(@parent_recording)),
+      redirect_to(@summary_path,
                   alert: "You are not allowed to post comments here.")
     end
 
@@ -140,7 +148,7 @@ module RecordingStudioCommentable
 
       return if authorized?(:manage)
 
-      redirect_to(redirect_target(recording_comments_path(@parent_recording)),
+      redirect_to(comments_collection_path,
                   alert: "You are not allowed to edit this comment.")
     end
 
@@ -157,6 +165,20 @@ module RecordingStudioCommentable
     # ------------------------------------------------------------------ #
     # Helpers
     # ------------------------------------------------------------------ #
+
+    def return_to_options
+      return {} unless return_to_path.present?
+
+      { return_to: return_to_path }
+    end
+
+    def comments_collection_path
+      @comments_collection_path || all_recording_comments_path(@parent_recording, return_to_options)
+    end
+
+    def comments_relation
+      @comments_relation ||= chronological_comments
+    end
 
     def chronological_comments
       return [] unless defined?(RecordingStudio::Recording)

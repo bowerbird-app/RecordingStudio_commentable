@@ -1,11 +1,25 @@
 class HomeController < ApplicationController
+  before_action :load_workspace_context, only: %i[index scenarios]
+  before_action :load_scenario_recordings, only: %i[index scenarios]
+
   def index
+  end
+
+  def scenarios
+    @new_comment = RecordingStudioCommentable::Comment.new
+  end
+
+  private
+
+  def load_workspace_context
     @workspace = Workspace.first
     @root_recording = RecordingStudio::Recording.unscoped.find_by(
       recordable: @workspace,
       parent_recording_id: nil
     )
+  end
 
+  def load_scenario_recordings
     scenario_titles = [
       "Reference Folder",
       "Quinn owns this document",

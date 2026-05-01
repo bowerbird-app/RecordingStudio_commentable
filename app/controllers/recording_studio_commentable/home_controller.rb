@@ -2,32 +2,57 @@
 
 module RecordingStudioCommentable
   class HomeController < ApplicationController
+    before_action :require_actor!
+
     def index
-      @workspace = Workspace.first if defined?(Workspace)
-      @root_recording = RecordingStudio::Recording.unscoped.find_by(
-        recordable: @workspace,
-        parent_recording_id: nil
+      @external_back_path = scenarios_target_path
+      @comment_entries = visible_comment_entries
+    end
+
+    private
+
+    def visible_comment_entries
+      return [] unless defined?(RecordingStudio::Recording)
+
+      RecordingStudio::Recording
+        .where(recordable_type: "RecordingStudioCommentable::Comment")
+        .where(trashed_at: nil)
+        .includes(:recordable, :parent_recording)
+        .order(created_at: :desc)
+        .filter_map do |comment_recording|
+          parent_recording = comment_recording.parent_recording
+          next unless authorized_to_view?(parent_recording)
+
+          {
+            comment_recording: comment_recording,
+            parent_recording: parent_recording,
+            parent_title: recordable_title(parent_recording)
+          }
+        end
+    end
+
+    def authorized_to_view?(recording)
+      return false unless recording
+      return true unless defined?(RecordingStudioAccessible)
+
+      RecordingStudioAccessible.authorized?(
+        actor: current_recording_studio_actor,
+        recording: recording,
+        role: :view
       )
+    end
 
-      scenario_titles = [
-        "Reference Folder",
-        "Quinn owns this document",
-        "Admin User owns this document",
-        "Quinn and Admin User can comment"
-      ]
+    def recordable_title(recording)
+      recordable = recording.respond_to?(:recordable) ? recording.recordable : nil
+      return "Unknown item" unless recordable
 
-      @scenario_recordings = RecordingStudio::Recording.unscoped
-                                                       .where(parent_recording_id: nil)
-                                                       .where(recordable_type: %w[Folder Page])
-                                                       .where(trashed_at: nil)
-                                                       .includes(:recordable)
-                                                       .select { |recording| scenario_titles.include?(recording.recordable&.try(:name) || recording.recordable&.try(:title)) }
-                                                       .sort_by do |recording|
-        label = recording.recordable&.try(:name) || recording.recordable&.try(:title)
-        scenario_titles.index(label) || scenario_titles.length
-      end
+      recordable.try(:title) || recordable.try(:name) || recordable.class.name
+    end
 
-      @new_comment = RecordingStudioCommentable::Comment.new
+    def scenarios_target_path
+      return main_app.scenarios_path if main_app.respond_to?(:scenarios_path)
+
+      main_app.root_path
     end
   end
 end

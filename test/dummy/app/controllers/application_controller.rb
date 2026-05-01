@@ -10,6 +10,8 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :set_current_actor
 
+  helper_method :current_recording_studio_actor
+
   private
 
   def application_layout
@@ -18,5 +20,9 @@ class ApplicationController < ActionController::Base
 
   def set_current_actor
     Current.actor = current_user
+  end
+
+  def current_recording_studio_actor
+    Current.actor || current_user
   end
 end
