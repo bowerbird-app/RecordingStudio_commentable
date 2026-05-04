@@ -3,17 +3,27 @@
     { text: "Back", href: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path) }
   ]) %>
 
-  <%= render FlatPack::PageTitle::Component.new(
+  <%= render FlatPack::Comments::Thread::Component.new(
+    count: @comments_count,
     title: "Add comment",
-    subtitle: @page_title,
-    variant: :h1
-  ) %>
+    empty_title: "",
+    empty_body: ""
+  ) do |thread| %>
+    <% thread.header do %>
+      <%= render FlatPack::PageTitle::Component.new(
+        title: "Add comment",
+        subtitle: @page_title,
+        variant: :h1,
+        class: "mb-0 pb-0"
+      ) %>
+    <% end %>
 
-  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-    <% card.body do %>
+    <% thread.comment do %>
       <%= render "form",
             comment: @comment,
-            url: recording_comments_path(@parent_recording, return_to: params[:return_to]) %>
+            url: recording_comments_path(@parent_recording, return_to: params[:return_to]),
+            cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path),
+            force_composer: true %>
     <% end %>
   <% end %>
 </div>
