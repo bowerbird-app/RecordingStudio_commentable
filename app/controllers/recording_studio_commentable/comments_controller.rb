@@ -357,7 +357,7 @@ module RecordingStudioCommentable
     end
 
     def comment_from(comment_recording)
-      comment_recording.respond_to?(:recordable) ? comment_recording.recordable : comment_recording
+      comment_recording.try(:recordable) || comment_recording
     end
 
     def root_recording_for(recording)
