@@ -10,7 +10,8 @@ RecordingStudioCommentable.configure do |config|
   # Optional host-app layout. Leave blank to use the engine's default layout.
   # config.layout = "flat_pack_sidebar"
 
-  # Enable FlatPack rich text editing for comment bodies.
+  # Comment editor mode: false, :toolbar, or :selection.
+  # true is supported as a backwards-compatible alias for :toolbar.
   config.rich_text_comments = false
 
   # Configure which attribute each recordable type should use for display labels.

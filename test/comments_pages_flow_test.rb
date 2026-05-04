@@ -147,7 +147,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes page_partial_source, "accessible: entry[:accessible]"
     assert_includes comment_partial_source, "local_assigns.fetch(:accessible, true)"
     assert_includes comment_partial_source,
-                    "RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments"
+                    "configuration.respond_to?(:rich_text_comments_enabled?)"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
     assert_includes comment_partial_source, "Comment hidden"
     refute_includes comment_partial_source, 'text: "Show"'
@@ -269,7 +269,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes new_view_source, "force_composer: true"
     refute_includes new_view_source, "FlatPack::Card::Component.new(style: :outlined)"
     assert_includes dummy_initializer_source, 'config.layout = ""'
-    assert_includes dummy_initializer_source, "config.rich_text_comments = true"
+    assert_includes dummy_initializer_source, "config.rich_text_comments = :toolbar"
     assert_includes dummy_initializer_source, "config.recordable_display_attributes = {"
     assert_includes dummy_initializer_source, "config.author_display_attributes = {"
     assert_includes dummy_initializer_source, "config.author_avatar_attributes = {"
@@ -277,15 +277,14 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes dummy_initializer_source, '"User" => :display_name'
     assert_includes dummy_initializer_source, '"User" => :avatar_url'
     assert_includes form_partial_source,
-                    "RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments"
+                    "configuration.respond_to?(:rich_text_comment_editor_options)"
     assert_includes form_partial_source, "force_composer = local_assigns.fetch(:force_composer, false)"
     assert_includes form_partial_source, "rich_text_comments_enabled && force_composer"
     assert_includes form_partial_source, "rich_text: true"
     assert_includes form_partial_source,
                     "relative overflow-hidden rounded-xl border border-[var(--comments-composer-border-color)]"
     assert_includes form_partial_source, "FlatPack::Comments::Composer::Component.new("
-    assert_includes form_partial_source, "preset: :content"
-    assert_includes form_partial_source, "format: :html"
+    assert_includes form_partial_source, "rich_text_comment_editor_options(placeholder: \"Write your comment...\")"
     assert_includes scenarios_view_source, 'text: "Open comment feed"'
     assert_includes scenarios_view_source,
                     "link_to recording_comments_path(recording)"

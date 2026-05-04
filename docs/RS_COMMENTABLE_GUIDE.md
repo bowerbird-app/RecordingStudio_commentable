@@ -40,7 +40,7 @@ end
 
 Leave `config.layout` unset to keep the engine's default blank layout. Set it to a host layout path when commentable pages should render inside your app shell, for example a sidebar layout.
 
-Turn that flag on if you want comment forms to use FlatPack's rich text editor and render sanitized HTML in the feed.
+Set `config.rich_text_comments` to `:toolbar` if you want the current comment-form editor with a visible toolbar, or `:selection` if you want formatting controls to appear from the selection bubble menu. `true` remains a backwards-compatible alias for `:toolbar`.
 
 What the install generator does:
 
@@ -108,11 +108,11 @@ The important part is that `recording` here is a `RecordingStudio::Recording` fo
 
 By default, comments use a plain textarea.
 
-If you want rich text comments, enable the config flag in your initializer:
+If you want rich text comments, pick the editor mode in your initializer:
 
 ```ruby
 RecordingStudioCommentable.configure do |config|
-  config.rich_text_comments = true
+  config.rich_text_comments = :toolbar
 end
 ```
 
@@ -121,6 +121,13 @@ What changes when this is enabled:
 - the new/edit comment form uses FlatPack rich text mode
 - comment bodies are stored as HTML
 - rendered comments are sanitized through `FlatPack::RichTextSanitizer` before display
+
+Available modes:
+
+- `false` keeps the plain textarea
+- `:toolbar` uses the current rich-text editor with a visible toolbar
+- `:selection` hides the fixed toolbar and relies on the selection-triggered bubble menu
+- `true` is still accepted and behaves like `:toolbar`
 
 ## The main flow
 

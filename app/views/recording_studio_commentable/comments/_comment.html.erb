@@ -1,5 +1,12 @@
 <%# app/views/recording_studio_commentable/comments/_comment.html.erb %>
-<% rich_text_comments_enabled = RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments %>
+<% configuration = RecordingStudioCommentable.configuration %>
+<% rich_text_comments_enabled = if configuration.respond_to?(:rich_text_comments_enabled?)
+  configuration.rich_text_comments_enabled?
+elsif configuration.respond_to?(:rich_text_comments)
+  configuration.rich_text_comments.present?
+else
+  false
+end %>
 <% comment = comment_recording.respond_to?(:recordable) ? comment_recording.recordable : comment_recording %>
 <% parent_recording = local_assigns[:parent_recording] || @parent_recording %>
 <% accessible = local_assigns.fetch(:accessible, true) %>

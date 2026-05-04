@@ -1,5 +1,23 @@
 <%# app/views/recording_studio_commentable/comments/_form.html.erb %>
-<% rich_text_comments_enabled = RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments %>
+<% configuration = RecordingStudioCommentable.configuration %>
+<% rich_text_comments_enabled = if configuration.respond_to?(:rich_text_comments_enabled?)
+  configuration.rich_text_comments_enabled?
+elsif configuration.respond_to?(:rich_text_comments)
+  configuration.rich_text_comments.present?
+else
+  false
+end %>
+<% rich_text_options = if configuration.respond_to?(:rich_text_comment_editor_options)
+  configuration.rich_text_comment_editor_options(placeholder: "Write your comment...")
+else
+  {
+    preset: :content,
+    toolbar: :standard,
+    bubble_menu: true,
+    format: :html,
+    placeholder: "Write your comment..."
+  }
+end %>
 <% force_composer = local_assigns.fetch(:force_composer, false) %>
 <% submit_label = comment.new_record? ? "Post comment" : "Save changes" %>
 <% cancel_path = local_assigns[:cancel_path] %>
@@ -29,12 +47,7 @@
             error: comment.errors[:body].first,
             rows: 4,
             rich_text: true,
-            rich_text_options: {
-              preset: :content,
-              toolbar: :standard,
-              format: :html,
-              placeholder: "Write your comment..."
-            },
+            rich_text_options: rich_text_options,
             class: "flex flex-col gap-3 [&_.flat-pack-richtext-toolbar]:border-0 [&_.flat-pack-richtext-toolbar]:border-b [&_.flat-pack-richtext-toolbar]:border-[var(--comments-composer-border-color)] [&_.flat-pack-richtext-toolbar]:px-0 [&_.flat-pack-richtext-toolbar]:pb-3 [&_.flat-pack-richtext-toolbar]:pt-0 [&_.flat-pack-richtext-editor]:min-h-16 [&_.flat-pack-richtext-editor]:border-0 [&_.flat-pack-richtext-editor]:bg-transparent [&_.flat-pack-richtext-editor]:px-0 [&_.flat-pack-richtext-editor]:py-0 [&_.flat-pack-richtext-editor]:shadow-none"
           ) %>
 
@@ -78,16 +91,11 @@
         name: "comment[body]",
         value: comment.body,
         label: "Comment",
-        placeholder: "Write your comment…",
+        placeholder: "Write your comment...",
         error: comment.errors[:body].first,
         rows: 4,
-        rich_text: rich_text_comments_enabled,
-        rich_text_options: {
-          preset: :content,
-          toolbar: :standard,
-          format: :html,
-          placeholder: "Write your comment…"
-        }
+        rich_text: true,
+        rich_text_options: rich_text_options
       ) %>
 
       <div class="flex justify-end">
@@ -103,7 +111,7 @@
     <%= render FlatPack::Comments::Composer::Component.new(
       name: "comment[body]",
       value: comment.body,
-      placeholder: "Write your comment…",
+      placeholder: "Write your comment...",
       submit_label: submit_label,
       rows: 4,
       avatar: { name: actor_name }

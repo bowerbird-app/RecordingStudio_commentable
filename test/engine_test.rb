@@ -39,7 +39,7 @@ class EngineTest < Minitest::Test
       {
         timeout: 12,
         layout: "flat_pack_pseudo_top_nav",
-        rich_text_comments: true,
+        rich_text_comments: :selection,
         recordable_display_attributes: { "Event" => :event_name },
         author_display_attributes: { "User" => :full_name },
         author_avatar_attributes: { "User" => :avatar_url }
@@ -51,7 +51,7 @@ class EngineTest < Minitest::Test
         {
           timeout: 12,
           layout: "host_comment_shell",
-          rich_text_comments: true,
+          rich_text_comments: :toolbar,
           recordable_display_attributes: { "Page" => :title },
           author_display_attributes: { "SystemActor" => :display_name },
           author_avatar_attributes: { "SystemActor" => :avatar_url }
@@ -65,7 +65,7 @@ class EngineTest < Minitest::Test
     assert_equal RecordingStudioCommentable.configuration, hook_payload
     assert_equal 12, RecordingStudioCommentable.configuration.timeout
     assert_equal "flat_pack_pseudo_top_nav", RecordingStudioCommentable.configuration.layout
-    assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
+    assert_equal :selection, RecordingStudioCommentable.configuration.rich_text_comments
     assert_equal({ "Event" => :event_name }, RecordingStudioCommentable.configuration.recordable_display_attributes)
     assert_equal({ "User" => :full_name }, RecordingStudioCommentable.configuration.author_display_attributes)
     assert_equal({ "User" => :avatar_url }, RecordingStudioCommentable.configuration.author_avatar_attributes)
@@ -76,7 +76,7 @@ class EngineTest < Minitest::Test
       def each_pair
         yield(:timeout, 15)
         yield(:layout, "flat_pack_pseudo_top_nav")
-        yield(:rich_text_comments, true)
+        yield(:rich_text_comments, "selection")
         yield(:recordable_display_attributes, { Page: :title })
         yield(:author_display_attributes, { User: :full_name })
         yield(:author_avatar_attributes, { User: :avatar_url })
@@ -96,7 +96,7 @@ class EngineTest < Minitest::Test
 
     assert_equal 15, RecordingStudioCommentable.configuration.timeout
     assert_equal "flat_pack_pseudo_top_nav", RecordingStudioCommentable.configuration.layout
-    assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
+    assert_equal :selection, RecordingStudioCommentable.configuration.rich_text_comments
     assert_equal({ "Page" => :title }, RecordingStudioCommentable.configuration.recordable_display_attributes)
     assert_equal({ "User" => :full_name }, RecordingStudioCommentable.configuration.author_display_attributes)
     assert_equal({ "User" => :avatar_url }, RecordingStudioCommentable.configuration.author_avatar_attributes)

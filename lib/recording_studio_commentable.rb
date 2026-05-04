@@ -34,6 +34,7 @@ module RecordingStudioCommentable
       upgraded = Configuration.new
       upgraded.timeout = config.timeout if config.respond_to?(:timeout)
       upgraded.layout = config.layout if config.respond_to?(:layout)
+      upgraded.rich_text_comments = config.rich_text_comments if config.respond_to?(:rich_text_comments)
       if config.respond_to?(:recordable_display_attributes)
         upgraded.recordable_display_attributes = config.recordable_display_attributes
       end

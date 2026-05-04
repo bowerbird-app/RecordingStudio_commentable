@@ -15,7 +15,7 @@ class ConfigurationTest < Minitest::Test
     @configuration.merge!(
       timeout: 9,
       layout: "flat_pack_pseudo_top_nav",
-      rich_text_comments: true,
+      rich_text_comments: :selection,
       recordable_display_attributes: { Page: :title },
       author_display_attributes: { User: :full_name },
       author_avatar_attributes: { User: :avatar_url }
@@ -23,7 +23,7 @@ class ConfigurationTest < Minitest::Test
 
     assert_equal 9, @configuration.timeout
     assert_equal "flat_pack_pseudo_top_nav", @configuration.layout
-    assert_equal true, @configuration.rich_text_comments
+    assert_equal :selection, @configuration.rich_text_comments
     assert_equal({ "Page" => :title }, @configuration.recordable_display_attributes)
     assert_equal({ "User" => :full_name }, @configuration.author_display_attributes)
     assert_equal({ "User" => :avatar_url }, @configuration.author_avatar_attributes)
@@ -34,7 +34,7 @@ class ConfigurationTest < Minitest::Test
 
     refute_respond_to @configuration, :unknown_key
     assert_equal 7, @configuration.timeout
-    assert_equal true, @configuration.rich_text_comments
+    assert_equal :toolbar, @configuration.rich_text_comments
   end
 
   def test_merge_with_non_enumerable_is_noop
@@ -48,6 +48,36 @@ class ConfigurationTest < Minitest::Test
 
   def test_defaults_rich_text_comments_to_false
     assert_equal false, @configuration.rich_text_comments
+  end
+
+  def test_rich_text_comments_normalizes_string_mode_names
+    @configuration.rich_text_comments = "selection"
+
+    assert_equal :selection, @configuration.rich_text_comments
+  end
+
+  def test_rich_text_comments_exposes_enabled_flag_and_editor_options
+    @configuration.rich_text_comments = :selection
+
+    assert_equal true, @configuration.rich_text_comments_enabled?
+    assert_equal(
+      {
+        preset: :content,
+        toolbar: :none,
+        bubble_menu: true,
+        format: :html,
+        placeholder: "Write your comment..."
+      },
+      @configuration.rich_text_comment_editor_options(placeholder: "Write your comment...")
+    )
+  end
+
+  def test_rich_text_comments_rejects_unknown_modes
+    error = assert_raises(ArgumentError) do
+      @configuration.rich_text_comments = :balloon_party
+    end
+
+    assert_includes error.message, "rich_text_comments must be false, true, :toolbar, or :selection"
   end
 
   def test_defaults_layout_to_nil

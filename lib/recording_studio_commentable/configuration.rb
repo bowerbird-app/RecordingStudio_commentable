@@ -4,9 +4,20 @@ require_relative "hooks"
 
 module RecordingStudioCommentable
   class Configuration
-    attr_accessor :timeout, :rich_text_comments
-    attr_reader :hooks, :recordable_display_attributes, :author_display_attributes, :author_avatar_attributes
-    attr_reader :layout
+    RICH_TEXT_COMMENT_MODES = {
+      true => :toolbar,
+      false => false,
+      nil => false,
+      "" => false,
+      :toolbar => :toolbar,
+      "toolbar" => :toolbar,
+      :selection => :selection,
+      "selection" => :selection
+    }.freeze
+
+    attr_accessor :timeout
+    attr_reader :rich_text_comments, :hooks, :recordable_display_attributes, :author_display_attributes,
+                :author_avatar_attributes, :layout
 
     def initialize
       @timeout = 5
@@ -20,6 +31,26 @@ module RecordingStudioCommentable
 
     def layout=(value)
       @layout = value.to_s.strip.presence
+    end
+
+    def rich_text_comments=(value)
+      @rich_text_comments = normalize_rich_text_comments(value)
+    end
+
+    def rich_text_comments_enabled?
+      rich_text_comments.present?
+    end
+
+    def rich_text_comment_editor_options(placeholder: nil)
+      return {} unless rich_text_comments_enabled?
+
+      {
+        preset: :content,
+        toolbar: rich_text_comments == :selection ? :none : :standard,
+        bubble_menu: true,
+        format: :html,
+        placeholder: placeholder
+      }.compact
     end
 
     def recordable_display_attributes=(value)
@@ -66,6 +97,20 @@ module RecordingStudioCommentable
 
         normalized[recordable_type.to_s] = attribute_name.to_sym
       end
+    end
+
+    def normalize_rich_text_comments(value)
+      normalized = if value.is_a?(String)
+                     stripped = value.strip
+                     RICH_TEXT_COMMENT_MODES.fetch(stripped, stripped.presence&.to_sym)
+                   else
+                     RICH_TEXT_COMMENT_MODES.fetch(value, value)
+                   end
+
+      return normalized if [false, :toolbar, :selection].include?(normalized)
+
+      raise ArgumentError,
+            "rich_text_comments must be false, true, :toolbar, or :selection, got #{value.inspect}"
     end
   end
 end

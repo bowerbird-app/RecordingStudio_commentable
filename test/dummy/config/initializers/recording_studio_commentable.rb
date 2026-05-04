@@ -2,7 +2,7 @@
 
 RecordingStudioCommentable.configure do |config|
   config.layout = ""
-  config.rich_text_comments = true
+  config.rich_text_comments = :selection
   config.recordable_display_attributes = {
     "Page" => :title,
     "Folder" => :name
