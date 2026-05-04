@@ -279,7 +279,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes form_partial_source,
                     "RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments"
     assert_includes form_partial_source, "force_composer = local_assigns.fetch(:force_composer, false)"
-    assert_includes form_partial_source, "rich_text_comments_enabled && !force_composer"
+    assert_includes form_partial_source, "rich_text_comments_enabled && force_composer"
+    assert_includes form_partial_source, "rich_text: true"
+    assert_includes form_partial_source,
+                    "relative overflow-hidden rounded-xl border border-[var(--comments-composer-border-color)]"
     assert_includes form_partial_source, "FlatPack::Comments::Composer::Component.new("
     assert_includes form_partial_source, "preset: :content"
     assert_includes form_partial_source, "format: :html"
