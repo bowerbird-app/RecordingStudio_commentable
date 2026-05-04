@@ -76,7 +76,9 @@
 
           <% @comments.each do |comment_recording| %>
             <% thread.comment do %>
-              <%= render "comment", comment_recording: comment_recording %>
+              <%= render "comment",
+                    comment_recording: comment_recording,
+                    replies: (@replies || {}).fetch(comment_recording.id, []) %>
             <% end %>
           <% end %>
         <% end %>

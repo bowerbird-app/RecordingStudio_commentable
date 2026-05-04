@@ -20,21 +20,26 @@ module RecordingStudioCommentable
 
       @comment = Comment.new
       @comments = comments_relation.to_a
+      @replies = load_replies(@comments)
     end
 
     def all
       @comment = Comment.new
       @comments = comments_relation.to_a
       @comments_count = @comments.size
+      @replies = load_replies(@comments)
     end
 
     def new
       @comment = Comment.new
+      @parent_comment_recording = find_parent_comment_recording
     end
 
     def create
+      effective_parent = find_parent_comment_recording || @parent_recording
+
       result = Services::CreateComment.call(
-        parent_recording: @parent_recording,
+        parent_recording: effective_parent,
         body: comment_params[:body],
         author: current_recording_studio_actor
       )
@@ -49,10 +54,12 @@ module RecordingStudioCommentable
           @show_comments = true
           @comments = comments_relation.to_a
           @comments_count = @comments.size
+          @replies = load_replies(@comments)
           render :index, status: :unprocessable_entity
         elsif inline_composer_request?
           @comments = comments_relation.to_a
           @comments_count = @comments.size
+          @replies = load_replies(@comments)
           render :all, status: :unprocessable_entity
         else
           render :new, status: :unprocessable_entity
@@ -259,6 +266,39 @@ module RecordingStudioCommentable
         .where(trashed_at: nil)
         .order(created_at: :asc)
         .includes(:recordable)
+    end
+
+    # Loads replies for a list of top-level comment recordings.
+    # Returns a Hash of { recording_id => [reply_recordings] }.
+    def load_replies(top_level_recordings)
+      return {} unless defined?(RecordingStudio::Recording)
+      return {} if top_level_recordings.empty?
+
+      ids = top_level_recordings.map(&:id)
+
+      RecordingStudio::Recording
+        .where(parent_recording_id: ids)
+        .where(recordable_type: "RecordingStudioCommentable::Comment")
+        .where(trashed_at: nil)
+        .order(created_at: :asc)
+        .includes(:recordable)
+        .group_by(&:parent_recording_id)
+    end
+
+    # Resolves the parent comment recording from params[:parent_comment_id].
+    # Returns nil when the param is absent or the recording fails security checks.
+    # Security: the recording must be a non-trashed comment that is a direct child
+    # of the current page recording, preventing cross-thread reply injection.
+    def find_parent_comment_recording
+      return unless params[:parent_comment_id].present?
+
+      recording = find_recording(params[:parent_comment_id])
+      return unless recording
+      return unless recording.parent_recording_id == @parent_recording.id
+      return unless recording.recordable_type == "RecordingStudioCommentable::Comment"
+      return if recording.trashed_at.present?
+
+      recording
     end
 
     def structure_child_recordings

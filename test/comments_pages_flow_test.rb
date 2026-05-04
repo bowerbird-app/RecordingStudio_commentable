@@ -257,7 +257,9 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source,
                     'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
     assert_includes view_source, "thread.comment do"
-    assert_includes view_source, '<%= render "comment", comment_recording: comment_recording %>'
+    assert_includes view_source, 'render "comment"'
+    assert_includes view_source, "comment_recording: comment_recording"
+    assert_includes view_source, "replies:"
     refute_includes view_source, "thread.composer do"
     refute_includes view_source, "FlatPack::Card::Component.new(style: :outlined)"
     refute_includes view_source, "FlatPack::PageTitle::Component.new("
@@ -317,7 +319,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source, "comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil"
     assert_includes comment_partial_source, "avatar: { name: author_name, src: author_avatar_url }"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
-    assert_includes comment_partial_source, '<%= link_to "Reply", "#"'
+    assert_includes comment_partial_source, 'link_to "Reply"'
+    assert_includes comment_partial_source, "new_recording_comment_path"
+    assert_includes comment_partial_source, "parent_comment_id: comment_recording.id"
+    refute_includes comment_partial_source, 'link_to "Reply", "#"'
     refute_includes comment_partial_source, 'text: "Show"'
     refute_includes comment_partial_source, 'text: "Edit"'
     refute_includes comment_partial_source, 'text: "Delete"'

@@ -4,6 +4,7 @@
 <% comment = comment_recording.try(:recordable) || comment_recording %>
 <% parent_recording = local_assigns[:parent_recording] || @parent_recording %>
 <% accessible = local_assigns.fetch(:accessible, true) %>
+<% replies = local_assigns.fetch(:replies, []) %>
 <% author_name = comment.respond_to?(:author_display_name) ? comment.author_display_name : "Anonymous" %>
 <% author_avatar_url = comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil %>
 <% created_at = comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
@@ -25,8 +26,26 @@ end %>
   ) do |item| %>
     <% if accessible %>
       <% item.actions do %>
-        <%= link_to "Reply", "#", class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
+        <%= link_to "Reply",
+              main_app.new_recording_comment_path(parent_recording, parent_comment_id: comment_recording.id),
+              class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
       <% end %>
     <% end %>
+  <% end %>
+
+  <% if replies.any? %>
+    <%# Replies are rendered one level deep by passing an empty replies array.
+        This is a deliberate design choice: the engine supports one level of
+        threading (top-level comments and their direct replies). Deeper nesting
+        is avoided to keep the query strategy simple and the UI scannable. %>
+    <div class="ml-8 mt-4 flex flex-col gap-4 border-l-2 border-[var(--surface-border-color)] pl-4">
+      <% replies.each do |reply_recording| %>
+        <%= render "comment",
+              comment_recording: reply_recording,
+              parent_recording: parent_recording,
+              accessible: accessible,
+              replies: [] %>
+      <% end %>
+    </div>
   <% end %>
 </div>
