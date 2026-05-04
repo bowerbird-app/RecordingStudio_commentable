@@ -1,23 +1,7 @@
 <%# app/views/recording_studio_commentable/comments/_form.html.erb %>
 <% configuration = RecordingStudioCommentable.configuration %>
-<% rich_text_comments_enabled = if configuration.respond_to?(:rich_text_comments_enabled?)
-  configuration.rich_text_comments_enabled?
-elsif configuration.respond_to?(:rich_text_comments)
-  configuration.rich_text_comments.present?
-else
-  false
-end %>
-<% rich_text_options = if configuration.respond_to?(:rich_text_comment_editor_options)
-  configuration.rich_text_comment_editor_options(placeholder: "Write your comment...")
-else
-  {
-    preset: :content,
-    toolbar: :standard,
-    bubble_menu: true,
-    format: :html,
-    placeholder: "Write your comment..."
-  }
-end %>
+<% rich_text_comments_enabled = configuration.rich_text_comments_enabled? %>
+<% rich_text_options = configuration.rich_text_comment_editor_options(placeholder: "Write your comment...") %>
 <% force_composer = local_assigns.fetch(:force_composer, false) %>
 <% submit_label = comment.new_record? ? "Post comment" : "Save changes" %>
 <% cancel_path = local_assigns[:cancel_path] %>

@@ -47,15 +47,11 @@ module RecordingStudioCommentable
     initializer "recording_studio_commentable.load_config" do |app|
       if app.respond_to?(:config_for)
         begin
-          yaml = begin
-            app.config_for(:recording_studio_commentable)
-          rescue StandardError
-            nil
-          end
-          RecordingStudioCommentable.configuration.merge!(yaml) if yaml.respond_to?(:each)
-        rescue StandardError => _e
-          # ignore load errors; host app can provide initializer overrides
+          yaml = app.config_for(:recording_studio_commentable)
+        rescue StandardError
+          yaml = nil
         end
+        RecordingStudioCommentable.configuration.merge!(yaml) if yaml.respond_to?(:each)
       end
 
       if app.config.respond_to?(:x) && app.config.x.respond_to?(:recording_studio_commentable)
@@ -67,7 +63,7 @@ module RecordingStudioCommentable
             hash = {}
             xcfg.each_pair { |k, v| hash[k] = v } if xcfg.respond_to?(:each_pair)
             RecordingStudioCommentable.configuration.merge!(hash) if hash&.any?
-          rescue StandardError => _e
+          rescue StandardError
             # ignore
           end
         end

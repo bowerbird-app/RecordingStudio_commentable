@@ -35,10 +35,7 @@ module RecordingStudioCommentable
     end
 
     def commentable_layout
-      configured_layout = RecordingStudioCommentable.configuration.layout if
-        RecordingStudioCommentable.configuration.respond_to?(:layout)
-
-      configured_layout.presence || "recording_studio_commentable/application"
+      RecordingStudioCommentable.configuration.layout.presence || "recording_studio_commentable/application"
     end
   end
 end

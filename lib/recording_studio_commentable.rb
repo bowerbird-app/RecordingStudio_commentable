@@ -24,30 +24,26 @@ module RecordingStudioCommentable
 
     private
 
+    MIGRATEABLE_ATTRIBUTES = %i[
+      timeout
+      use_recording_studio_trashable_for_destroy
+      layout
+      rich_text_comments
+      recordable_display_attributes
+      author_display_attributes
+      author_avatar_attributes
+    ].freeze
+    private_constant :MIGRATEABLE_ATTRIBUTES
+
     def normalize_configuration(config)
       return Configuration.new unless config
-      return config if config.respond_to?(:rich_text_comments) &&
-                       config.respond_to?(:use_recording_studio_trashable_for_destroy) &&
-                       config.respond_to?(:layout) &&
-                       config.respond_to?(:recordable_display_attributes) &&
-                       config.respond_to?(:author_display_attributes) &&
-                       config.respond_to?(:author_avatar_attributes)
+      return config if config.is_a?(Configuration)
 
       upgraded = Configuration.new
-      upgraded.timeout = config.timeout if config.respond_to?(:timeout)
-      if config.respond_to?(:use_recording_studio_trashable_for_destroy)
-        upgraded.use_recording_studio_trashable_for_destroy = config.use_recording_studio_trashable_for_destroy
-      end
-      upgraded.layout = config.layout if config.respond_to?(:layout)
-      upgraded.rich_text_comments = config.rich_text_comments if config.respond_to?(:rich_text_comments)
-      if config.respond_to?(:recordable_display_attributes)
-        upgraded.recordable_display_attributes = config.recordable_display_attributes
-      end
-      if config.respond_to?(:author_display_attributes)
-        upgraded.author_display_attributes = config.author_display_attributes
-      end
-      if config.respond_to?(:author_avatar_attributes)
-        upgraded.author_avatar_attributes = config.author_avatar_attributes
+      MIGRATEABLE_ATTRIBUTES.each do |attr|
+        next unless config.respond_to?(attr)
+
+        upgraded.public_send(:"#{attr}=", config.public_send(attr))
       end
       upgraded.instance_variable_set(:@hooks, config.hooks) if config.respond_to?(:hooks)
       upgraded
