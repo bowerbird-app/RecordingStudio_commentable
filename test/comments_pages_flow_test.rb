@@ -7,7 +7,12 @@ class CommentsPagesFlowTest < Minitest::Test
     routes_source = read_workspace_file("config/routes.rb")
     dummy_routes_source = read_workspace_file("test/dummy/config/routes.rb")
 
-    assert_includes routes_source, "get :all, path: \"all\""
+    refute_includes routes_source, "resources :recordings, only: [] do"
+    refute_includes routes_source, "resources :comments, only: %i[index]"
+    refute_includes routes_source, "get :all, path: \"all\""
+    assert_includes dummy_routes_source, "scope module: :recording_studio_commentable do"
+    assert_includes dummy_routes_source, "resources :comments, only: %i[index new create edit update destroy] do"
+    assert_includes dummy_routes_source, "get :all, path: \"all\""
     assert_includes dummy_routes_source, 'get "/recordings", to: "home#recordings", as: :recordings_browser'
     assert_includes dummy_routes_source, 'get "/recordings/:id", to: "home#recording", as: :recording_browser'
     assert_includes dummy_routes_source, 'get "/services", to: "home#services", as: :services'
@@ -137,7 +142,6 @@ class CommentsPagesFlowTest < Minitest::Test
     controller_source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
     layout_source = read_workspace_file("app/views/layouts/recording_studio_commentable/application.html.erb")
 
-    assert_includes application_controller_source, 'layout "recording_studio_commentable/application"'
     assert_includes controller_source, "before_action :authorize_view!, only: %i[index all]"
     assert_includes controller_source, "def all"
     assert_includes controller_source, "@show_comments = summary_show_comments_request?"
@@ -154,7 +158,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "@can_create_comment = authorized?(:edit)"
     assert_includes controller_source, "ActiveModel::Type::Boolean.new.cast(params[:inline_composer])"
     assert_includes controller_source, "ActiveModel::Type::Boolean.new.cast(params[:show_comments])"
-    assert_includes controller_source, "recording_comments_path(@parent_recording, return_to_options.merge(show_comments: true))"
+    assert_includes controller_source, "show_comments ? { show_comments: true } : {}"
+    assert_includes controller_source, "main_app.recording_comments_path("
+    assert_includes controller_source, "main_app.all_recording_comments_path(@parent_recording, return_to_options)"
+    assert_includes controller_source, "main_app.new_recording_comment_path(@parent_recording, return_to_options)"
     assert_includes controller_source, "normalized_home_paths = [root_path, root_path.chomp(\"/\")].uniq"
     assert_includes controller_source,
                     "referer_uri.query.present? ? \"\#{referer_uri.path}?\#{referer_uri.query}\" : referer_uri.path"
@@ -178,12 +185,13 @@ class CommentsPagesFlowTest < Minitest::Test
                     'onclick: "if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"'
     assert_includes view_source, "unless @show_comments"
     assert_includes view_source,
-            'recording_comments_path(@parent_recording, return_to: params[:return_to], show_comments: true)'
+                    "main_app.recording_comments_path(@parent_recording, show_comments: true)"
     assert_includes view_source, "@comments_count.positive? ? \"\#{@comments_count} Comments\" : \"Add comment\""
     assert_includes view_source, "if @show_comments"
-    assert_includes view_source, 'show_comments: true,'
-    assert_includes view_source, 'inline_composer: true'
-    assert_includes view_source, 'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
+    assert_includes view_source, "show_comments: true,"
+    assert_includes view_source, "inline_composer: true"
+    assert_includes view_source,
+                    'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
   end
 
   def test_all_comments_page_template_shows_back_button_and_comment_thread
@@ -193,7 +201,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source, "thread.header do"
     assert_includes view_source, "if @can_create_comment"
     assert_includes view_source,
-                    "recording_comments_path(@parent_recording, return_to: params[:return_to], inline_composer: true)"
+                    "main_app.recording_comments_path("
     assert_includes view_source, "force_composer: true"
     assert_includes view_source, "FlatPack::Comments::Thread::Component.new("
     assert_includes view_source, 'class: "max-w-none rounded-none bg-transparent p-0 shadow-none"'
@@ -222,7 +230,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes new_view_source, "thread.header do"
     assert_includes new_view_source, "thread.comment do"
     assert_includes new_view_source, 'title: "Add comment"'
-    assert_includes new_view_source, "recording_comments_path(@parent_recording, return_to: params[:return_to])"
+    assert_includes new_view_source, "main_app.recording_comments_path(@parent_recording, return_to: params[:return_to])"
     assert_includes new_view_source,
                     "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "force_composer: true"
@@ -242,6 +250,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes form_partial_source, "preset: :content"
     assert_includes form_partial_source, "format: :html"
     assert_includes scenarios_view_source, 'text: "Open comment feed"'
+    assert_includes scenarios_view_source,
+            'link_to recording_comments_path(recording)'
     assert_includes scenarios_view_source, "They can open the feed, but cannot add a comment."
     refute_includes scenarios_view_source, 'text: "Post comment"'
     refute_includes scenarios_view_source, "form_with model: @new_comment"

@@ -19,7 +19,11 @@
         <% if @can_create_comment %>
         <%= render "form",
               comment: @comment,
-              url: recording_comments_path(@parent_recording, return_to: params[:return_to], inline_composer: true),
+            url: main_app.recording_comments_path(
+              @parent_recording,
+              return_to: params[:return_to],
+              inline_composer: true
+            ),
               force_composer: true %>
         <% end %>
 

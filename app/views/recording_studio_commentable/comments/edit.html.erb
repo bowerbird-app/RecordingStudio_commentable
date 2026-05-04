@@ -13,7 +13,7 @@
     <% card.body do %>
       <%= render "form",
             comment: @comment,
-            url: recording_comment_path(@parent_recording, @comment_recording, return_to: params[:return_to]),
+            url: main_app.recording_comment_path(@parent_recording, @comment_recording, return_to: params[:return_to]),
             cancel_path: @comments_collection_path %>
     <% end %>
   <% end %>

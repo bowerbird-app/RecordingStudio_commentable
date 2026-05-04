@@ -32,7 +32,7 @@
       <footer class="border-t border-(--surface-border-color) pt-6">
           <%= link_to(
                 @comments_count.positive? ?
-                  recording_comments_path(@parent_recording, return_to: params[:return_to], show_comments: true) :
+            main_app.recording_comments_path(@parent_recording, show_comments: true) :
                   @new_comment_path
               ) do %>
           <%= render FlatPack::Button::Component.new(
@@ -60,9 +60,8 @@
               <% if @can_create_comment %>
                 <%= render "form",
                       comment: @comment,
-                      url: recording_comments_path(
+                      url: main_app.recording_comments_path(
                         @parent_recording,
-                        return_to: params[:return_to],
                         show_comments: true,
                         inline_composer: true
                       ),

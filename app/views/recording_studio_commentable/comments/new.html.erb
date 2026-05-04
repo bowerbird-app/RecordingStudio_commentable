@@ -21,7 +21,7 @@
     <% thread.comment do %>
       <%= render "form",
             comment: @comment,
-            url: recording_comments_path(@parent_recording, return_to: params[:return_to]),
+          url: main_app.recording_comments_path(@parent_recording, return_to: params[:return_to]),
             cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path),
             force_composer: true %>
     <% end %>

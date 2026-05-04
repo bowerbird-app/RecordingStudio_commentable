@@ -128,9 +128,9 @@ module RecordingStudioCommentable
       @page_recordable = @parent_recording.respond_to?(:recordable) ? @parent_recording.recordable : nil
       @page_title = recordable_display_title(@page_recordable, missing: "Missing recordable")
       @page_body = @page_recordable.try(:body).presence
-      @summary_path = recording_comments_path(@parent_recording, return_to_options)
-      @comments_collection_path = all_recording_comments_path(@parent_recording, return_to_options)
-      @new_comment_path = new_recording_comment_path(@parent_recording, return_to_options)
+      @summary_path = summary_path
+      @comments_collection_path = host_comments_collection_path
+      @new_comment_path = host_new_comment_path
       @external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path
       @can_create_comment = authorized?(:edit)
     end
@@ -205,11 +205,26 @@ module RecordingStudioCommentable
     end
 
     def comments_collection_path
-      @comments_collection_path || all_recording_comments_path(@parent_recording, return_to_options)
+      @comments_collection_path || host_comments_collection_path
     end
 
     def expanded_summary_path
-      recording_comments_path(@parent_recording, return_to_options.merge(show_comments: true))
+      summary_path(show_comments: true)
+    end
+
+    def summary_path(show_comments: false)
+      main_app.recording_comments_path(
+        @parent_recording,
+        show_comments ? { show_comments: true } : {}
+      )
+    end
+
+    def host_comments_collection_path
+      main_app.all_recording_comments_path(@parent_recording, return_to_options)
+    end
+
+    def host_new_comment_path
+      main_app.new_recording_comment_path(@parent_recording, return_to_options)
     end
 
     def inline_composer_request?
