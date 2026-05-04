@@ -18,6 +18,7 @@ module RecordingStudioCommentable
     end
 
     def all
+      @comment = Comment.new
       @comments = comments_relation.to_a
       @comments_count = @comments.size
     end
@@ -39,7 +40,13 @@ module RecordingStudioCommentable
       else
         @comment = Comment.new(body: comment_params[:body])
         @comment.errors.add(:base, result.error) if result.error
-        render :new, status: :unprocessable_entity
+        if inline_composer_request?
+          @comments = comments_relation.to_a
+          @comments_count = @comments.size
+          render :all, status: :unprocessable_entity
+        else
+          render :new, status: :unprocessable_entity
+        end
       end
     end
 
@@ -109,12 +116,13 @@ module RecordingStudioCommentable
       return unless @parent_recording
 
       @page_recordable = @parent_recording.respond_to?(:recordable) ? @parent_recording.recordable : nil
-      @page_title = recordable_title(@page_recordable)
+      @page_title = recordable_display_title(@page_recordable, missing: "Missing recordable")
       @page_body = @page_recordable.try(:body).presence
       @summary_path = recording_comments_path(@parent_recording, return_to_options)
       @comments_collection_path = all_recording_comments_path(@parent_recording, return_to_options)
       @new_comment_path = new_recording_comment_path(@parent_recording, return_to_options)
       @external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path
+      @can_create_comment = authorized?(:edit)
     end
 
     # ------------------------------------------------------------------ #
@@ -190,6 +198,10 @@ module RecordingStudioCommentable
       @comments_collection_path || all_recording_comments_path(@parent_recording, return_to_options)
     end
 
+    def inline_composer_request?
+      ActiveModel::Type::Boolean.new.cast(params[:inline_composer])
+    end
+
     def comments_relation
       @comments_relation ||= chronological_comments
     end
@@ -231,7 +243,7 @@ module RecordingStudioCommentable
             event: event,
             title: event.action.to_s.humanize,
             details: event_snapshot_details(event),
-            recordable_title: recordable_title(event_recordable),
+            recordable_title: recordable_display_title(event_recordable, missing: "Missing recordable"),
             recordable_details: event_recordable_snapshot_details(event, event_recordable)
           }
         end
@@ -242,17 +254,11 @@ module RecordingStudioCommentable
 
       {
         recording: recording,
-        title: recordable_title(recordable),
+        title: recordable_display_title(recordable, missing: "Missing recordable"),
         recording_details: recording_only_details(recording),
-        recordable_title: recordable_title(recordable),
+        recordable_title: recordable_display_title(recordable, missing: "Missing recordable"),
         recordable_details: recordable_snapshot_details(recordable)
       }
-    end
-
-    def recordable_title(recordable)
-      return "Missing recordable" unless recordable
-
-      recordable.try(:title) || recordable.try(:name) || recordable.class.name
     end
 
     def recording_only_details(recording)

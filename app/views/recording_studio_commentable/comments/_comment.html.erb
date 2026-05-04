@@ -2,93 +2,30 @@
 <% rich_text_comments_enabled = RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments %>
 <% comment = comment_recording.respond_to?(:recordable) ? comment_recording.recordable : comment_recording %>
 <% parent_recording = local_assigns[:parent_recording] || @parent_recording %>
-<% parent_title = local_assigns[:parent_title] %>
 <% accessible = local_assigns.fetch(:accessible, true) %>
-<% show_page_action = local_assigns[:show_page_action] %>
-<% return_to = local_assigns[:return_to] || params[:return_to] %>
-<% actor = current_recording_studio_actor %>
-<% is_author = comment.respond_to?(:author) && comment.author == actor %>
+<% author_name = comment.respond_to?(:author_display_name) ? comment.author_display_name : "Anonymous" %>
+<% author_avatar_url = comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil %>
+<% created_at = comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
+<% body_html = accessible && rich_text_comments_enabled ? FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe : nil %>
+<% body_text = if accessible
+  rich_text_comments_enabled ? nil : comment.body.to_s
+else
+  "Comment hidden"
+end %>
 
 <div class="<%= accessible ? "" : "opacity-60" %>">
-  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-    <% card.body do %>
-      <div class="flex items-start gap-3">
-      <div class="flex-1 min-w-0">
-        <% if parent_title.present? %>
-          <p class="mb-2 text-base font-semibold leading-6 text-(--surface-content-color)"><%= parent_title %></p>
-        <% end %>
-
-        <div class="flex items-center gap-2 mb-2">
-          <%= render FlatPack::Badge::Component.new(
-            text: comment.respond_to?(:author_display_name) ? comment.author_display_name : "Anonymous",
-            style: :info,
-            size: :sm
-          ) %>
-          <span class="text-xs text-(--surface-muted-content-color)">
-            <%= comment_recording.respond_to?(:created_at) ? comment_recording.created_at.strftime("%b %-d, %Y at %H:%M") : "" %>
-          </span>
-        </div>
-
-        <% if accessible %>
-          <% if rich_text_comments_enabled %>
-            <div class="prose prose-sm max-w-none text-sm leading-6">
-              <%= FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe %>
-            </div>
-          <% else %>
-            <p class="text-sm leading-6 whitespace-pre-wrap"><%= comment.body %></p>
-          <% end %>
-        <% else %>
-          <p class="text-sm leading-6 text-(--surface-muted-content-color)">Comment hidden</p>
-        <% end %>
-      </div>
-
-      <% if accessible && (show_page_action || is_author || (defined?(RecordingStudioAccessible) && RecordingStudioAccessible.authorized?(actor: actor, recording: parent_recording, role: :manage))) %>
-        <div class="flex items-center gap-2 shrink-0">
-          <% if show_page_action %>
-            <%= render FlatPack::Button::Component.new(
-                  text: "Show",
-                  style: :ghost,
-                  size: :sm,
-                  url: recording_comments_path(parent_recording, return_to: return_to),
-                  data: { turbo_frame: "_top" }
-                ) %>
-          <% end %>
-
-          <% if is_author || (defined?(RecordingStudioAccessible) && RecordingStudioAccessible.authorized?(actor: actor, recording: parent_recording, role: :manage)) %>
-            <%= render FlatPack::Button::Component.new(
-                  text: "Edit",
-                  style: :ghost,
-                  size: :sm,
-                  url: edit_recording_comment_path(parent_recording, comment_recording, return_to: return_to),
-                  data: { turbo_frame: "_top" }
-                ) %>
-
-            <%= button_to recording_comment_path(parent_recording, comment_recording, return_to: return_to),
-                  method: :delete,
-                  form: { data: { turbo_frame: "_top" } },
-                  data: { turbo_confirm: "Delete this comment?" } do %>
-              <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm, type: "submit") %>
-            <% end %>
-          <% end %>
-        </div>
-      <% elsif !accessible %>
-        <div class="flex items-center gap-2 shrink-0 pointer-events-none">
-          <% if show_page_action %>
-            <div class="opacity-60">
-              <%= render FlatPack::Button::Component.new(text: "Show", style: :ghost, size: :sm) %>
-            </div>
-          <% end %>
-
-          <div class="opacity-60">
-            <%= render FlatPack::Button::Component.new(text: "Edit", style: :ghost, size: :sm) %>
-          </div>
-
-          <div class="opacity-60">
-            <%= render FlatPack::Button::Component.new(text: "Delete", style: :ghost, size: :sm) %>
-          </div>
-        </div>
+  <%= render FlatPack::Comments::Item::Component.new(
+    author_name: author_name,
+    timestamp: created_at&.strftime("%b %-d, %Y at %H:%M"),
+    timestamp_iso: created_at&.iso8601,
+    body: body_text,
+    body_html: body_html,
+    avatar: { name: author_name, src: author_avatar_url }
+  ) do |item| %>
+    <% if accessible %>
+      <% item.actions do %>
+        <%= link_to "Reply", "#", class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
       <% end %>
-      </div>
     <% end %>
   <% end %>
 </div>

@@ -1,35 +1,71 @@
 <%# app/views/recording_studio_commentable/comments/_form.html.erb %>
 <% rich_text_comments_enabled = RecordingStudioCommentable.configuration.respond_to?(:rich_text_comments) && RecordingStudioCommentable.configuration.rich_text_comments %>
+<% force_composer = local_assigns.fetch(:force_composer, false) %>
+<% submit_label = comment.new_record? ? "Post comment" : "Save changes" %>
+<% cancel_path = local_assigns[:cancel_path] %>
+<% actor_name = current_recording_studio_actor.respond_to?(:display_name) ? current_recording_studio_actor.display_name : current_recording_studio_actor.to_s.presence || "You" %>
 <%= form_with model: comment, url: url, local: false do |f| %>
   <%= render FlatPack::Alert::Component.new(
     style: :danger,
     description: comment.errors.full_messages.join(", ")
   ) if comment.errors.any? %>
 
-  <div class="flex flex-col gap-4">
-    <%= render FlatPack::TextArea::Component.new(
+  <% if rich_text_comments_enabled && !force_composer %>
+    <div class="flex flex-col gap-4">
+      <%= render FlatPack::TextArea::Component.new(
+        name: "comment[body]",
+        value: comment.body,
+        label: "Comment",
+        placeholder: "Write your comment…",
+        error: comment.errors[:body].first,
+        rows: 4,
+        rich_text: rich_text_comments_enabled,
+        rich_text_options: {
+          preset: :content,
+          toolbar: :standard,
+          format: :html,
+          placeholder: "Write your comment…"
+        }
+      ) %>
+
+      <div class="flex justify-end">
+        <%= render FlatPack::Button::Component.new(
+          text: submit_label,
+          style: :primary,
+          size: :md,
+          type: "submit"
+        ) %>
+      </div>
+    </div>
+  <% else %>
+    <%= render FlatPack::Comments::Composer::Component.new(
       name: "comment[body]",
       value: comment.body,
-      label: "Comment",
       placeholder: "Write your comment…",
-      error: comment.errors[:body].first,
+      submit_label: submit_label,
       rows: 4,
-      rich_text: rich_text_comments_enabled,
-      rich_text_options: {
-        preset: :content,
-        toolbar: :standard,
-        format: :html,
-        placeholder: "Write your comment…"
-      }
-    ) %>
-
-    <div class="flex justify-end">
-      <%= render FlatPack::Button::Component.new(
-        text: comment.new_record? ? "Post comment" : "Save changes",
-        style: :primary,
-        size: :md,
-        type: "submit"
-      ) %>
-    </div>
-  </div>
+      avatar: { name: actor_name }
+    ) do |composer| %>
+      <% if cancel_path.present? %>
+        <% composer.actions do %>
+          <div class="flex w-full items-center justify-end gap-2">
+            <%= render FlatPack::Button::Component.new(
+              text: "Cancel",
+              url: cancel_path,
+              style: :ghost,
+              size: :sm,
+              class: "rounded-xl"
+            ) %>
+            <%= render FlatPack::Button::Component.new(
+              text: submit_label,
+              style: :primary,
+              size: :sm,
+              type: "submit",
+              class: "rounded-xl"
+            ) %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
 <% end %>
