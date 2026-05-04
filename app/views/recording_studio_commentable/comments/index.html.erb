@@ -32,7 +32,7 @@
       <footer class="border-t border-(--surface-border-color) pt-6">
           <%= link_to(
                 @comments_count.positive? ?
-            main_app.recording_comments_path(@parent_recording, show_comments: true) :
+            @comments_collection_path :
                   @new_comment_path
               ) do %>
           <%= render FlatPack::Button::Component.new(
