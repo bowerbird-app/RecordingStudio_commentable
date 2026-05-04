@@ -99,7 +99,7 @@ module RecordingStudioCommentable
 
     def return_to_path
       path = params[:return_to].to_s
-      return if path.blank? || !path.start_with?("/")
+      return if path.blank? || !path.start_with?("/") || path.start_with?("//")
 
       path
     end
