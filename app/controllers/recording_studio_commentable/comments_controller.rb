@@ -102,9 +102,9 @@ module RecordingStudioCommentable
       return if path.blank?
 
       uri = URI.parse(path)
-      return if uri.host.present? || !uri.path.start_with?("/")
+      return if uri.host.present? || uri.path.nil? || !uri.path.start_with?("/")
 
-      uri.path
+      uri.request_uri
     rescue URI::InvalidURIError
       nil
     end
