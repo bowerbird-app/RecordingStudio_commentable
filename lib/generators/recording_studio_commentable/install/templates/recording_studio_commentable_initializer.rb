@@ -10,6 +10,10 @@ RecordingStudioCommentable.configure do |config|
   # Optional host-app layout. Leave blank to use the engine's default layout.
   # config.layout = "flat_pack_sidebar"
 
+  # Use recording_studio_trashable's namespaced trash API for comment deletion.
+  # Leave false unless the host app installs recording_studio_trashable.
+  config.use_recording_studio_trashable_for_destroy = false
+
   # Comment editor mode: false, :toolbar, or :selection.
   # true is supported as a backwards-compatible alias for :toolbar.
   config.rich_text_comments = false

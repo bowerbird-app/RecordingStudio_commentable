@@ -27,6 +27,7 @@ module RecordingStudioCommentable
     def normalize_configuration(config)
       return Configuration.new unless config
       return config if config.respond_to?(:rich_text_comments) &&
+                       config.respond_to?(:use_recording_studio_trashable_for_destroy) &&
                        config.respond_to?(:layout) &&
                        config.respond_to?(:recordable_display_attributes) &&
                        config.respond_to?(:author_display_attributes) &&
@@ -34,6 +35,9 @@ module RecordingStudioCommentable
 
       upgraded = Configuration.new
       upgraded.timeout = config.timeout if config.respond_to?(:timeout)
+      if config.respond_to?(:use_recording_studio_trashable_for_destroy)
+        upgraded.use_recording_studio_trashable_for_destroy = config.use_recording_studio_trashable_for_destroy
+      end
       upgraded.layout = config.layout if config.respond_to?(:layout)
       upgraded.rich_text_comments = config.rich_text_comments if config.respond_to?(:rich_text_comments)
       if config.respond_to?(:recordable_display_attributes)

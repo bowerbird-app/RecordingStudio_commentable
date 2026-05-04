@@ -15,12 +15,13 @@ module RecordingStudioCommentable
       "selection" => :selection
     }.freeze
 
-    attr_accessor :timeout
+    attr_accessor :timeout, :use_recording_studio_trashable_for_destroy
     attr_reader :rich_text_comments, :hooks, :recordable_display_attributes, :author_display_attributes,
                 :author_avatar_attributes, :layout
 
     def initialize
       @timeout = 5
+      @use_recording_studio_trashable_for_destroy = false
       @rich_text_comments = false
       @layout = nil
       @recordable_display_attributes = {}
@@ -68,6 +69,7 @@ module RecordingStudioCommentable
     def to_h
       {
         timeout: timeout,
+        use_recording_studio_trashable_for_destroy: use_recording_studio_trashable_for_destroy,
         rich_text_comments: rich_text_comments,
         layout: layout,
         recordable_display_attributes: recordable_display_attributes.dup,

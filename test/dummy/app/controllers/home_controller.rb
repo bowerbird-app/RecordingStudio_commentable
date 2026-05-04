@@ -180,7 +180,7 @@ class HomeController < ApplicationController
         examples: [
           {
             label: "Configure layout and rich text",
-            input: 'RecordingStudioCommentable.configure do |config|\n  config.layout = "flat_pack_sidebar"\n  config.rich_text_comments = :selection\nend',
+            input: 'RecordingStudioCommentable.configure do |config|\n  config.layout = "flat_pack_sidebar"\n  config.use_recording_studio_trashable_for_destroy = true\n  config.rich_text_comments = :selection\nend',
             output: "Updates the shared Configuration object used by the engine"
           }
         ]

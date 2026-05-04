@@ -124,6 +124,7 @@ result = RecordingStudioCommentable::Services::DestroyComment.call(
 ```ruby
 RecordingStudioCommentable.configure do |config|
   config.timeout = 5
+  config.use_recording_studio_trashable_for_destroy = false
   config.layout = "flat_pack_sidebar"
   config.rich_text_comments = :toolbar
   config.recordable_display_attributes = {
@@ -147,6 +148,8 @@ end
 ```
 
 Leave `config.layout` unset to use the engine's default blank layout. Set it to a host layout path, such as `flat_pack_sidebar`, when you want the commentable pages and `/commentable` home feed to render inside your app shell.
+
+Set `config.use_recording_studio_trashable_for_destroy` to `true` only when the host app installs `recording_studio_trashable` and wants comment deletion to call `recording_studio_trashable_trash!` on the comment recording. The default is `false`, which keeps the existing `RecordingStudio` trash or direct-destroy fallback behavior.
 
 Set `config.rich_text_comments` to `false`, `:toolbar`, or `:selection`. `:toolbar` keeps the visible editor toolbar, while `:selection` hides it and uses the selection bubble menu instead. `true` is still accepted as a backwards-compatible alias for `:toolbar`.
 

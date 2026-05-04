@@ -82,6 +82,7 @@ class InstallGeneratorTest < Minitest::Test
       generator.copy_initializer
 
       initializer = File.read(File.join(dir, "config/initializers/recording_studio_commentable.rb"))
+      assert_includes initializer, "config.use_recording_studio_trashable_for_destroy = false"
       assert_includes initializer, "config.rich_text_comments = false"
       assert_includes initializer, "Comment editor mode: false, :toolbar, or :selection"
       assert_includes initializer, "config.recordable_display_attributes = {}"

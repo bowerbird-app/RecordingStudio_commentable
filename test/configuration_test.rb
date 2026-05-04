@@ -14,6 +14,7 @@ class ConfigurationTest < Minitest::Test
   def test_merge_updates_known_attributes
     @configuration.merge!(
       timeout: 9,
+      use_recording_studio_trashable_for_destroy: true,
       layout: "flat_pack_pseudo_top_nav",
       rich_text_comments: :selection,
       recordable_display_attributes: { Page: :title },
@@ -22,6 +23,7 @@ class ConfigurationTest < Minitest::Test
     )
 
     assert_equal 9, @configuration.timeout
+    assert_equal true, @configuration.use_recording_studio_trashable_for_destroy
     assert_equal "flat_pack_pseudo_top_nav", @configuration.layout
     assert_equal :selection, @configuration.rich_text_comments
     assert_equal({ "Page" => :title }, @configuration.recordable_display_attributes)
@@ -34,6 +36,7 @@ class ConfigurationTest < Minitest::Test
 
     refute_respond_to @configuration, :unknown_key
     assert_equal 7, @configuration.timeout
+    assert_equal false, @configuration.use_recording_studio_trashable_for_destroy
     assert_equal :toolbar, @configuration.rich_text_comments
   end
 
@@ -43,7 +46,13 @@ class ConfigurationTest < Minitest::Test
     @configuration.merge!(nil)
 
     assert_equal original[:timeout], @configuration.timeout
+    assert_equal original[:use_recording_studio_trashable_for_destroy],
+                 @configuration.use_recording_studio_trashable_for_destroy
     assert_equal original[:rich_text_comments], @configuration.rich_text_comments
+  end
+
+  def test_defaults_use_recording_studio_trashable_for_destroy_to_false
+    assert_equal false, @configuration.use_recording_studio_trashable_for_destroy
   end
 
   def test_defaults_rich_text_comments_to_false
@@ -155,6 +164,7 @@ class ConfigurationTest < Minitest::Test
 
     assert_kind_of RecordingStudioCommentable::Configuration, upgraded
     assert_equal 11, upgraded.timeout
+    assert_equal false, upgraded.use_recording_studio_trashable_for_destroy
     assert_nil upgraded.layout
     assert_equal false, upgraded.rich_text_comments
     assert_equal({}, upgraded.recordable_display_attributes)

@@ -38,6 +38,7 @@ class EngineTest < Minitest::Test
     xcfg = Struct.new(:recording_studio_commentable).new(
       {
         timeout: 12,
+        use_recording_studio_trashable_for_destroy: true,
         layout: "flat_pack_pseudo_top_nav",
         rich_text_comments: :selection,
         recordable_display_attributes: { "Event" => :event_name },
@@ -50,6 +51,7 @@ class EngineTest < Minitest::Test
       def config_for(_name)
         {
           timeout: 12,
+          use_recording_studio_trashable_for_destroy: false,
           layout: "host_comment_shell",
           rich_text_comments: :toolbar,
           recordable_display_attributes: { "Page" => :title },
@@ -64,6 +66,7 @@ class EngineTest < Minitest::Test
     assert hook_called
     assert_equal RecordingStudioCommentable.configuration, hook_payload
     assert_equal 12, RecordingStudioCommentable.configuration.timeout
+    assert_equal true, RecordingStudioCommentable.configuration.use_recording_studio_trashable_for_destroy
     assert_equal "flat_pack_pseudo_top_nav", RecordingStudioCommentable.configuration.layout
     assert_equal :selection, RecordingStudioCommentable.configuration.rich_text_comments
     assert_equal({ "Event" => :event_name }, RecordingStudioCommentable.configuration.recordable_display_attributes)
@@ -75,6 +78,7 @@ class EngineTest < Minitest::Test
     pair_config = Class.new do
       def each_pair
         yield(:timeout, 15)
+        yield(:use_recording_studio_trashable_for_destroy, true)
         yield(:layout, "flat_pack_pseudo_top_nav")
         yield(:rich_text_comments, "selection")
         yield(:recordable_display_attributes, { Page: :title })
@@ -95,6 +99,7 @@ class EngineTest < Minitest::Test
     find_initializer("recording_studio_commentable.load_config").block.call(app)
 
     assert_equal 15, RecordingStudioCommentable.configuration.timeout
+    assert_equal true, RecordingStudioCommentable.configuration.use_recording_studio_trashable_for_destroy
     assert_equal "flat_pack_pseudo_top_nav", RecordingStudioCommentable.configuration.layout
     assert_equal :selection, RecordingStudioCommentable.configuration.rich_text_comments
     assert_equal({ "Page" => :title }, RecordingStudioCommentable.configuration.recordable_display_attributes)
@@ -113,7 +118,7 @@ class EngineTest < Minitest::Test
     app_config = Struct.new(:x).new(xcfg)
     app = Struct.new(:config) do
       def config_for(_name)
-        { timeout: 5, layout: nil, rich_text_comments: false }
+        { timeout: 5, use_recording_studio_trashable_for_destroy: false, layout: nil, rich_text_comments: false }
       end
     end.new(app_config)
 
@@ -121,6 +126,7 @@ class EngineTest < Minitest::Test
     find_initializer("recording_studio_commentable.load_config").block.call(app)
 
     assert_equal 5, RecordingStudioCommentable.configuration.timeout
+    assert_equal false, RecordingStudioCommentable.configuration.use_recording_studio_trashable_for_destroy
     assert_nil RecordingStudioCommentable.configuration.layout
     assert_equal false, RecordingStudioCommentable.configuration.rich_text_comments
   end

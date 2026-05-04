@@ -34,11 +34,14 @@ The generated initializer keeps rich text comments off by default:
 ```ruby
 RecordingStudioCommentable.configure do |config|
   config.layout = "flat_pack_sidebar"
+  config.use_recording_studio_trashable_for_destroy = false
   config.rich_text_comments = false
 end
 ```
 
 Leave `config.layout` unset to keep the engine's default blank layout. Set it to a host layout path when commentable pages should render inside your app shell, for example a sidebar layout.
+
+Set `config.use_recording_studio_trashable_for_destroy` to `true` only when your host app also installs `recording_studio_trashable` and wants comment deletion to use that gem's namespaced trash lifecycle method on the comment recording. Leave it `false` to keep the default destroy behavior in this addon.
 
 Set `config.rich_text_comments` to `:toolbar` if you want the current comment-form editor with a visible toolbar, or `:selection` if you want formatting controls to appear from the selection bubble menu. `true` remains a backwards-compatible alias for `:toolbar`.
 
