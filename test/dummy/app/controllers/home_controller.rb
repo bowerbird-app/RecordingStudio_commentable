@@ -1,9 +1,10 @@
 class HomeController < ApplicationController
-  before_action :load_workspace_context, only: %i[index scenarios services recordings recording]
+  before_action :load_workspace_context, only: %i[index scenarios services recordings recording gem_routes]
   before_action :load_scenario_recordings, only: %i[index scenarios]
   before_action :load_service_catalog, only: :services
   before_action :load_recording_catalog, only: :recordings
   before_action :load_recording_detail, only: :recording
+  before_action :load_gem_route_catalog, only: :gem_routes
 
   def index
   end
@@ -18,6 +19,9 @@ class HomeController < ApplicationController
   end
 
   def recording
+  end
+
+  def gem_routes
   end
 
   private
@@ -98,6 +102,27 @@ class HomeController < ApplicationController
     ]
   end
 
+  def load_gem_route_catalog
+    @gem_route_groups = [
+      {
+        title: "Mounted engine routes",
+        subtitle: "Routes exposed under /commentable by the mounted RecordingStudioCommentable engine.",
+        routes: route_catalog_for(
+          RecordingStudioCommentable::Engine.routes,
+          path_prefix: "/commentable"
+        )
+      },
+      {
+        title: "Dummy app routes",
+        subtitle: "Host-app routes that still dispatch into RecordingStudioCommentable controllers.",
+        routes: route_catalog_for(
+          Rails.application.routes,
+          controller_prefix: "recording_studio_commentable/"
+        )
+      }
+    ]
+  end
+
   def load_recording_catalog
     @recordings = RecordingStudio::Recording.unscoped
       .where(recordable_type: ["Folder", "Page"])
@@ -111,6 +136,33 @@ class HomeController < ApplicationController
         title: recordable_display_title(recording.recordable, missing: "Missing recordable")
       }
     end
+  end
+
+  def route_catalog_for(route_set, path_prefix: nil, controller_prefix: nil)
+    route_set.routes.filter_map do |route|
+      controller = route.defaults[:controller].to_s
+      next if controller.blank?
+      next if controller_prefix && !controller.start_with?(controller_prefix)
+
+      {
+        name: route.name.presence || "(none)",
+        verb: normalized_route_verb(route),
+        path: normalized_route_path(route, path_prefix: path_prefix),
+        controller: controller,
+        action: route.defaults[:action].to_s
+      }
+    end.sort_by { |entry| [entry[:path], entry[:verb], entry[:name]] }
+  end
+
+  def normalized_route_verb(route)
+    route.verb.to_s.delete("^").delete("$").split("|").join(", ")
+  end
+
+  def normalized_route_path(route, path_prefix: nil)
+    path = route.path.spec.to_s.delete_suffix("(.:format)")
+    return path if path_prefix.blank? || path.start_with?(path_prefix)
+
+    "#{path_prefix}#{path}"
   end
 
   def load_recording_detail

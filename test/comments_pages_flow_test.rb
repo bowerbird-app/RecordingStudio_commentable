@@ -15,8 +15,37 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes dummy_routes_source, "get :all, path: \"all\""
     assert_includes dummy_routes_source, 'get "/recordings", to: "home#recordings", as: :recordings_browser'
     assert_includes dummy_routes_source, 'get "/recordings/:id", to: "home#recording", as: :recording_browser'
+    assert_includes dummy_routes_source, 'get "/gem-routes", to: "home#gem_routes", as: :gem_routes'
     assert_includes dummy_routes_source, 'get "/services", to: "home#services", as: :services'
     refute_includes dummy_routes_source, 'get "up" => "rails/health#show", as: :rails_health_check'
+  end
+
+  def test_dummy_gem_routes_page_lists_gem_route_catalog_and_sidebar_link
+    controller_source = read_workspace_file("test/dummy/app/controllers/home_controller.rb")
+    view_source = read_workspace_file("test/dummy/app/views/home/gem_routes.html.erb")
+    sidebar_source = read_workspace_file("test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb")
+
+    assert_includes controller_source, "before_action :load_gem_route_catalog, only: :gem_routes"
+    assert_includes controller_source, "def gem_routes"
+    assert_includes controller_source, "RecordingStudioCommentable::Engine.routes"
+    assert_includes controller_source, 'path_prefix: "/commentable"'
+    assert_includes controller_source, 'controller_prefix: "recording_studio_commentable/"'
+    assert_includes controller_source, "route_set.routes.filter_map do |route|"
+    assert_includes controller_source, "route.path.spec.to_s.delete_suffix(\"(.:format)\")"
+    assert_includes view_source, 'title: "Gem routes"'
+    assert_includes view_source,
+                    'subtitle: "A dummy-app reference for the RecordingStudioCommentable routes exposed by the mounted engine and the host app."'
+    assert_includes view_source, "@gem_route_groups.each do |group|"
+    assert_includes view_source, 'title: group[:title]'
+    assert_includes view_source, "group[:routes].each do |route|"
+    assert_includes view_source, 'FlatPack::Badge::Component.new(text: route[:verb], style: :info, size: :sm)'
+    assert_includes view_source, ">Path<"
+    assert_includes view_source, ">Helper<"
+    assert_includes view_source, ">Controller<"
+    assert_includes view_source, ">Action<"
+    assert_includes sidebar_source, 'label: "Gem routes"'
+    assert_includes sidebar_source, 'href: "/gem-routes"'
+    assert_includes sidebar_source, "icon: :git_branch"
   end
 
   def test_dummy_recordings_pages_expose_recording_structure_and_sidebar_link

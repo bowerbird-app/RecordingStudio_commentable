@@ -1,0 +1,70 @@
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Gem routes",
+    subtitle: "A dummy-app reference for the RecordingStudioCommentable routes exposed by the mounted engine and the host app.",
+    variant: :h1
+  ) %>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <% @gem_route_groups.each do |group| %>
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.body do %>
+          <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
+            <p class="text-(--surface-muted-content-color)"><%= group[:title] %></p>
+            <p class="text-3xl font-semibold"><%= group[:routes].size %></p>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="flex flex-col gap-6">
+    <% @gem_route_groups.each do |group| %>
+      <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: group[:title],
+            subtitle: group[:subtitle],
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+
+        <% card.body do %>
+          <div class="flex flex-col gap-4">
+            <% group[:routes].each do |route| %>
+              <%= render FlatPack::Card::Component.new(style: :outlined) do |route_card| %>
+                <% route_card.body do %>
+                  <div class="grid gap-4 lg:grid-cols-[minmax(0,160px)_minmax(0,1fr)]">
+                    <div class="flex items-start gap-2">
+                      <%= render FlatPack::Badge::Component.new(text: route[:verb], style: :info, size: :sm) %>
+                    </div>
+
+                    <dl class="grid gap-3 text-sm leading-6 text-(--surface-content-color) md:grid-cols-2">
+                      <div>
+                        <dt class="text-(--surface-muted-content-color)">Path</dt>
+                        <dd class="break-all font-medium"><%= route[:path] %></dd>
+                      </div>
+                      <div>
+                        <dt class="text-(--surface-muted-content-color)">Helper</dt>
+                        <dd class="break-all"><%= route[:name] %></dd>
+                      </div>
+                      <div>
+                        <dt class="text-(--surface-muted-content-color)">Controller</dt>
+                        <dd class="break-all"><%= route[:controller] %></dd>
+                      </div>
+                      <div>
+                        <dt class="text-(--surface-muted-content-color)">Action</dt>
+                        <dd><%= route[:action] %></dd>
+                      </div>
+                    </dl>
+                  </div>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
