@@ -124,6 +124,17 @@ result = RecordingStudioCommentable::Services::DestroyComment.call(
 ```ruby
 RecordingStudioCommentable.configure do |config|
   config.timeout = 5
+  config.recordable_display_attributes = {
+    "Page" => :title,
+    "Event" => :event_name
+  }
+  config.author_display_attributes = {
+    "User" => :full_name,
+    "SystemActor" => :display_name
+  }
+  config.author_avatar_attributes = {
+    "User" => :avatar_url
+  }
 
   # Lifecycle hooks
   config.hooks.after_initialize { Rails.logger.info "Commentable ready!" }

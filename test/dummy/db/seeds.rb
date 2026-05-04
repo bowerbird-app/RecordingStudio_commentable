@@ -5,6 +5,7 @@
 # Create the admin user
 user = User.find_or_initialize_by(email: "admin@admin.com")
 user.name = "Admin User"
+user.avatar_url = "https://i.pravatar.cc/160?u=admin@admin.com"
 if user.new_record?
   user.password = "Password"
   user.password_confirmation = "Password"
@@ -13,6 +14,7 @@ user.save!
 
 quinn = User.find_or_initialize_by(email: "quinn@admin.com")
 quinn.name = "Quinn Owner"
+quinn.avatar_url = nil
 if quinn.new_record?
   quinn.password = "Password"
   quinn.password_confirmation = "Password"

@@ -2,10 +2,13 @@
 
 module RecordingStudioCommentable
   class ApplicationController < (defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base)
+    include RecordingStudioCommentable::RecordableDisplayHelper
+
     protect_from_forgery with: :exception unless defined?(::ApplicationController)
     layout "recording_studio_commentable/application"
 
     helper_method :current_recording_studio_actor
+    helper_method :recordable_display_title
 
     private
 

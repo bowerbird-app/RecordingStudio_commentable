@@ -61,7 +61,7 @@ module RecordingStudioCommentable
           {
             comment_recording: comment_recording,
             parent_recording: parent_recording,
-            parent_title: recordable_title(parent_recording),
+            parent_title: recordable_display_title(parent_recording),
             accessible: accessible
           }
         end.compact
@@ -76,13 +76,6 @@ module RecordingStudioCommentable
         recording: recording,
         role: :view
       )
-    end
-
-    def recordable_title(recording)
-      recordable = recording.respond_to?(:recordable) ? recording.recordable : nil
-      return "Unknown item" unless recordable
-
-      recordable.try(:title) || recordable.try(:name) || recordable.class.name
     end
 
     def root_recording_for(recording)

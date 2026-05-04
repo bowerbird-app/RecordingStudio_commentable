@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "recording_studio_commentable/display_attribute_resolver"
+
 module RecordingStudioCommentable
   # Stores the body text and authorship of a single comment.
   #
@@ -26,7 +28,22 @@ module RecordingStudioCommentable
     def author_display_name
       return "Anonymous" unless author
 
-      author.respond_to?(:display_name) ? author.display_name : author.to_s
+      configured_name = RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
+        author,
+        mappings: RecordingStudioCommentable::DisplayAttributeResolver.mapping_for_configuration(:author_display_attributes),
+        fallback_attributes: %i[display_name name]
+      )
+
+      configured_name || author.to_s
+    end
+
+    def author_avatar_url
+      return unless author
+
+      RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
+        author,
+        mappings: RecordingStudioCommentable::DisplayAttributeResolver.mapping_for_configuration(:author_avatar_attributes)
+      )
     end
   end
 end

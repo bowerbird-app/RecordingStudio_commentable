@@ -30,7 +30,22 @@ class CommentTest < Minitest::Test
     def author_display_name
       return "Anonymous" unless author
 
-      author.respond_to?(:display_name) ? author.display_name : author.to_s
+      configured_name = RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
+        author,
+        mappings: RecordingStudioCommentable::DisplayAttributeResolver.mapping_for_configuration(:author_display_attributes),
+        fallback_attributes: %i[display_name name]
+      )
+
+      configured_name || author.to_s
+    end
+
+    def author_avatar_url
+      return unless author
+
+      RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
+        author,
+        mappings: RecordingStudioCommentable::DisplayAttributeResolver.mapping_for_configuration(:author_avatar_attributes)
+      )
     end
 
     def persisted?
@@ -41,6 +56,15 @@ class CommentTest < Minitest::Test
   def test_valid_with_body
     comment = StubComment.new(body: "Great work!")
     assert comment.valid?
+  end
+
+  def setup
+    @original_configuration = RecordingStudioCommentable.instance_variable_get(:@configuration)
+    RecordingStudioCommentable.instance_variable_set(:@configuration, RecordingStudioCommentable::Configuration.new)
+  end
+
+  def teardown
+    RecordingStudioCommentable.instance_variable_set(:@configuration, @original_configuration)
   end
 
   def test_invalid_without_body
@@ -75,6 +99,52 @@ class CommentTest < Minitest::Test
     assert_equal "user:42", comment.author_display_name
   end
 
+  def test_author_display_name_uses_configured_method
+    author_class = Class.new do
+      attr_reader :first_name, :last_name
+
+      def initialize(first_name, last_name)
+        @first_name = first_name
+        @last_name = last_name
+      end
+
+      def full_name
+        "#{first_name} #{last_name}"
+      end
+    end
+    Object.const_set("NamedAuthor", author_class)
+    RecordingStudioCommentable.configuration.author_display_attributes = { "NamedAuthor" => :full_name }
+
+    comment = StubComment.new(body: "Hello", author: NamedAuthor.new("Ada", "Lovelace"))
+
+    assert_equal "Ada Lovelace", comment.author_display_name
+  ensure
+    Object.send(:remove_const, :NamedAuthor) if Object.const_defined?(:NamedAuthor)
+  end
+
+  def test_author_avatar_url_uses_configured_method
+    author_class = Class.new do
+      def profile_image
+        "https://example.com/avatar.png"
+      end
+    end
+    Object.const_set("AvatarAuthor", author_class)
+    RecordingStudioCommentable.configuration.author_avatar_attributes = { "AvatarAuthor" => :profile_image }
+
+    comment = StubComment.new(body: "Hello", author: AvatarAuthor.new)
+
+    assert_equal "https://example.com/avatar.png", comment.author_avatar_url
+  ensure
+    Object.send(:remove_const, :AvatarAuthor) if Object.const_defined?(:AvatarAuthor)
+  end
+
+  def test_author_avatar_url_returns_nil_without_configuration
+    author = Object.new
+    comment = StubComment.new(body: "Hello", author: author)
+
+    assert_nil comment.author_avatar_url
+  end
+
   def test_comment_class_defined
     # Comment lives in app/models/ and is autoloaded by Rails Zeitwerk in a
     # full Rails environment. In unit tests without a booted app, verify the
@@ -86,5 +156,7 @@ class CommentTest < Minitest::Test
     content = File.read(comment_path)
     assert_includes content, "class Comment"
     assert_includes content, "validates :body, presence: true"
+    assert_includes content, "def author_display_name"
+    assert_includes content, "def author_avatar_url"
   end
 end

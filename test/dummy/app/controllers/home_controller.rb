@@ -108,7 +108,7 @@ class HomeController < ApplicationController
     @recording_entries = @recordings.map do |recording|
       {
         recording: recording,
-        title: recordable_title(recording.recordable)
+        title: recordable_display_title(recording.recordable, missing: "Missing recordable")
       }
     end
   end
@@ -137,9 +137,9 @@ class HomeController < ApplicationController
 
     {
       recording: recording,
-      title: recordable_title(recordable),
+      title: recordable_display_title(recordable, missing: "Missing recordable"),
       recording_details: recording_only_details(recording),
-      recordable_title: recordable_title(recordable),
+      recordable_title: recordable_display_title(recordable, missing: "Missing recordable"),
       recordable_details: recordable_snapshot_details(recordable)
     }
   end
@@ -173,16 +173,10 @@ class HomeController < ApplicationController
           event: event,
           title: event.action.to_s.humanize,
           details: event_snapshot_details(event),
-          recordable_title: recordable_title(event_recordable),
+          recordable_title: recordable_display_title(event_recordable, missing: "Missing recordable"),
           recordable_details: event_recordable_snapshot_details(event, event_recordable)
         }
       end
-  end
-
-  def recordable_title(recordable)
-    return "Missing recordable" unless recordable
-
-    recordable.try(:title) || recordable.try(:name) || recordable.class.name
   end
 
   def recording_only_details(recording)

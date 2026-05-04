@@ -12,10 +12,19 @@ class ConfigurationTest < Minitest::Test
   end
 
   def test_merge_updates_known_attributes
-    @configuration.merge!(timeout: 9, rich_text_comments: true)
+    @configuration.merge!(
+      timeout: 9,
+      rich_text_comments: true,
+      recordable_display_attributes: { Page: :title },
+      author_display_attributes: { User: :full_name },
+      author_avatar_attributes: { User: :avatar_url }
+    )
 
     assert_equal 9, @configuration.timeout
     assert_equal true, @configuration.rich_text_comments
+    assert_equal({ "Page" => :title }, @configuration.recordable_display_attributes)
+    assert_equal({ "User" => :full_name }, @configuration.author_display_attributes)
+    assert_equal({ "User" => :avatar_url }, @configuration.author_avatar_attributes)
   end
 
   def test_merge_ignores_unknown_keys
@@ -37,6 +46,37 @@ class ConfigurationTest < Minitest::Test
 
   def test_defaults_rich_text_comments_to_false
     assert_equal false, @configuration.rich_text_comments
+  end
+
+  def test_defaults_recordable_display_attributes_to_empty_hash
+    assert_equal({}, @configuration.recordable_display_attributes)
+  end
+
+  def test_defaults_author_display_attributes_to_empty_hash
+    assert_equal({}, @configuration.author_display_attributes)
+  end
+
+  def test_defaults_author_avatar_attributes_to_empty_hash
+    assert_equal({}, @configuration.author_avatar_attributes)
+  end
+
+  def test_recordable_display_attributes_normalize_string_keys_and_symbol_values
+    @configuration.recordable_display_attributes = { Page: "title", "Event" => :event_name, "" => :ignored,
+                                                     nil => :ignored }
+
+    assert_equal({ "Page" => :title, "Event" => :event_name }, @configuration.recordable_display_attributes)
+  end
+
+  def test_author_display_attributes_normalize_string_keys_and_symbol_values
+    @configuration.author_display_attributes = { User: "full_name", "Bot" => :display_name, "" => :ignored }
+
+    assert_equal({ "User" => :full_name, "Bot" => :display_name }, @configuration.author_display_attributes)
+  end
+
+  def test_author_avatar_attributes_normalize_string_keys_and_symbol_values
+    @configuration.author_avatar_attributes = { User: "avatar_url", "Bot" => :image_url, nil => :ignored }
+
+    assert_equal({ "User" => :avatar_url, "Bot" => :image_url }, @configuration.author_avatar_attributes)
   end
 
   def test_to_h_reports_registered_hook_counts
@@ -74,6 +114,9 @@ class ConfigurationTest < Minitest::Test
     assert_kind_of RecordingStudioCommentable::Configuration, upgraded
     assert_equal 11, upgraded.timeout
     assert_equal false, upgraded.rich_text_comments
+    assert_equal({}, upgraded.recordable_display_attributes)
+    assert_equal({}, upgraded.author_display_attributes)
+    assert_equal({}, upgraded.author_avatar_attributes)
     assert_same legacy_config.hooks, upgraded.hooks
   end
 end

@@ -35,11 +35,25 @@ class EngineTest < Minitest::Test
       hook_payload = cfg
     end
 
-    xcfg = Struct.new(:recording_studio_commentable).new({ timeout: 12, rich_text_comments: true })
+    xcfg = Struct.new(:recording_studio_commentable).new(
+      {
+        timeout: 12,
+        rich_text_comments: true,
+        recordable_display_attributes: { "Event" => :event_name },
+        author_display_attributes: { "User" => :full_name },
+        author_avatar_attributes: { "User" => :avatar_url }
+      }
+    )
     app_config = Struct.new(:x).new(xcfg)
     app = Struct.new(:config) do
       def config_for(_name)
-        { timeout: 12, rich_text_comments: true }
+        {
+          timeout: 12,
+          rich_text_comments: true,
+          recordable_display_attributes: { "Page" => :title },
+          author_display_attributes: { "SystemActor" => :display_name },
+          author_avatar_attributes: { "SystemActor" => :avatar_url }
+        }
       end
     end.new(app_config)
 
@@ -49,6 +63,9 @@ class EngineTest < Minitest::Test
     assert_equal RecordingStudioCommentable.configuration, hook_payload
     assert_equal 12, RecordingStudioCommentable.configuration.timeout
     assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
+    assert_equal({ "Event" => :event_name }, RecordingStudioCommentable.configuration.recordable_display_attributes)
+    assert_equal({ "User" => :full_name }, RecordingStudioCommentable.configuration.author_display_attributes)
+    assert_equal({ "User" => :avatar_url }, RecordingStudioCommentable.configuration.author_avatar_attributes)
   end
 
   def test_load_config_handles_errors_and_each_pair_fallback
@@ -56,6 +73,9 @@ class EngineTest < Minitest::Test
       def each_pair
         yield(:timeout, 15)
         yield(:rich_text_comments, true)
+        yield(:recordable_display_attributes, { Page: :title })
+        yield(:author_display_attributes, { User: :full_name })
+        yield(:author_avatar_attributes, { User: :avatar_url })
       end
     end.new
 
@@ -72,6 +92,9 @@ class EngineTest < Minitest::Test
 
     assert_equal 15, RecordingStudioCommentable.configuration.timeout
     assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
+    assert_equal({ "Page" => :title }, RecordingStudioCommentable.configuration.recordable_display_attributes)
+    assert_equal({ "User" => :full_name }, RecordingStudioCommentable.configuration.author_display_attributes)
+    assert_equal({ "User" => :avatar_url }, RecordingStudioCommentable.configuration.author_avatar_attributes)
   end
 
   def test_load_config_swallow_each_pair_errors

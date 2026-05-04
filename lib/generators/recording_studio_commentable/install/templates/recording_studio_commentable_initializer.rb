@@ -9,4 +9,15 @@ RecordingStudioCommentable.configure do |config|
 
   # Enable FlatPack rich text editing for comment bodies.
   config.rich_text_comments = false
+
+  # Configure which attribute each recordable type should use for display labels.
+  # Example: { "Page" => :title, "Event" => :event_name }
+  config.recordable_display_attributes = {}
+
+  # Configure which attribute or method each author type should use for display names.
+  # Methods are supported, for example: { "User" => :full_name }
+  config.author_display_attributes = {}
+
+  # Configure which attribute or method each author type should use for avatar URLs.
+  config.author_avatar_attributes = {}
 end
