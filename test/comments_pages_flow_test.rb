@@ -140,15 +140,21 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes application_controller_source, 'layout "recording_studio_commentable/application"'
     assert_includes controller_source, "before_action :authorize_view!, only: %i[index all]"
     assert_includes controller_source, "def all"
+    assert_includes controller_source, "@show_comments = summary_show_comments_request?"
     assert_includes controller_source, "@comment = Comment.new"
     assert_includes controller_source, "redirect_to comments_collection_path,"
+    assert_includes controller_source, "redirect_to post_create_redirect_path,"
     assert_includes controller_source, "redirect_to commentable_home_referer_path || comments_collection_path,"
+    assert_includes controller_source, "if inline_composer_request? && summary_show_comments_request?"
+    assert_includes controller_source, "render :index, status: :unprocessable_entity"
     assert_includes controller_source, "if inline_composer_request?"
     assert_includes controller_source, "render :all, status: :unprocessable_entity"
     assert_includes controller_source,
                     "@external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path"
     assert_includes controller_source, "@can_create_comment = authorized?(:edit)"
     assert_includes controller_source, "ActiveModel::Type::Boolean.new.cast(params[:inline_composer])"
+    assert_includes controller_source, "ActiveModel::Type::Boolean.new.cast(params[:show_comments])"
+    assert_includes controller_source, "recording_comments_path(@parent_recording, return_to_options.merge(show_comments: true))"
     assert_includes controller_source, "normalized_home_paths = [root_path, root_path.chomp(\"/\")].uniq"
     assert_includes controller_source,
                     "referer_uri.query.present? ? \"\#{referer_uri.path}?\#{referer_uri.query}\" : referer_uri.path"
@@ -167,11 +173,17 @@ class CommentsPagesFlowTest < Minitest::Test
     view_source = read_workspace_file("app/views/recording_studio_commentable/comments/index.html.erb")
 
     assert_includes view_source, 'text: "Back"'
-    assert_includes view_source, 'href: @external_back_path'
+    assert_includes view_source, "href: @external_back_path"
     assert_includes view_source,
                     'onclick: "if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"'
-    assert_includes view_source, "@comments_count.positive? ? @comments_collection_path : @new_comment_path"
+    assert_includes view_source, "unless @show_comments"
+    assert_includes view_source,
+            'recording_comments_path(@parent_recording, return_to: params[:return_to], show_comments: true)'
     assert_includes view_source, "@comments_count.positive? ? \"\#{@comments_count} Comments\" : \"Add comment\""
+    assert_includes view_source, "if @show_comments"
+    assert_includes view_source, 'show_comments: true,'
+    assert_includes view_source, 'inline_composer: true'
+    assert_includes view_source, 'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
   end
 
   def test_all_comments_page_template_shows_back_button_and_comment_thread
@@ -180,11 +192,13 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source, '{ text: "Back", href: @summary_path }'
     assert_includes view_source, "thread.header do"
     assert_includes view_source, "if @can_create_comment"
-    assert_includes view_source, 'recording_comments_path(@parent_recording, return_to: params[:return_to], inline_composer: true)'
+    assert_includes view_source,
+                    "recording_comments_path(@parent_recording, return_to: params[:return_to], inline_composer: true)"
     assert_includes view_source, "force_composer: true"
     assert_includes view_source, "FlatPack::Comments::Thread::Component.new("
     assert_includes view_source, 'class: "max-w-none rounded-none bg-transparent p-0 shadow-none"'
-    assert_includes view_source, 'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
+    assert_includes view_source,
+                    'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
     assert_includes view_source, "thread.comment do"
     assert_includes view_source, '<%= render "comment", comment_recording: comment_recording %>'
     refute_includes view_source, "thread.composer do"
@@ -228,7 +242,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes form_partial_source, "preset: :content"
     assert_includes form_partial_source, "format: :html"
     assert_includes scenarios_view_source, 'text: "Open comment feed"'
-    assert_includes scenarios_view_source, 'They can open the feed, but cannot add a comment.'
+    assert_includes scenarios_view_source, "They can open the feed, but cannot add a comment."
     refute_includes scenarios_view_source, 'text: "Post comment"'
     refute_includes scenarios_view_source, "form_with model: @new_comment"
     refute_includes dummy_home_controller_source, "@new_comment = RecordingStudioCommentable::Comment.new"
@@ -238,7 +252,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source, "local_assigns[:parent_recording] || @parent_recording"
     assert_includes comment_partial_source, "FlatPack::Comments::Item::Component.new("
     assert_includes comment_partial_source, "comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil"
-    assert_includes comment_partial_source, 'avatar: { name: author_name, src: author_avatar_url }'
+    assert_includes comment_partial_source, "avatar: { name: author_name, src: author_avatar_url }"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
     assert_includes comment_partial_source, '<%= link_to "Reply", "#"'
     refute_includes comment_partial_source, 'text: "Show"'
@@ -252,7 +266,7 @@ class CommentsPagesFlowTest < Minitest::Test
 
     assert_includes seeds_source, 'viewer = User.find_or_initialize_by(email: "view@admin.com")'
     assert_includes seeds_source, 'viewer.avatar_url = "https://i.pravatar.cc/160?u=view@admin.com"'
-    assert_includes seeds_source, 'public_page_recording => [[user, :edit], [quinn, :edit], [viewer, :view]]'
+    assert_includes seeds_source, "public_page_recording => [[user, :edit], [quinn, :edit], [viewer, :view]]"
     assert_includes seeds_source, 'puts "Seeded: view@admin.com / Password"'
     assert_includes session_view_source, 'text: "View-only: view@admin.com / Password"'
   end

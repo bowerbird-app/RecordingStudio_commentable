@@ -28,15 +28,60 @@
       </section>
     <% end %>
 
-    <footer class="border-t border-(--surface-border-color) pt-6">
-      <%= link_to(@comments_count.positive? ? @comments_collection_path : @new_comment_path) do %>
-        <%= render FlatPack::Button::Component.new(
-          text: @comments_count.positive? ? "#{@comments_count} Comments" : "Add comment",
-          style: :primary,
-          size: :lg,
-          class: "w-full justify-center"
-        ) %>
-      <% end %>
-    </footer>
+    <% unless @show_comments %>
+      <footer class="border-t border-(--surface-border-color) pt-6">
+          <%= link_to(
+                @comments_count.positive? ?
+                  recording_comments_path(@parent_recording, return_to: params[:return_to], show_comments: true) :
+                  @new_comment_path
+              ) do %>
+          <%= render FlatPack::Button::Component.new(
+            text: @comments_count.positive? ? "#{@comments_count} Comments" : "Add comment",
+            style: :primary,
+            size: :lg,
+            class: "w-full justify-center"
+          ) %>
+        <% end %>
+      </footer>
+    <% end %>
+
+    <% if @show_comments %>
+      <section class="border-t border-(--surface-border-color) pt-6">
+        <%= render FlatPack::Comments::Thread::Component.new(
+          count: @comments_count,
+          title: "Comments",
+          empty_title: "No comments yet",
+          empty_body: "Be the first to leave a comment.",
+          id: "comments",
+          class: "max-w-none rounded-none bg-transparent p-0 shadow-none"
+        ) do |thread| %>
+          <% thread.header do %>
+            <div class="flex flex-col gap-6">
+              <% if @can_create_comment %>
+                <%= render "form",
+                      comment: @comment,
+                      url: recording_comments_path(
+                        @parent_recording,
+                        return_to: params[:return_to],
+                        show_comments: true,
+                        inline_composer: true
+                      ),
+                      force_composer: true %>
+              <% end %>
+
+              <h2 class="text-xl font-bold text-(--comments-thread-title-color)">
+                Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>
+              </h2>
+            </div>
+          <% end %>
+
+          <% @comments.each do |comment_recording| %>
+            <% thread.comment do %>
+              <%= render "comment", comment_recording: comment_recording %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </section>
+    <% end %>
   </article>
 </div>

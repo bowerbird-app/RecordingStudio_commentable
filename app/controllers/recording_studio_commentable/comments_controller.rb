@@ -14,7 +14,12 @@ module RecordingStudioCommentable
     before_action :prepare_page_context
 
     def index
+      @show_comments = summary_show_comments_request?
       @comments_count = comments_relation.count
+      return unless @show_comments
+
+      @comment = Comment.new
+      @comments = comments_relation.to_a
     end
 
     def all
@@ -35,12 +40,17 @@ module RecordingStudioCommentable
       )
 
       if result.success?
-        redirect_to comments_collection_path,
+        redirect_to post_create_redirect_path,
                     notice: "Comment added."
       else
         @comment = Comment.new(body: comment_params[:body])
         @comment.errors.add(:base, result.error) if result.error
-        if inline_composer_request?
+        if inline_composer_request? && summary_show_comments_request?
+          @show_comments = true
+          @comments = comments_relation.to_a
+          @comments_count = @comments.size
+          render :index, status: :unprocessable_entity
+        elsif inline_composer_request?
           @comments = comments_relation.to_a
           @comments_count = @comments.size
           render :all, status: :unprocessable_entity
@@ -198,8 +208,22 @@ module RecordingStudioCommentable
       @comments_collection_path || all_recording_comments_path(@parent_recording, return_to_options)
     end
 
+    def expanded_summary_path
+      recording_comments_path(@parent_recording, return_to_options.merge(show_comments: true))
+    end
+
     def inline_composer_request?
       ActiveModel::Type::Boolean.new.cast(params[:inline_composer])
+    end
+
+    def summary_show_comments_request?
+      ActiveModel::Type::Boolean.new.cast(params[:show_comments])
+    end
+
+    def post_create_redirect_path
+      return expanded_summary_path if summary_show_comments_request?
+
+      comments_collection_path
     end
 
     def comments_relation
