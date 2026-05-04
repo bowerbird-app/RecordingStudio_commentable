@@ -14,7 +14,7 @@ class ConfigurationTest < Minitest::Test
   def test_merge_updates_known_attributes
     @configuration.merge!(
       timeout: 9,
-      layout: "flat_pack_sidebar",
+      layout: "flat_pack_pseudo_top_nav",
       rich_text_comments: true,
       recordable_display_attributes: { Page: :title },
       author_display_attributes: { User: :full_name },
@@ -22,7 +22,7 @@ class ConfigurationTest < Minitest::Test
     )
 
     assert_equal 9, @configuration.timeout
-  assert_equal "flat_pack_sidebar", @configuration.layout
+    assert_equal "flat_pack_pseudo_top_nav", @configuration.layout
     assert_equal true, @configuration.rich_text_comments
     assert_equal({ "Page" => :title }, @configuration.recordable_display_attributes)
     assert_equal({ "User" => :full_name }, @configuration.author_display_attributes)

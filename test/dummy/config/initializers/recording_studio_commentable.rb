@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RecordingStudioCommentable.configure do |config|
-  config.layout = "flat_pack_sidebar"
+  config.layout = ""
   config.rich_text_comments = true
   config.recordable_display_attributes = {
     "Page" => :title,

@@ -266,7 +266,7 @@ class CommentsPagesFlowTest < Minitest::Test
                     "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "force_composer: true"
     refute_includes new_view_source, "FlatPack::Card::Component.new(style: :outlined)"
-    assert_includes dummy_initializer_source, 'config.layout = "flat_pack_sidebar"'
+    assert_includes dummy_initializer_source, 'config.layout = "flat_pack_pseudo_top_nav"'
     assert_includes dummy_initializer_source, "config.rich_text_comments = true"
     assert_includes dummy_initializer_source, "config.recordable_display_attributes = {"
     assert_includes dummy_initializer_source, "config.author_display_attributes = {"

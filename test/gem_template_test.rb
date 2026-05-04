@@ -20,6 +20,15 @@ class RecordingStudioCommentableTest < Minitest::Test
     assert_includes controller_source, "flat_pack_sidebar"
   end
 
+  def test_dummy_pseudo_top_nav_layout_exists_for_commentable_layout_config
+    layout_path = File.expand_path("dummy/app/views/layouts/flat_pack_pseudo_top_nav.html.erb", __dir__)
+    assert File.exist?(layout_path)
+
+    layout_source = File.read(layout_path)
+    assert_includes layout_source, 'render "layouts/flat_pack/top_nav"'
+    assert_includes layout_source, "Pseudo layout preview"
+  end
+
   def test_engine_uses_its_own_layout_without_dummy_sidebar_shell
     layout_path = File.expand_path("../app/views/layouts/recording_studio_commentable/application.html.erb", __dir__)
     assert File.exist?(layout_path)
@@ -50,7 +59,7 @@ class RecordingStudioCommentableTest < Minitest::Test
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_includes view_source, "Template workflow"
+    assert_includes view_source, "Scenario matrix"
     assert_includes view_source, "Workspace state"
     assert_includes view_source, "/scenarios"
   end
@@ -68,9 +77,9 @@ class RecordingStudioCommentableTest < Minitest::Test
     view_path = File.expand_path("../app/views/recording_studio_commentable/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_includes view_source, 'title: "Commentable"'
+    assert_includes view_source, 'title: "Recording Studio Commentable"'
     assert_includes view_source, 'subtitle: "All comments"'
-    assert_includes view_source, "recording_studio_commentable/comments/comment"
+    assert_includes view_source, 'render "comments_page"'
   end
 
   def test_dummy_routes_expose_scenarios_page
