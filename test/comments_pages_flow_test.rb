@@ -166,7 +166,10 @@ class CommentsPagesFlowTest < Minitest::Test
   def test_summary_page_template_shows_text_block_and_dynamic_bottom_button
     view_source = read_workspace_file("app/views/recording_studio_commentable/comments/index.html.erb")
 
-    assert_includes view_source, '{ text: "Back", href: @external_back_path }'
+    assert_includes view_source, 'text: "Back"'
+    assert_includes view_source, 'href: @external_back_path'
+    assert_includes view_source,
+                    'onclick: "if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"'
     assert_includes view_source, "@comments_count.positive? ? @comments_collection_path : @new_comment_path"
     assert_includes view_source, "@comments_count.positive? ? \"\#{@comments_count} Comments\" : \"Add comment\""
   end

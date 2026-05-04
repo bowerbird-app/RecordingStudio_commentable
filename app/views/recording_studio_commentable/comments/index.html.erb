@@ -1,6 +1,10 @@
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
   <%= render FlatPack::Breadcrumb::Component.new(items: [
-    { text: "Back", href: @external_back_path }
+    {
+      text: "Back",
+      href: @external_back_path,
+      onclick: "if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"
+    }
   ]) %>
 
   <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
