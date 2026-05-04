@@ -61,7 +61,7 @@ module RecordingStudioCommentable
     end
 
     def edit
-      @comment = @comment_recording.respond_to?(:recordable) ? @comment_recording.recordable : @comment_recording
+      @comment = comment_from(@comment_recording)
     end
 
     def update
@@ -77,7 +77,7 @@ module RecordingStudioCommentable
         redirect_to comments_collection_path,
                     notice: "Comment updated."
       else
-        @comment = @comment_recording.respond_to?(:recordable) ? @comment_recording.recordable : @comment_recording
+        @comment = comment_from(@comment_recording)
         @comment.errors.add(:base, result.error) if result.error
         render :edit, status: :unprocessable_entity
       end
@@ -125,7 +125,7 @@ module RecordingStudioCommentable
     def prepare_page_context
       return unless @parent_recording
 
-      @page_recordable = @parent_recording.respond_to?(:recordable) ? @parent_recording.recordable : nil
+      @page_recordable = @parent_recording.try(:recordable)
       @page_title = recordable_display_title(@page_recordable, missing: "Missing recordable")
       @page_body = @page_recordable.try(:body).presence
       @summary_path = summary_path
@@ -140,7 +140,7 @@ module RecordingStudioCommentable
     # ------------------------------------------------------------------ #
 
     def require_commentable!
-      recordable = @parent_recording.respond_to?(:recordable) ? @parent_recording.recordable : nil
+      recordable = @parent_recording.try(:recordable)
       return if recordable&.class&.include?(RecordingStudioCommentable::Commentable)
 
       redirect_to(return_to_path || main_app.root_path, alert: "Comments are not enabled for this resource.")
@@ -161,7 +161,7 @@ module RecordingStudioCommentable
 
     def authorize_edit!
       actor = current_recording_studio_actor
-      comment_recordable = @comment_recording.respond_to?(:recordable) ? @comment_recording.recordable : nil
+      comment_recordable = @comment_recording.try(:recordable)
 
       # Allow comment authors to edit their own comments
       return if comment_recordable.respond_to?(:author) && comment_recordable.author == actor
@@ -187,7 +187,7 @@ module RecordingStudioCommentable
     # ------------------------------------------------------------------ #
 
     def return_to_options
-      return {} unless return_to_path.present?
+      return {} unless return_to_path
 
       { return_to: return_to_path }
     end
@@ -276,7 +276,7 @@ module RecordingStudioCommentable
         .where(recording_id: recording_ids)
         .order(created_at: :asc)
         .map do |event|
-          event_recordable = event.respond_to?(:recordable) ? event.recordable : nil
+          event_recordable = event.try(:recordable)
 
           {
             event: event,
@@ -289,7 +289,7 @@ module RecordingStudioCommentable
     end
 
     def recording_snapshot(recording)
-      recordable = recording.respond_to?(:recordable) ? recording.recordable : nil
+      recordable = recording.try(:recordable)
 
       {
         recording: recording,
@@ -354,6 +354,10 @@ module RecordingStudioCommentable
       details << ["Previous recordable id", event.previous_recordable_id] if event.previous_recordable_id.present?
       details.concat(recordable_snapshot_details(recordable)) if recordable
       details
+    end
+
+    def comment_from(comment_recording)
+      comment_recording.respond_to?(:recordable) ? comment_recording.recordable : comment_recording
     end
 
     def root_recording_for(recording)

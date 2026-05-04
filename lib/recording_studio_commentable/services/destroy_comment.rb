@@ -62,9 +62,7 @@ module RecordingStudioCommentable
       end
 
       def recording_studio_trashable_requested?
-        configuration = RecordingStudioCommentable.configuration
-        configuration.respond_to?(:use_recording_studio_trashable_for_destroy) &&
-          configuration.use_recording_studio_trashable_for_destroy == true
+        RecordingStudioCommentable.configuration.use_recording_studio_trashable_for_destroy
       end
 
       def recording_studio_trashable_available?
