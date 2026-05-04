@@ -16,7 +16,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes dummy_routes_source, 'get "/recordings", to: "home#recordings", as: :recordings_browser'
     assert_includes dummy_routes_source, 'get "/recordings/:id", to: "home#recording", as: :recording_browser'
     assert_includes dummy_routes_source, 'get "/gem-routes", to: "home#gem_routes", as: :gem_routes'
-    assert_includes dummy_routes_source, 'get "/services", to: "home#services", as: :services'
+    assert_includes dummy_routes_source, 'get "/helpers", to: "home#helpers", as: :helpers'
     refute_includes dummy_routes_source, 'get "up" => "rails/health#show", as: :rails_health_check'
   end
 
@@ -88,27 +88,42 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes sidebar_source, "icon: :file"
   end
 
-  def test_dummy_services_page_lists_service_objects_and_sidebar_link
+  def test_dummy_helpers_page_lists_available_helpers_public_services_and_host_api
     controller_source = read_workspace_file("test/dummy/app/controllers/home_controller.rb")
-    view_source = read_workspace_file("test/dummy/app/views/home/services.html.erb")
+    view_source = read_workspace_file("test/dummy/app/views/home/helpers.html.erb")
     sidebar_source = read_workspace_file("test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb")
 
-    assert_includes controller_source, "before_action :load_service_catalog, only: :services"
-    assert_includes controller_source, "def services"
-    assert_includes controller_source, 'title: "CreateComment"'
-    assert_includes controller_source, 'title: "UpdateComment"'
-    assert_includes controller_source, 'title: "DestroyComment"'
+    assert_includes controller_source, "before_action :load_helper_catalog, only: :helpers"
+    assert_includes controller_source, "def helpers"
+    assert_includes controller_source, 'title: "recordable_display_title"'
+    assert_includes controller_source, 'title: "truncate_comment_body"'
+    assert_includes controller_source, 'title: "current_recording_studio_actor"'
+    assert_includes controller_source, 'title: "CreateComment.call"'
+    assert_includes controller_source, 'title: "UpdateComment.call"'
+    assert_includes controller_source, 'title: "DestroyComment.call"'
+    assert_includes controller_source, 'title: "BaseService::Result"'
+    assert_includes controller_source, 'title: "RecordingStudioCommentable.configure"'
+    assert_includes controller_source, 'title: "RecordingStudioCommentable.configuration"'
+    assert_includes controller_source, 'title: "Commentable concern"'
+    assert_includes controller_source, 'title: "Comment author methods"'
+    assert_includes controller_source, 'title: "Hooks API"'
+    assert_includes controller_source, 'title: "Mounted routes"'
     assert_includes controller_source,
-                    "All service objects inherit from RecordingStudioCommentable::Services::BaseService."
-    assert_includes view_source, 'title: "Service objects"'
+                    "RecordableDisplayHelper is included in both the dummy app controller and the engine controller."
+    assert_includes view_source, 'title: "View helpers"'
+    assert_includes view_source, 'title: "Exposed helper methods"'
+    assert_includes view_source, 'title: "Public services"'
+    assert_includes view_source, 'title: "Host app API"'
     assert_includes view_source,
-                    'subtitle: "The command-style services that power comment creation, revision, and deletion in this gem."'
-    assert_includes view_source, "@service_catalog.each do |service|"
-    assert_includes view_source, "@service_features.each do |feature|"
-    assert_includes view_source, 'title: "Shared contract"'
-    assert_includes view_source, 'title: "Where to exercise them"'
-    assert_includes sidebar_source, 'label: "Services"'
-    assert_includes sidebar_source, 'href: "/services"'
+                    'subtitle: "A dummy-app reference for the helper methods exposed by RecordingStudioCommentable and the host controller layer."'
+    assert_includes view_source, "@helper_catalog.each do |helper_entry|"
+    assert_includes view_source, "@service_catalog.each do |service_entry|"
+    assert_includes view_source, "@host_api_catalog.each do |api_entry|"
+    assert_includes view_source, "helper_entry[:examples].each do |example|"
+    assert_includes view_source, 'title: "Shared notes"'
+    assert_includes view_source, 'title: "Where they show up"'
+    assert_includes sidebar_source, 'label: "Helpers"'
+    assert_includes sidebar_source, 'href: "/helpers"'
     assert_includes sidebar_source, "icon: :settings"
     refute_includes sidebar_source, 'label: "Health"'
     refute_includes sidebar_source, 'href: "/up"'

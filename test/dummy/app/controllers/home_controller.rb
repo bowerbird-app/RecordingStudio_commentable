@@ -1,7 +1,9 @@
+require "ostruct"
+
 class HomeController < ApplicationController
-  before_action :load_workspace_context, only: %i[index scenarios services recordings recording gem_routes]
+  before_action :load_workspace_context, only: %i[index scenarios helpers recordings recording gem_routes]
   before_action :load_scenario_recordings, only: %i[index scenarios]
-  before_action :load_service_catalog, only: :services
+  before_action :load_helper_catalog, only: :helpers
   before_action :load_recording_catalog, only: :recordings
   before_action :load_recording_detail, only: :recording
   before_action :load_gem_route_catalog, only: :gem_routes
@@ -12,7 +14,7 @@ class HomeController < ApplicationController
   def scenarios
   end
 
-  def services
+  def helpers
   end
 
   def recordings
@@ -54,51 +56,200 @@ class HomeController < ApplicationController
       end
   end
 
-  def load_service_catalog
-    @service_catalog = [
+  def load_helper_catalog
+    @helper_catalog = [
       {
-        title: "CreateComment",
-        class_name: "RecordingStudioCommentable::Services::CreateComment",
-        summary: "Creates a new comment under a parent recording.",
-        inputs: ["parent_recording", "body", "author"],
-        behavior: [
-          "Rejects blank bodies.",
-          "Builds a RecordingStudioCommentable::Comment instance.",
-          "Records the comment under the parent recording when RecordingStudio is available.",
-          "Falls back to saving the comment directly in standalone/test mode."
+        title: "recordable_display_title",
+        source: "RecordingStudioCommentable::RecordableDisplayHelper",
+        summary: "Resolves a readable label for a recordable or recording wrapper using configured mappings and fallback attributes.",
+        signature: 'recordable_display_title(recordable_or_recording, missing: "Unknown item")',
+        examples: [
+          {
+            label: "Recordable title fallback",
+            input: 'recordable_display_title(OpenStruct.new(title: "Launch plan"))',
+            output: recordable_display_title(OpenStruct.new(title: "Launch plan"))
+          },
+          {
+            label: "Missing recordable fallback",
+            input: 'recordable_display_title(nil, missing: "Missing recordable")',
+            output: recordable_display_title(nil, missing: "Missing recordable")
+          }
         ]
       },
       {
-        title: "UpdateComment",
-        class_name: "RecordingStudioCommentable::Services::UpdateComment",
-        summary: "Revises an existing comment while preserving RecordingStudio history.",
-        inputs: ["comment_recording", "root_recording", "body", "actor"],
-        behavior: [
-          "Rejects blank bodies.",
-          "Uses RecordingStudio revise when the root recording supports it.",
-          "Updates the comment record directly when RecordingStudio is unavailable.",
-          "Returns the updated comment via the shared Result object."
+        title: "truncate_comment_body",
+        source: "RecordingStudioCommentable::CommentBodyHelper",
+        summary: "Strips rich text markup and truncates long comment bodies at a word boundary for previews.",
+        signature: 'truncate_comment_body(comment_or_body, length: 280, omission: "...")',
+        examples: [
+          {
+            label: "HTML preview",
+            input: 'truncate_comment_body("<p>This is a long <strong>comment</strong> body for previews.</p>", length: 26)',
+            output: truncate_comment_body("<p>This is a long <strong>comment</strong> body for previews.</p>", length: 26)
+          },
+          {
+            label: "Comment-like object",
+            input: 'truncate_comment_body(OpenStruct.new(body: "Short comment"))',
+            output: truncate_comment_body(OpenStruct.new(body: "Short comment"))
+          }
         ]
       },
       {
-        title: "DestroyComment",
-        class_name: "RecordingStudioCommentable::Services::DestroyComment",
-        summary: "Removes a comment from the active feed without hard-deleting its history.",
-        inputs: ["comment_recording", "root_recording", "actor"],
-        behavior: [
-          "Uses RecordingStudio trash when available.",
-          "Soft-deletes at the recording layer so history is preserved.",
-          "Falls back to destroying the comment record directly outside RecordingStudio.",
-          "Returns the affected comment recording via the shared Result object."
+        title: "current_recording_studio_actor",
+        source: "ApplicationController helper_method",
+        summary: "Exposes the current signed-in actor to the dummy app and commentable views.",
+        signature: "current_recording_studio_actor()",
+        examples: [
+          {
+            label: "Current actor email",
+            input: "current_recording_studio_actor&.email",
+            output: current_recording_studio_actor&.email.to_s
+          }
         ]
       }
     ]
 
-    @service_features = [
-      "All service objects inherit from RecordingStudioCommentable::Services::BaseService.",
-      "Each service exposes a .call entry point and returns a Result with success?, value, error, and errors.",
-      "Before, after, and around hooks run through RecordingStudioCommentable::Hooks when configured.",
-      "Errors are normalized into failed Result objects instead of leaking exceptions into controllers."
+    @helper_notes = [
+      "RecordableDisplayHelper is included in both the dummy app controller and the engine controller.",
+      "CommentBodyHelper is exposed in the dummy app so helper previews match the commentable pages.",
+      "Each helper is available to ERB templates through helper_method wiring on the controller layer.",
+      "These examples are intended as copyable reference snippets for future dummy pages and comment UI states."
+    ]
+
+    @service_catalog = [
+      {
+        title: "CreateComment.call",
+        source: "RecordingStudioCommentable::Services::CreateComment",
+        summary: "Creates a new comment under a parent recording and returns a BaseService::Result.",
+        signature: 'RecordingStudioCommentable::Services::CreateComment.call(parent_recording:, body:, author: nil)',
+        examples: [
+          {
+            label: "Create a comment",
+            input: 'RecordingStudioCommentable::Services::CreateComment.call(parent_recording: recording, body: "Great work", author: current_user)',
+            output: "Returns a Result with success?, value, error, and errors"
+          }
+        ]
+      },
+      {
+        title: "UpdateComment.call",
+        source: "RecordingStudioCommentable::Services::UpdateComment",
+        summary: "Revises an existing comment body while preserving RecordingStudio history when available.",
+        signature: 'RecordingStudioCommentable::Services::UpdateComment.call(comment_recording:, root_recording:, body:, actor: nil)',
+        examples: [
+          {
+            label: "Update a comment",
+            input: 'RecordingStudioCommentable::Services::UpdateComment.call(comment_recording: comment_recording, root_recording: root_recording, body: "Updated text", actor: current_user)',
+            output: "Returns a Result with the updated comment as value on success"
+          }
+        ]
+      },
+      {
+        title: "DestroyComment.call",
+        source: "RecordingStudioCommentable::Services::DestroyComment",
+        summary: "Trashes or destroys a comment recording and returns a BaseService::Result.",
+        signature: 'RecordingStudioCommentable::Services::DestroyComment.call(comment_recording:, root_recording:, actor: nil)',
+        examples: [
+          {
+            label: "Remove a comment",
+            input: 'RecordingStudioCommentable::Services::DestroyComment.call(comment_recording: comment_recording, root_recording: root_recording, actor: current_user)',
+            output: "Returns a Result with the removed comment or recording on success"
+          }
+        ]
+      },
+      {
+        title: "BaseService::Result",
+        source: "RecordingStudioCommentable::Services::BaseService::Result",
+        summary: "Common response object returned by the public service entrypoints.",
+        signature: "result.success? / result.failure? / result.value / result.error / result.errors / result.on_success / result.on_failure / result.value!",
+        examples: [
+          {
+            label: "Handle success or failure",
+            input: "result.on_success { |value| ... }.on_failure { |error, errors| ... }",
+            output: "Allows chaining success and failure handlers on the result object"
+          }
+        ]
+      }
+    ]
+
+    @host_api_catalog = [
+      {
+        title: "RecordingStudioCommentable.configure",
+        source: "RecordingStudioCommentable module",
+        summary: "Primary host-app entrypoint for configuring the addon.",
+        signature: "RecordingStudioCommentable.configure do |config| ... end",
+        examples: [
+          {
+            label: "Configure layout and rich text",
+            input: 'RecordingStudioCommentable.configure do |config|\n  config.layout = "flat_pack_sidebar"\n  config.rich_text_comments = :selection\nend',
+            output: "Updates the shared Configuration object used by the engine"
+          }
+        ]
+      },
+      {
+        title: "RecordingStudioCommentable.configuration",
+        source: "RecordingStudioCommentable module",
+        summary: "Returns the normalized configuration object for reads or advanced host setup.",
+        signature: "RecordingStudioCommentable.configuration",
+        examples: [
+          {
+            label: "Read merged config",
+            input: "RecordingStudioCommentable.configuration.rich_text_comments",
+            output: RecordingStudioCommentable.configuration.rich_text_comments.inspect
+          }
+        ]
+      },
+      {
+        title: "Commentable concern",
+        source: "RecordingStudioCommentable::Commentable",
+        summary: "Include this concern in a host model to mark it as commentable.",
+        signature: "include RecordingStudioCommentable::Commentable",
+        examples: [
+          {
+            label: "Opt a model into comments",
+            input: 'class Page < ApplicationRecord\n  include RecordingStudioCommentable::Commentable\nend',
+            output: "Adds class- and instance-level commentable? checks"
+          }
+        ]
+      },
+      {
+        title: "Comment author methods",
+        source: "RecordingStudioCommentable::Comment",
+        summary: "Comment records expose derived author metadata for rendering names and avatars in the feed.",
+        signature: "comment.author_display_name / comment.author_avatar_url",
+        examples: [
+          {
+            label: "Resolve an author avatar",
+            input: 'RecordingStudioCommentable.configure do |config|\n  config.author_avatar_attributes = { "User" => :avatar_url }\nend\ncomment.author_avatar_url',
+            output: "Returns the configured avatar URL for the comment author, or nil when unavailable"
+          }
+        ]
+      },
+      {
+        title: "Hooks API",
+        source: "RecordingStudioCommentable::Hooks",
+        summary: "Host hooks for initialization, service instrumentation, and model/controller extensions.",
+        signature: "config.hooks.before_initialize / after_initialize / on_configuration / before_service / after_service / around_service / extend_model / extend_controller",
+        examples: [
+          {
+            label: "Instrument services",
+            input: 'RecordingStudioCommentable.configure do |config|\n  config.hooks.after_service do |service_class, result|\n    Rails.logger.info("#{service_class.name}: #{result.success?}")\n  end\nend',
+            output: "Registers a host hook against the shared hooks registry"
+          }
+        ]
+      },
+      {
+        title: "Mounted routes",
+        source: "RecordingStudioCommentable::Engine",
+        summary: "Mounted engine routes provide the browser surface after installation.",
+        signature: 'mount RecordingStudioCommentable::Engine, at: "/commentable"',
+        examples: [
+          {
+            label: "Open the addon home",
+            input: 'recording_studio_commentable.root_path or /commentable',
+            output: "Navigates to the installed addon UI"
+          }
+        ]
+      }
     ]
   end
 

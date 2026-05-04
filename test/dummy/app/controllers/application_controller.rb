@@ -1,6 +1,8 @@
 require "recording_studio_commentable/recordable_display_helper"
+require "recording_studio_commentable/comment_body_helper"
 
 class ApplicationController < ActionController::Base
+  include RecordingStudioCommentable::CommentBodyHelper
   include RecordingStudioCommentable::RecordableDisplayHelper
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
@@ -14,7 +16,7 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :set_current_actor
 
-  helper_method :current_recording_studio_actor, :recordable_display_title
+  helper_method :current_recording_studio_actor, :recordable_display_title, :truncate_comment_body
 
   private
 

@@ -1,0 +1,191 @@
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "View helpers",
+    subtitle: "A dummy-app reference for the helper methods exposed by RecordingStudioCommentable and the host controller layer.",
+    variant: :h1
+  ) %>
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+    <div class="flex flex-col gap-6">
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Exposed helper methods",
+            subtitle: "The helper methods currently available to dummy-app and engine ERB templates.",
+            variant: :h2,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+      <% end %>
+
+      <% @helper_catalog.each do |helper_entry| %>
+        <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+          <% card.header do %>
+            <%= render FlatPack::PageTitle::Component.new(
+              title: helper_entry[:title],
+              subtitle: helper_entry[:source],
+              variant: :h3,
+              class: "mb-0 pb-0"
+            ) %>
+          <% end %>
+
+          <% card.body do %>
+            <div class="space-y-4 text-sm leading-6 text-(--surface-content-color)">
+              <p><%= helper_entry[:summary] %></p>
+
+              <div>
+                <p class="mb-2 font-medium text-(--surface-content-color)">Signature</p>
+                <div class="rounded-xl border border-(--surface-border-color) bg-(--surface-secondary-background-color) px-4 py-3 font-mono text-xs leading-5 text-(--surface-content-color)">
+                  <%= helper_entry[:signature] %>
+                </div>
+              </div>
+
+              <div>
+                <p class="mb-2 font-medium text-(--surface-content-color)">Examples</p>
+                <div class="space-y-3">
+                  <% helper_entry[:examples].each do |example| %>
+                    <div class="rounded-xl border border-(--surface-border-color) px-4 py-3">
+                      <p class="font-medium text-(--surface-content-color)"><%= example[:label] %></p>
+                      <p class="mt-2 font-mono text-xs leading-5 text-(--surface-muted-content-color)"><%= example[:input] %></p>
+                      <p class="mt-2 text-sm text-(--surface-content-color)">Returns: <span class="font-medium"><%= example[:output] %></span></p>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Public services",
+            subtitle: "Service entrypoints a host app can call directly after installing the gem.",
+            variant: :h2,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+      <% end %>
+
+      <% @service_catalog.each do |service_entry| %>
+        <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+          <% card.header do %>
+            <%= render FlatPack::PageTitle::Component.new(
+              title: service_entry[:title],
+              subtitle: service_entry[:source],
+              variant: :h3,
+              class: "mb-0 pb-0"
+            ) %>
+          <% end %>
+
+          <% card.body do %>
+            <div class="space-y-4 text-sm leading-6 text-(--surface-content-color)">
+              <p><%= service_entry[:summary] %></p>
+
+              <div>
+                <p class="mb-2 font-medium text-(--surface-content-color)">Signature</p>
+                <div class="rounded-xl border border-(--surface-border-color) bg-(--surface-secondary-background-color) px-4 py-3 font-mono text-xs leading-5 text-(--surface-content-color)">
+                  <%= service_entry[:signature] %>
+                </div>
+              </div>
+
+              <div>
+                <p class="mb-2 font-medium text-(--surface-content-color)">Examples</p>
+                <div class="space-y-3">
+                  <% service_entry[:examples].each do |example| %>
+                    <div class="rounded-xl border border-(--surface-border-color) px-4 py-3">
+                      <p class="font-medium text-(--surface-content-color)"><%= example[:label] %></p>
+                      <p class="mt-2 font-mono text-xs leading-5 text-(--surface-muted-content-color whitespace-pre-wrap)"><%= example[:input] %></p>
+                      <p class="mt-2 text-sm text-(--surface-content-color)">Returns: <span class="font-medium"><%= example[:output] %></span></p>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Shared notes",
+            subtitle: "How these helpers are wired into the dummy app and the engine.",
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+
+        <% card.body do %>
+          <ul class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
+            <% @helper_notes.each do |note| %>
+              <li><%= note %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Host app API",
+            subtitle: "The install-time modules and methods a host app can use outside of views.",
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+
+        <% card.body do %>
+          <div class="space-y-4">
+            <% @host_api_catalog.each do |api_entry| %>
+              <div class="rounded-xl border border-(--surface-border-color) px-4 py-3 text-sm leading-6 text-(--surface-content-color)">
+                <p class="font-medium text-(--surface-content-color)"><%= api_entry[:title] %></p>
+                <p class="text-(--surface-muted-content-color)"><%= api_entry[:source] %></p>
+                <p class="mt-2"><%= api_entry[:summary] %></p>
+                <p class="mt-2 font-mono text-xs leading-5 whitespace-pre-wrap"><%= api_entry[:signature] %></p>
+                <% api_entry[:examples].each do |example| %>
+                  <div class="mt-3 rounded-lg bg-(--surface-secondary-background-color) px-3 py-2">
+                    <p class="font-medium"><%= example[:label] %></p>
+                    <p class="mt-1 font-mono text-xs leading-5 whitespace-pre-wrap text-(--surface-muted-content-color)"><%= example[:input] %></p>
+                    <p class="mt-1">Returns: <span class="font-medium"><%= example[:output] %></span></p>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+        <% card.header do %>
+          <%= render FlatPack::PageTitle::Component.new(
+            title: "Where they show up",
+            subtitle: "Existing dummy-app and engine pages that already rely on these helpers and APIs.",
+            variant: :h3,
+            class: "mb-0 pb-0"
+          ) %>
+        <% end %>
+
+        <% card.body do %>
+          <dl class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
+            <div>
+              <dt class="text-(--surface-muted-content-color)">Comment feed</dt>
+              <dd><%= link_to "/commentable", "/commentable", class: "underline" %></dd>
+            </div>
+            <div>
+              <dt class="text-(--surface-muted-content-color)">Recordings browser</dt>
+              <dd><%= link_to "/recordings", recordings_browser_path, class: "underline" %></dd>
+            </div>
+            <div>
+              <dt class="text-(--surface-muted-content-color)">Comment scenarios</dt>
+              <dd><%= link_to "/scenarios", scenarios_path, class: "underline" %></dd>
+            </div>
+          </dl>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

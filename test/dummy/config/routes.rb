@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   get "/recordings/:id", to: "home#recording", as: :recording_browser
   get "/scenarios", to: "home#scenarios", as: :scenarios
   get "/gem-routes", to: "home#gem_routes", as: :gem_routes
-  get "/services", to: "home#services", as: :services
+  get "/helpers", to: "home#helpers", as: :helpers
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
