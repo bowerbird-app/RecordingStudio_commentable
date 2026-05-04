@@ -99,9 +99,14 @@ module RecordingStudioCommentable
 
     def return_to_path
       path = params[:return_to].to_s
-      return if path.blank? || !path.start_with?("/")
+      return if path.blank?
 
-      path
+      uri = URI.parse(path)
+      return if uri.host.present? || uri.path.nil? || !uri.path.start_with?("/")
+
+      uri.request_uri
+    rescue URI::InvalidURIError
+      nil
     end
 
     # ------------------------------------------------------------------ #
