@@ -124,6 +124,7 @@ result = RecordingStudioCommentable::Services::DestroyComment.call(
 ```ruby
 RecordingStudioCommentable.configure do |config|
   config.timeout = 5
+  config.layout = "flat_pack_sidebar"
   config.recordable_display_attributes = {
     "Page" => :title,
     "Event" => :event_name
@@ -143,6 +144,8 @@ RecordingStudioCommentable.configure do |config|
   end
 end
 ```
+
+Leave `config.layout` unset to use the engine's default blank layout. Set it to a host layout path, such as `flat_pack_sidebar`, when you want the commentable pages and `/commentable` home feed to render inside your app shell.
 
 ## Quick Start (Dummy App)
 

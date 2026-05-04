@@ -14,6 +14,7 @@ class ConfigurationTest < Minitest::Test
   def test_merge_updates_known_attributes
     @configuration.merge!(
       timeout: 9,
+      layout: "flat_pack_sidebar",
       rich_text_comments: true,
       recordable_display_attributes: { Page: :title },
       author_display_attributes: { User: :full_name },
@@ -21,6 +22,7 @@ class ConfigurationTest < Minitest::Test
     )
 
     assert_equal 9, @configuration.timeout
+  assert_equal "flat_pack_sidebar", @configuration.layout
     assert_equal true, @configuration.rich_text_comments
     assert_equal({ "Page" => :title }, @configuration.recordable_display_attributes)
     assert_equal({ "User" => :full_name }, @configuration.author_display_attributes)
@@ -46,6 +48,16 @@ class ConfigurationTest < Minitest::Test
 
   def test_defaults_rich_text_comments_to_false
     assert_equal false, @configuration.rich_text_comments
+  end
+
+  def test_defaults_layout_to_nil
+    assert_nil @configuration.layout
+  end
+
+  def test_layout_normalizes_blank_values_to_nil
+    @configuration.layout = "   "
+
+    assert_nil @configuration.layout
   end
 
   def test_defaults_recordable_display_attributes_to_empty_hash
@@ -113,6 +125,7 @@ class ConfigurationTest < Minitest::Test
 
     assert_kind_of RecordingStudioCommentable::Configuration, upgraded
     assert_equal 11, upgraded.timeout
+    assert_nil upgraded.layout
     assert_equal false, upgraded.rich_text_comments
     assert_equal({}, upgraded.recordable_display_attributes)
     assert_equal({}, upgraded.author_display_attributes)

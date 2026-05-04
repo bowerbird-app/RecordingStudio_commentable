@@ -171,6 +171,8 @@ class CommentsPagesFlowTest < Minitest::Test
     controller_source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
     layout_source = read_workspace_file("app/views/layouts/recording_studio_commentable/application.html.erb")
 
+    assert_includes application_controller_source, "layout :commentable_layout"
+    assert_includes application_controller_source, 'configured_layout.presence || "recording_studio_commentable/application"'
     assert_includes controller_source, "before_action :authorize_view!, only: %i[index all]"
     assert_includes controller_source, "def all"
     assert_includes controller_source, "@show_comments = summary_show_comments_request?"
@@ -264,6 +266,7 @@ class CommentsPagesFlowTest < Minitest::Test
                     "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "force_composer: true"
     refute_includes new_view_source, "FlatPack::Card::Component.new(style: :outlined)"
+    assert_includes dummy_initializer_source, 'config.layout = "flat_pack_sidebar"'
     assert_includes dummy_initializer_source, "config.rich_text_comments = true"
     assert_includes dummy_initializer_source, "config.recordable_display_attributes = {"
     assert_includes dummy_initializer_source, "config.author_display_attributes = {"

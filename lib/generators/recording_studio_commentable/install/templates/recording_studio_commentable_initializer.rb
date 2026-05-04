@@ -7,6 +7,9 @@ RecordingStudioCommentable.configure do |config|
   # Timeout for service operations (seconds)
   # config.timeout = 5
 
+  # Optional host-app layout. Leave blank to use the engine's default layout.
+  # config.layout = "flat_pack_sidebar"
+
   # Enable FlatPack rich text editing for comment bodies.
   config.rich_text_comments = false
 

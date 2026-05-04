@@ -26,12 +26,14 @@ module RecordingStudioCommentable
     def normalize_configuration(config)
       return Configuration.new unless config
       return config if config.respond_to?(:rich_text_comments) &&
+                       config.respond_to?(:layout) &&
                        config.respond_to?(:recordable_display_attributes) &&
                        config.respond_to?(:author_display_attributes) &&
                        config.respond_to?(:author_avatar_attributes)
 
       upgraded = Configuration.new
       upgraded.timeout = config.timeout if config.respond_to?(:timeout)
+      upgraded.layout = config.layout if config.respond_to?(:layout)
       if config.respond_to?(:recordable_display_attributes)
         upgraded.recordable_display_attributes = config.recordable_display_attributes
       end

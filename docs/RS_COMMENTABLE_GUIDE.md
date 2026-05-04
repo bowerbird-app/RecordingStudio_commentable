@@ -33,9 +33,12 @@ The generated initializer keeps rich text comments off by default:
 
 ```ruby
 RecordingStudioCommentable.configure do |config|
+  config.layout = "flat_pack_sidebar"
   config.rich_text_comments = false
 end
 ```
+
+Leave `config.layout` unset to keep the engine's default blank layout. Set it to a host layout path when commentable pages should render inside your app shell, for example a sidebar layout.
 
 Turn that flag on if you want comment forms to use FlatPack's rich text editor and render sanitized HTML in the feed.
 

@@ -5,7 +5,7 @@ module RecordingStudioCommentable
     include RecordingStudioCommentable::RecordableDisplayHelper
 
     protect_from_forgery with: :exception unless defined?(::ApplicationController)
-    layout "recording_studio_commentable/application"
+    layout :commentable_layout
 
     helper_method :current_recording_studio_actor
     helper_method :recordable_display_title
@@ -30,6 +30,13 @@ module RecordingStudioCommentable
       else
         head :unauthorized
       end
+    end
+
+    def commentable_layout
+      configured_layout = RecordingStudioCommentable.configuration.layout if
+        RecordingStudioCommentable.configuration.respond_to?(:layout)
+
+      configured_layout.presence || "recording_studio_commentable/application"
     end
   end
 end

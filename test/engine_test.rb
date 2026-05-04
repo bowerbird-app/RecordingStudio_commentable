@@ -38,6 +38,7 @@ class EngineTest < Minitest::Test
     xcfg = Struct.new(:recording_studio_commentable).new(
       {
         timeout: 12,
+        layout: "flat_pack_sidebar",
         rich_text_comments: true,
         recordable_display_attributes: { "Event" => :event_name },
         author_display_attributes: { "User" => :full_name },
@@ -49,6 +50,7 @@ class EngineTest < Minitest::Test
       def config_for(_name)
         {
           timeout: 12,
+          layout: "host_comment_shell",
           rich_text_comments: true,
           recordable_display_attributes: { "Page" => :title },
           author_display_attributes: { "SystemActor" => :display_name },
@@ -62,6 +64,7 @@ class EngineTest < Minitest::Test
     assert hook_called
     assert_equal RecordingStudioCommentable.configuration, hook_payload
     assert_equal 12, RecordingStudioCommentable.configuration.timeout
+    assert_equal "flat_pack_sidebar", RecordingStudioCommentable.configuration.layout
     assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
     assert_equal({ "Event" => :event_name }, RecordingStudioCommentable.configuration.recordable_display_attributes)
     assert_equal({ "User" => :full_name }, RecordingStudioCommentable.configuration.author_display_attributes)
@@ -72,6 +75,7 @@ class EngineTest < Minitest::Test
     pair_config = Class.new do
       def each_pair
         yield(:timeout, 15)
+        yield(:layout, "flat_pack_sidebar")
         yield(:rich_text_comments, true)
         yield(:recordable_display_attributes, { Page: :title })
         yield(:author_display_attributes, { User: :full_name })
@@ -91,6 +95,7 @@ class EngineTest < Minitest::Test
     find_initializer("recording_studio_commentable.load_config").block.call(app)
 
     assert_equal 15, RecordingStudioCommentable.configuration.timeout
+  assert_equal "flat_pack_sidebar", RecordingStudioCommentable.configuration.layout
     assert_equal true, RecordingStudioCommentable.configuration.rich_text_comments
     assert_equal({ "Page" => :title }, RecordingStudioCommentable.configuration.recordable_display_attributes)
     assert_equal({ "User" => :full_name }, RecordingStudioCommentable.configuration.author_display_attributes)
@@ -108,7 +113,7 @@ class EngineTest < Minitest::Test
     app_config = Struct.new(:x).new(xcfg)
     app = Struct.new(:config) do
       def config_for(_name)
-        { timeout: 5, rich_text_comments: false }
+        { timeout: 5, layout: nil, rich_text_comments: false }
       end
     end.new(app_config)
 
@@ -116,6 +121,7 @@ class EngineTest < Minitest::Test
     find_initializer("recording_studio_commentable.load_config").block.call(app)
 
     assert_equal 5, RecordingStudioCommentable.configuration.timeout
+    assert_nil RecordingStudioCommentable.configuration.layout
     assert_equal false, RecordingStudioCommentable.configuration.rich_text_comments
   end
 

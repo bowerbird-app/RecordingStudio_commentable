@@ -6,14 +6,20 @@ module RecordingStudioCommentable
   class Configuration
     attr_accessor :timeout, :rich_text_comments
     attr_reader :hooks, :recordable_display_attributes, :author_display_attributes, :author_avatar_attributes
+    attr_reader :layout
 
     def initialize
       @timeout = 5
       @rich_text_comments = false
+      @layout = nil
       @recordable_display_attributes = {}
       @author_display_attributes = {}
       @author_avatar_attributes = {}
       @hooks = Hooks.new
+    end
+
+    def layout=(value)
+      @layout = value.to_s.strip.presence
     end
 
     def recordable_display_attributes=(value)
@@ -32,6 +38,7 @@ module RecordingStudioCommentable
       {
         timeout: timeout,
         rich_text_comments: rich_text_comments,
+        layout: layout,
         recordable_display_attributes: recordable_display_attributes.dup,
         author_display_attributes: author_display_attributes.dup,
         author_avatar_attributes: author_avatar_attributes.dup,
