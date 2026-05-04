@@ -37,6 +37,8 @@
         "Accessible in Recording Studio, but folders are not commentable here, so posting fails."
       elsif edit_access
         "Accessible for #{actor_name}. Adding a comment will succeed."
+      elsif view_access
+        "Accessible for #{actor_name}. They can open the feed, but cannot add a comment."
       else
         "Not accessible for #{actor_name}. Opening the feed or adding a comment will fail."
       end %>

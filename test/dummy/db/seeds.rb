@@ -21,6 +21,15 @@ if quinn.new_record?
 end
 quinn.save!
 
+viewer = User.find_or_initialize_by(email: "view@admin.com")
+viewer.name = "View Only"
+viewer.avatar_url = "https://i.pravatar.cc/160?u=view@admin.com"
+if viewer.new_record?
+  viewer.password = "Password"
+  viewer.password_confirmation = "Password"
+end
+viewer.save!
+
 # Create the workspace recordable
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 
@@ -66,7 +75,7 @@ Page.where(title: "Publicly accessible document").update_all(title: "Quinn and A
 
 public_page = Page.find_or_create_by!(title: "Quinn and Admin User can comment")
 Page.where(id: public_page.id).update_all(
-  body: "Both seeded users can comment on this page because it grants explicit access to each of them."
+  body: "Admin User and Quinn can comment on this page. View Only can open the feed, but cannot add comments because this page grants view access only."
 )
 public_page.reload
 
@@ -123,7 +132,7 @@ public_page_recording = RecordingStudio::Recording.unscoped.create!(
   folder_recording => [[user, :edit], [quinn, :edit]],
   quinn_page_recording => [[quinn, :edit]],
   admin_page_recording => [[user, :edit]],
-  public_page_recording => [[user, :edit], [quinn, :edit]]
+  public_page_recording => [[user, :edit], [quinn, :edit], [viewer, :view]]
 }.each do |recording, grants|
   grants.each do |actor, role|
     access_record = RecordingStudio::Access.find_or_create_by!(actor: actor, role: role)
@@ -137,6 +146,7 @@ end
 
 puts "Seeded: admin@admin.com / Password"
 puts "Seeded: quinn@admin.com / Password"
+puts "Seeded: view@admin.com / Password"
 puts "Seeded: Workspace '#{workspace.name}' with root recording ##{root_recording.id}"
 puts "Seeded: Folder '#{folder.name}' recording ##{folder_recording.id}"
 puts "Seeded: Page '#{quinn_page.title}' recording ##{quinn_page_recording.id}"
