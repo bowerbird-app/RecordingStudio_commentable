@@ -144,6 +144,55 @@ public_page_recording = RecordingStudio::Recording.unscoped.create!(
   end
 end
 
+create_seed_comment = lambda do |parent_recording:, body:, author:|
+  Current.actor = author
+
+  result = RecordingStudioCommentable::Services::CreateComment.call(
+    parent_recording: parent_recording,
+    body: body,
+    author: author
+  )
+
+  raise "Failed to seed comment: #{Array(result.errors).join(", ")}" unless result.success?
+
+  RecordingStudio::Recording.unscoped
+    .where(parent_recording_id: parent_recording.id, recordable: result.value)
+    .order(created_at: :desc)
+    .first!
+end
+
+public_intro_comment_recording = create_seed_comment.call(
+  parent_recording: public_page_recording,
+  author: user,
+  body: "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."
+)
+
+create_seed_comment.call(
+  parent_recording: public_intro_comment_recording,
+  author: quinn,
+  body: "Reply sample: Quinn can respond here, which makes the feed show a threaded conversation immediately."
+)
+
+create_seed_comment.call(
+  parent_recording: public_page_recording,
+  author: quinn,
+  body: "A second top-level comment gives the paginated feed examples enough items to demonstrate the different loading modes."
+)
+
+create_seed_comment.call(
+  parent_recording: quinn_page_recording,
+  author: quinn,
+  body: "Quinn-owned page sample comment. This should only be writable for Quinn in the dummy scenarios."
+)
+
+create_seed_comment.call(
+  parent_recording: admin_page_recording,
+  author: user,
+  body: "Admin-owned page sample comment. This gives the dedicated scenario page a visible thread from the first load."
+)
+
+Current.actor = user
+
 puts "Seeded: admin@admin.com / Password"
 puts "Seeded: quinn@admin.com / Password"
 puts "Seeded: view@admin.com / Password"
@@ -152,3 +201,4 @@ puts "Seeded: Folder '#{folder.name}' recording ##{folder_recording.id}"
 puts "Seeded: Page '#{quinn_page.title}' recording ##{quinn_page_recording.id}"
 puts "Seeded: Page '#{admin_page.title}' recording ##{admin_page_recording.id}"
 puts "Seeded: Page '#{public_page.title}' recording ##{public_page_recording.id}"
+puts "Seeded: Sample comments for the scenario pages"
