@@ -144,12 +144,12 @@ class NestedRepliesTest < Minitest::Test
   def test_controller_loads_replies_in_index_all_and_create_failure
     source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
 
-    # @replies is set in the index action (show_comments branch)
+      # @replies is set in the summary page branch and inline summary validation failure path.
     assert_includes source, "@replies = load_replies(@comments)"
-    # Appears in all, index, and create failure paths — verify at least 3 occurrences
+      # Verify it still appears in both places where the summary template renders nested replies.
     reply_count = source.scan("@replies = load_replies(@comments)").size
-    assert reply_count >= 3,
-           "Expected @replies = load_replies(@comments) to appear at least 3 times (index, all, create); found #{reply_count}"
+      assert reply_count >= 2,
+        "Expected @replies = load_replies(@comments) to appear at least 2 times (index and create summary failure); found #{reply_count}"
   end
 
   def test_controller_initializes_parent_comment_recording_in_new
@@ -162,13 +162,19 @@ class NestedRepliesTest < Minitest::Test
   # Comment partial: reply link and nested replies block
   # ------------------------------------------------------------------ #
 
-  def test_comment_partial_reply_link_points_to_new_recording_comment_path
+  def test_comment_partial_reply_button_defaults_to_engine_aware_comment_path
     source = read_workspace_file("app/views/recording_studio_commentable/comments/_comment.html.erb")
 
-    assert_includes source, 'link_to "Reply"'
-    assert_includes source, "new_recording_comment_path"
-    assert_includes source, "parent_comment_id: comment_recording.id"
-    refute_includes source, 'link_to "Reply", "#"'
+    assert_includes source, 'text: "Reply"'
+    assert_includes source, "local_assigns.fetch(:allow_reply, true)"
+    assert_includes source,
+            'link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]'
+    assert_includes source, "FlatPack::Button::Component.new(**reply_action_options)"
+    assert_includes source, 'class: "text-sm font-medium text-[var(--color-primary)] hover:underline"'
+    assert_includes source, 'data: { turbo_frame: "_top" }'
+    assert_includes source, "recording_studio_commentable.reply_comment_path"
+    assert_includes source, "local_assigns[:reply_button_resolver]"
+    assert_includes source, "elsif allow_reply"
   end
 
   def test_comment_partial_renders_nested_replies
@@ -179,6 +185,8 @@ class NestedRepliesTest < Minitest::Test
     assert_includes source, "replies.each do |reply_recording|"
     assert_includes source, 'render "recording_studio_commentable/comments/comment"'
     assert_includes source, "comment_recording: reply_recording"
+    assert_includes source, "allow_reply: false"
+    assert_includes source, "reply_button_resolver: reply_button_resolver"
   end
 
   def test_comment_partial_uses_indented_border_for_replies
@@ -205,10 +213,10 @@ class NestedRepliesTest < Minitest::Test
   def test_all_template_passes_replies_to_comment_partial
     source = read_workspace_file("app/views/recording_studio_commentable/comments/all.html.erb")
 
-    assert_includes source, "replies:"
-    assert_includes source, "@replies"
-    assert_includes source, "comment_recording.id"
-    assert_includes source, "fetch(comment_recording.id, [])"
+    assert_includes source, "RecordingStudioCommentable::CommentsFeed::Component.new("
+    assert_includes source, "include_composer: true"
+    assert_includes source, "comment: @comment"
+    assert_includes source, "can_create_comment: @can_create_comment"
   end
 
   # ------------------------------------------------------------------ #
@@ -234,8 +242,8 @@ class NestedRepliesTest < Minitest::Test
   end
 
   # ------------------------------------------------------------------ #
-  # Routes: no new routes were added to the engine or dummy app
-  # (replies reuse the existing create route via the parent_comment_id param)
+  # Routes: replies use the existing create route via parent_comment_id,
+  # but the engine now exposes the same comment browser routes as the host app.
   # ------------------------------------------------------------------ #
 
   def test_dummy_routes_unchanged_for_replies
@@ -248,12 +256,15 @@ class NestedRepliesTest < Minitest::Test
     refute_includes source, "post :reply"
   end
 
-  def test_engine_routes_unchanged
+  def test_engine_routes_include_comment_browser_paths
     source = read_workspace_file("config/routes.rb")
 
     assert_includes source, "root \"home#index\""
-    refute_includes source, "reply"
-    refute_includes source, "resources :comments"
+    assert_includes source, "resources :comments, only: [] do"
+    assert_includes source, "get :reply"
+    assert_includes source, "post :reply, action: :create_reply"
+    refute_includes source, "resources :recordings, only: [] do"
+    refute_includes source, "resources :replies"
   end
 
   private
