@@ -6,9 +6,15 @@ module RecordingStudioCommentable
       COMMENT_RECORDABLE_TYPE = "RecordingStudioCommentable::Comment"
       LOADING_MODES = %i[all infinite load_more].freeze
       DEFAULT_PAGE_SIZE = 20
+      DEFAULT_REPLY_BUTTON_OPTIONS = {
+        text: "Reply",
+        style: :ghost,
+        size: :sm,
+        data: { turbo_frame: "_top" }
+      }.freeze
 
       def initialize(recording:, mode: :all, page_size: DEFAULT_PAGE_SIZE, include_composer: false, return_to: nil,
-                     comment: nil, can_create_comment: nil)
+                     comment: nil, can_create_comment: nil, reply_action: nil)
         super()
         @recording = recording
         @requested_mode = mode
@@ -17,6 +23,7 @@ module RecordingStudioCommentable
         @return_to = return_to
         @comment = comment
         @can_create_comment = can_create_comment
+        @reply_action = reply_action
       end
 
       def loading_mode
@@ -80,7 +87,13 @@ module RecordingStudioCommentable
       def current_page_comments
         @current_page_comments ||= begin
           scope = top_level_comments_relation
-          scope = scope.limit(page_size).offset((current_page - 1) * page_size) if paginated?
+          if paginated?
+            scope = if scope.respond_to?(:limit)
+                      scope.limit(page_size).offset((current_page - 1) * page_size)
+                    else
+                      Array(scope).slice((current_page - 1) * page_size, page_size) || []
+                    end
+          end
           scope.to_a
         end
       end
@@ -112,6 +125,14 @@ module RecordingStudioCommentable
         )
       end
 
+      def reply_button_resolver
+        return if @reply_action.nil?
+
+        @reply_button_resolver ||= lambda do |comment_recording, parent_recording|
+          reply_button_options_for(comment_recording, parent_recording)
+        end
+      end
+
       attr_reader :recording
 
       private
@@ -121,20 +142,22 @@ module RecordingStudioCommentable
       end
 
       def top_level_comments_relation
-        @top_level_comments_relation ||= begin
-          return RecordingStudio::Recording.none unless defined?(RecordingStudio::Recording)
+        return @top_level_comments_relation if defined?(@top_level_comments_relation)
 
-          RecordingStudio::Recording
-            .where(parent_recording: recording)
-            .where(recordable_type: COMMENT_RECORDABLE_TYPE)
-            .where(trashed_at: nil)
-            .order(created_at: :asc)
-            .includes(:recordable)
-        end
+        @top_level_comments_relation = if defined?(RecordingStudio::Recording)
+                                         RecordingStudio::Recording
+                                           .where(parent_recording: recording)
+                                           .where(recordable_type: COMMENT_RECORDABLE_TYPE)
+                                           .where(trashed_at: nil)
+                                           .order(created_at: :asc)
+                                           .includes(:recordable)
+                                       else
+                                         []
+                                       end
       end
 
       def top_level_comments_count
-        @top_level_comments_count ||= top_level_comments_relation.count
+        @top_level_comments_count ||= top_level_comments_relation.size
       end
 
       def load_replies(top_level_recordings)
@@ -180,6 +203,46 @@ module RecordingStudioCommentable
         options[:loading] = loading_mode if paginated?
         options[:page_size] = page_size if paginated?
         options
+      end
+
+      def reply_button_options_for(comment_recording, parent_recording = recording)
+        default_options = default_reply_button_options_for(comment_recording, parent_recording)
+        custom_options = resolve_reply_action(comment_recording, parent_recording, default_options)
+        return if custom_options == false
+
+        default_options.merge(custom_options || {})
+      end
+
+      def default_reply_button_options_for(comment_recording, _parent_recording)
+        DEFAULT_REPLY_BUTTON_OPTIONS.merge(
+          url: helpers.recording_studio_commentable.reply_comment_path(
+            comment_recording,
+            reply_return_to_options
+          )
+        )
+      end
+
+      def resolve_reply_action(comment_recording, parent_recording, default_options)
+        case @reply_action
+        when nil
+          nil
+        when false
+          false
+        when Hash
+          @reply_action
+        else
+          @reply_action.call(
+            comment_recording: comment_recording,
+            parent_recording: parent_recording,
+            component: self,
+            default_options: default_options
+          )
+        end
+      end
+
+      def reply_return_to_options
+        path = effective_return_to.presence || helpers.request&.fullpath
+        path.present? ? { return_to: path } : {}
       end
     end
   end

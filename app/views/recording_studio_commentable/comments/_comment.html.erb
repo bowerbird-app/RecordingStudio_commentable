@@ -5,6 +5,24 @@
 <% parent_recording = local_assigns[:parent_recording] || @parent_recording %>
 <% accessible = local_assigns.fetch(:accessible, true) %>
 <% replies = local_assigns.fetch(:replies, []) %>
+<% allow_reply = local_assigns.fetch(:allow_reply, true) %>
+<% default_reply_return_to = request&.fullpath %>
+<% reply_button_resolver = local_assigns[:reply_button_resolver] %>
+<% reply_action_options = if allow_reply && reply_button_resolver.present?
+  reply_button_resolver.call(comment_recording, parent_recording)
+elsif allow_reply
+  {
+    text: "Reply",
+    href: recording_studio_commentable.reply_comment_path(
+      comment_recording,
+      default_reply_return_to.present? ? { return_to: default_reply_return_to } : {}
+    ),
+    class: "text-sm font-medium text-[var(--color-primary)] hover:underline",
+    data: { turbo_frame: "_top" }
+  }
+else
+  nil
+end %>
 <% author_name = comment.respond_to?(:author_display_name) ? comment.author_display_name : "Anonymous" %>
 <% author_avatar_url = comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil %>
 <% created_at = comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
@@ -26,9 +44,13 @@ end %>
   ) do |item| %>
     <% if accessible %>
       <% item.actions do %>
-        <%= link_to "Reply",
-              main_app.new_recording_comment_path(parent_recording, parent_comment_id: comment_recording.id),
-              class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
+        <% if reply_action_options.present? %>
+          <% if reply_button_resolver.present? %>
+            <%= render FlatPack::Button::Component.new(**reply_action_options) %>
+          <% else %>
+            <%= link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data] %>
+          <% end %>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
@@ -44,6 +66,8 @@ end %>
               comment_recording: reply_recording,
               parent_recording: parent_recording,
               accessible: accessible,
+              allow_reply: false,
+              reply_button_resolver: reply_button_resolver,
               replies: [] %>
       <% end %>
     </div>

@@ -3,12 +3,14 @@
 module RecordingStudioCommentable
   class ApplicationController < (defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base)
     include RecordingStudioCommentable::CommentBodyHelper
+    include RecordingStudioCommentable::CommentRoutesHelper
     include RecordingStudioCommentable::RecordableDisplayHelper
 
     protect_from_forgery with: :exception unless defined?(::ApplicationController)
     layout :commentable_layout
 
     helper_method :current_recording_studio_actor
+    helper_method :commentable_reply_comment_path
     helper_method :truncate_comment_body
     helper_method :recordable_display_title
 
@@ -22,6 +24,10 @@ module RecordingStudioCommentable
       elsif respond_to?(:current_user, true)
         current_user
       end
+    end
+
+    def commentable_reply_comment_path(comment_recording, **options)
+      recording_studio_commentable.reply_comment_path(comment_recording, options)
     end
 
     def require_actor!

@@ -7,7 +7,7 @@ module RecordingStudioCommentable
     PAGE_SIZE = 12
 
     def index
-      @external_back_path = scenarios_target_path
+      @external_back_path = main_app.root_path
 
       all_entries = visible_comment_entries
       @page = current_page
@@ -118,12 +118,6 @@ module RecordingStudioCommentable
       return false unless recording
 
       recording.recordable_type == "Workspace"
-    end
-
-    def scenarios_target_path
-      return main_app.scenarios_path(anchor: "comment-scenarios") if main_app.respond_to?(:scenarios_path)
-
-      main_app.root_path
     end
   end
 end

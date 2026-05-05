@@ -1,8 +1,10 @@
 require "recording_studio_commentable/recordable_display_helper"
 require "recording_studio_commentable/comment_body_helper"
+require "recording_studio_commentable/comment_routes_helper"
 
 class ApplicationController < ActionController::Base
   include RecordingStudioCommentable::CommentBodyHelper
+  include RecordingStudioCommentable::CommentRoutesHelper
   include RecordingStudioCommentable::RecordableDisplayHelper
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
@@ -16,7 +18,10 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :set_current_actor
 
-  helper_method :current_recording_studio_actor, :recordable_display_title, :truncate_comment_body
+  helper_method :current_recording_studio_actor,
+                :commentable_reply_comment_path,
+                :recordable_display_title,
+                :truncate_comment_body
 
   private
 
@@ -30,5 +35,9 @@ class ApplicationController < ActionController::Base
 
   def current_recording_studio_actor
     Current.actor || current_user
+  end
+
+  def commentable_reply_comment_path(comment_recording, **options)
+    recording_studio_commentable.reply_comment_path(comment_recording, options)
   end
 end

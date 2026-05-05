@@ -3,8 +3,9 @@
     {
       text: "Back",
       href: @external_back_path,
-      onclick: "if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"
-    }
+      onclick: @back_button_onclick,
+      data: { turbo: false }
+    }.compact
   ]) %>
 
   <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
@@ -52,7 +53,7 @@
               <% if @can_create_comment %>
                 <%= render "form",
                       comment: @comment,
-                      url: main_app.recording_comments_path(
+                      url: commentable_recording_comments_path(
                         @parent_recording,
                         show_comments: true,
                         inline_composer: true

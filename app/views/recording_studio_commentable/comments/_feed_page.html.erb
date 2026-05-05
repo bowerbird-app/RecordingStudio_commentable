@@ -4,6 +4,7 @@
       <%= render "recording_studio_commentable/comments/comment",
             comment_recording: comment_recording,
             parent_recording: feed.recording,
+            reply_button_resolver: feed.reply_button_resolver,
             replies: replies.fetch(comment_recording.id, []) %>
     <% end %>
   </div>

@@ -5,10 +5,12 @@ require "uri"
 module RecordingStudioCommentable
   class CommentsController < ApplicationController
     before_action :require_actor!
-    before_action :load_parent_recording
+    before_action :load_parent_recording, except: %i[reply create_reply]
+    before_action :load_reply_target_comment_recording, only: %i[reply create_reply]
+    before_action :load_reply_parent_recording, only: %i[reply create_reply]
     before_action :require_commentable!
-    before_action :authorize_view!, only: %i[index all]
-    before_action :authorize_create!, only: %i[new create]
+    before_action :authorize_view!, only: %i[index all reply]
+    before_action :authorize_create!, only: %i[new create reply create_reply]
     before_action :load_comment_recording, only: %i[edit update destroy]
     before_action :authorize_edit!, only: %i[edit update destroy]
     before_action :prepare_page_context
@@ -31,6 +33,19 @@ module RecordingStudioCommentable
     def new
       @comment = Comment.new
       @parent_comment_recording = find_parent_comment_recording
+      @composer_title = "Add comment"
+      @composer_url = main_app.recording_comments_path(@parent_recording, return_to_options)
+    end
+
+    def reply
+      @comment = Comment.new
+      @parent_comment_recording = @reply_target_comment_recording
+      @comments_count = comment_count
+      @composer_title = "Reply"
+      @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
+      @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording, return_to_options)
+
+      render :new
     end
 
     def create
@@ -58,8 +73,32 @@ module RecordingStudioCommentable
           @comments_count = comment_count
           render :all, status: :unprocessable_entity
         else
+          @composer_title = "Add comment"
+          @composer_url = main_app.recording_comments_path(@parent_recording, return_to_options)
           render :new, status: :unprocessable_entity
         end
+      end
+    end
+
+    def create_reply
+      result = Services::CreateComment.call(
+        parent_recording: @reply_target_comment_recording,
+        body: comment_params[:body],
+        author: current_recording_studio_actor
+      )
+
+      if result.success?
+        redirect_to post_reply_redirect_path,
+                    notice: "Comment added."
+      else
+        @comment = Comment.new(body: comment_params[:body])
+        @comment.errors.add(:base, result.error) if result.error
+        @parent_comment_recording = @reply_target_comment_recording
+        @comments_count = comment_count
+        @composer_title = "Reply"
+        @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
+        @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording, return_to_options)
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -101,15 +140,7 @@ module RecordingStudioCommentable
     private
 
     def return_to_path
-      path = params[:return_to].to_s
-      return if path.blank?
-
-      uri = URI.parse(path)
-      return if uri.host.present? || uri.path.nil? || !uri.path.start_with?("/")
-
-      uri.query.present? ? "#{uri.path}?#{uri.query}" : uri.path
-    rescue URI::InvalidURIError
-      nil
+      @return_to_path ||= normalize_relative_path(params[:return_to].to_s)
     end
 
     # ------------------------------------------------------------------ #
@@ -130,6 +161,20 @@ module RecordingStudioCommentable
       redirect_to(comments_collection_path, alert: "Comment not found.")
     end
 
+    def load_reply_target_comment_recording
+      @reply_target_comment_recording = find_recording(params[:id])
+      return if valid_reply_target_comment_recording?(@reply_target_comment_recording)
+
+      redirect_to(commentable_reply_fallback_path, alert: "Comment not found.")
+    end
+
+    def load_reply_parent_recording
+      @parent_recording = root_recording_for(@reply_target_comment_recording.parent_recording)
+      return if @parent_recording
+
+      redirect_to(commentable_reply_fallback_path, alert: "Recording not found.")
+    end
+
     def prepare_page_context
       return unless @parent_recording
 
@@ -139,7 +184,8 @@ module RecordingStudioCommentable
       @summary_path = summary_path
       @comments_collection_path = host_comments_collection_path
       @new_comment_path = host_new_comment_path
-      @external_back_path = commentable_home_referer_path || return_to_path || main_app.root_path
+      @external_back_path = commentable_home_referer_path || external_return_to_path || main_app.root_path
+      @back_button_onclick = external_return_to_path.present? ? nil : 'if (window.history.length > 1) { event.preventDefault(); window.history.back(); }'
       @can_create_comment = authorized?(:edit)
     end
 
@@ -163,7 +209,7 @@ module RecordingStudioCommentable
     def authorize_create!
       return if authorized?(:edit)
 
-      redirect_to(@summary_path,
+      redirect_to(summary_path,
                   alert: "You are not allowed to post comments here.")
     end
 
@@ -200,6 +246,51 @@ module RecordingStudioCommentable
       { return_to: return_to_path }
     end
 
+    def external_return_to_path
+      @external_return_to_path ||= begin
+        path = return_to_path
+
+        while (next_path = nested_comment_return_to_path(path))
+          path = next_path
+        end
+
+        path
+      end
+    end
+
+    def nested_comment_return_to_path(path)
+      return unless path.present? && comment_navigation_path?(path)
+
+      uri = URI.parse(path)
+      params = Rack::Utils.parse_nested_query(uri.query.to_s)
+      normalize_relative_path(params["return_to"].to_s)
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    def comment_navigation_path?(path)
+      uri = URI.parse(path)
+
+      [
+        main_app.recording_comments_path(@parent_recording),
+        main_app.all_recording_comments_path(@parent_recording),
+        main_app.new_recording_comment_path(@parent_recording)
+      ].include?(uri.path)
+    rescue URI::InvalidURIError
+      false
+    end
+
+    def normalize_relative_path(path)
+      return if path.blank?
+
+      uri = URI.parse(path)
+      return if uri.host.present? || uri.path.nil? || !uri.path.start_with?("/")
+
+      uri.query.present? ? "#{uri.path}?#{uri.query}" : uri.path
+    rescue URI::InvalidURIError
+      nil
+    end
+
     def commentable_home_referer_path
       return unless request.referer.present?
 
@@ -223,7 +314,7 @@ module RecordingStudioCommentable
     def summary_path(show_comments: false)
       main_app.recording_comments_path(
         @parent_recording,
-        show_comments ? { show_comments: true } : {}
+        return_to_options.merge(show_comments ? { show_comments: true } : {})
       )
     end
 
@@ -247,6 +338,12 @@ module RecordingStudioCommentable
       return expanded_summary_path if summary_show_comments_request?
 
       comments_collection_path
+    end
+
+    def post_reply_redirect_path
+      return return_to_path if return_to_path
+
+      recording_studio_commentable.root_path
     end
 
     def comments_relation
@@ -309,6 +406,18 @@ module RecordingStudioCommentable
       return if recording.trashed_at.present?
 
       recording
+    end
+
+    def valid_reply_target_comment_recording?(recording)
+      recording.present? &&
+        recording.recordable_type == "RecordingStudioCommentable::Comment" &&
+        recording.trashed_at.blank?
+    end
+
+    def commentable_reply_fallback_path
+      return return_to_path if return_to_path
+
+      recording_studio_commentable.root_path
     end
 
     def structure_child_recordings

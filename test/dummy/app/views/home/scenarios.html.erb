@@ -63,7 +63,7 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-              <%= link_to recording_comments_path(recording) do %>
+              <%= link_to recording_comments_path(recording, return_to: scenarios_path(anchor: "comment-scenarios")) do %>
                 <%= render FlatPack::Button::Component.new(text: "Open comment feed", style: :secondary, size: :sm) %>
               <% end %>
             </div>

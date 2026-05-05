@@ -33,6 +33,7 @@
         <%= render "recording_studio_commentable/comments/comment",
               comment_recording: comment_recording,
               parent_recording: feed.recording,
+              reply_button_resolver: feed.reply_button_resolver,
               replies: feed.replies_for_current_page.fetch(comment_recording.id, []) %>
       <% end %>
     <% end %>

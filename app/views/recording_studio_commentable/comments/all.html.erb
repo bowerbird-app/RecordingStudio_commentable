@@ -3,14 +3,28 @@
     { text: "Back", href: @summary_path }
   ]) %>
 
+  <% show_new_comment_button = ActiveModel::Type::Boolean.new.cast(params[:new_comment_button]) %>
+
   <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
   <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
+
+  <% if show_new_comment_button && @can_create_comment %>
+    <div class="flex justify-start">
+      <%= render FlatPack::Button::Component.new(
+            text: "Add comment",
+            url: @new_comment_path,
+            style: :secondary,
+            size: :sm,
+            class: "justify-start"
+          ) %>
+    </div>
+  <% end %>
 
   <%= render RecordingStudioCommentable::CommentsFeed::Component.new(
         recording: @parent_recording,
         mode: params[:loading],
         page_size: params[:page_size],
-        include_composer: true,
+        include_composer: !show_new_comment_button,
         return_to: params[:return_to],
         comment: @comment,
         can_create_comment: @can_create_comment
