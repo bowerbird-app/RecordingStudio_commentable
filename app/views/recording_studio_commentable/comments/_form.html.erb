@@ -2,7 +2,6 @@
 <% configuration = RecordingStudioCommentable.configuration %>
 <% rich_text_comments_enabled = configuration.rich_text_comments_enabled? %>
 <% rich_text_options = configuration.rich_text_comment_editor_options(placeholder: "Write your comment...") %>
-<% force_composer = local_assigns.fetch(:force_composer, false) %>
 <% parent_comment_id = local_assigns[:parent_comment_id] %>
 <% submit_label = comment.new_record? ? "Post comment" : "Save changes" %>
 <% cancel_path = local_assigns[:cancel_path] %>
@@ -14,113 +13,34 @@
     description: comment.errors.full_messages.join(", ")
   ) if comment.errors.any? %>
 
-  <% if rich_text_comments_enabled && force_composer %>
-    <div class="flex items-start gap-4">
-      <div class="shrink-0">
-        <%= render FlatPack::Avatar::Component.new(
-          name: actor_name,
-          size: :md,
-          shape: :circle
-        ) %>
-      </div>
-
-      <div class="flex-1">
-        <div class="relative overflow-hidden rounded-xl border border-[var(--comments-composer-border-color)] bg-[var(--comments-composer-background-color)] px-4 py-4 shadow-sm transition-all duration-base focus-within:border-[var(--comments-composer-focus-border-color)] focus-within:ring-2 focus-within:ring-[var(--comments-composer-focus-ring-color)]">
-          <%= render FlatPack::TextArea::Component.new(
-            name: "comment[body]",
-            value: comment.body,
-            placeholder: "Write your comment...",
-            error: comment.errors[:body].first,
-            rows: 4,
-            rich_text: true,
-            rich_text_options: rich_text_options,
-            class: "flex flex-col gap-3 [&_.flat-pack-richtext-toolbar]:border-0 [&_.flat-pack-richtext-toolbar]:border-b [&_.flat-pack-richtext-toolbar]:border-[var(--comments-composer-border-color)] [&_.flat-pack-richtext-toolbar]:px-0 [&_.flat-pack-richtext-toolbar]:pb-3 [&_.flat-pack-richtext-toolbar]:pt-0 [&_.flat-pack-richtext-editor]:min-h-16 [&_.flat-pack-richtext-editor]:border-0 [&_.flat-pack-richtext-editor]:bg-transparent [&_.flat-pack-richtext-editor]:px-0 [&_.flat-pack-richtext-editor]:py-0 [&_.flat-pack-richtext-editor]:shadow-none"
+  <%= render FlatPack::Comments::Composer::Component.new(
+    name: "comment[body]",
+    value: comment.body,
+    placeholder: "Write your comment...",
+    submit_label: submit_label,
+    rows: 4,
+    rich_text: rich_text_comments_enabled,
+    rich_text_options: rich_text_options,
+    avatar: { name: actor_name }
+  ) do |composer| %>
+    <% if cancel_path.present? %>
+      <% composer.actions do %>
+        <div class="flex w-full items-center justify-end gap-2">
+          <%= render FlatPack::Button::Component.new(
+            text: "Cancel",
+            url: cancel_path,
+            style: :ghost,
+            size: :sm,
+            class: "rounded-xl"
           ) %>
-
-          <% if cancel_path.present? %>
-            <div class="px-4 pt-4">
-              <div class="flex w-full items-center justify-end gap-2">
-                <%= render FlatPack::Button::Component.new(
-                  text: "Cancel",
-                  url: cancel_path,
-                  style: :ghost,
-                  size: :sm,
-                  class: "rounded-xl"
-                ) %>
-                <%= render FlatPack::Button::Component.new(
-                  text: submit_label,
-                  style: :primary,
-                  size: :sm,
-                  type: "submit",
-                  class: "rounded-xl"
-                ) %>
-              </div>
-            </div>
-          <% else %>
-            <button
-              type="submit"
-              class="absolute bottom-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--comments-composer-submit-background-color)] text-[var(--comments-composer-submit-text-color)] shadow-lg transition-colors duration-base hover:bg-[var(--comments-composer-submit-hover-background-color)]"
-              aria-label="<%= submit_label %>"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5 rotate-90">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-              <span class="sr-only"><%= submit_label %></span>
-            </button>
-          <% end %>
+          <%= render FlatPack::Button::Component.new(
+            text: submit_label,
+            style: :primary,
+            size: :sm,
+            type: "submit",
+            class: "rounded-xl"
+          ) %>
         </div>
-      </div>
-    </div>
-  <% elsif rich_text_comments_enabled %>
-    <div class="flex flex-col gap-4">
-      <%= render FlatPack::TextArea::Component.new(
-        name: "comment[body]",
-        value: comment.body,
-        label: "Comment",
-        placeholder: "Write your comment...",
-        error: comment.errors[:body].first,
-        rows: 4,
-        rich_text: true,
-        rich_text_options: rich_text_options
-      ) %>
-
-      <div class="flex justify-end">
-        <%= render FlatPack::Button::Component.new(
-          text: submit_label,
-          style: :primary,
-          size: :md,
-          type: "submit"
-        ) %>
-      </div>
-    </div>
-  <% else %>
-    <%= render FlatPack::Comments::Composer::Component.new(
-      name: "comment[body]",
-      value: comment.body,
-      placeholder: "Write your comment...",
-      submit_label: submit_label,
-      rows: 4,
-      avatar: { name: actor_name }
-    ) do |composer| %>
-      <% if cancel_path.present? %>
-        <% composer.actions do %>
-          <div class="flex w-full items-center justify-end gap-2">
-            <%= render FlatPack::Button::Component.new(
-              text: "Cancel",
-              url: cancel_path,
-              style: :ghost,
-              size: :sm,
-              class: "rounded-xl"
-            ) %>
-            <%= render FlatPack::Button::Component.new(
-              text: submit_label,
-              style: :primary,
-              size: :sm,
-              type: "submit",
-              class: "rounded-xl"
-            ) %>
-          </div>
-        <% end %>
       <% end %>
     <% end %>
   <% end %>

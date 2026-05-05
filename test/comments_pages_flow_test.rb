@@ -301,15 +301,12 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes dummy_initializer_source, '"Page" => :title'
     assert_includes dummy_initializer_source, '"User" => :display_name'
     assert_includes dummy_initializer_source, '"User" => :avatar_url'
-    assert_includes form_partial_source,
-                    "configuration.respond_to?(:rich_text_comment_editor_options)"
-    assert_includes form_partial_source, "force_composer = local_assigns.fetch(:force_composer, false)"
-    assert_includes form_partial_source, "rich_text_comments_enabled && force_composer"
-    assert_includes form_partial_source, "rich_text: true"
-    assert_includes form_partial_source,
-                    "relative overflow-hidden rounded-xl border border-[var(--comments-composer-border-color)]"
     assert_includes form_partial_source, "FlatPack::Comments::Composer::Component.new("
     assert_includes form_partial_source, "rich_text_comment_editor_options(placeholder: \"Write your comment...\")"
+    assert_includes form_partial_source, "rich_text: rich_text_comments_enabled"
+    refute_includes form_partial_source, "force_composer = local_assigns.fetch(:force_composer, false)"
+    refute_includes form_partial_source, "rich_text_comments_enabled && force_composer"
+    refute_includes form_partial_source, "FlatPack::TextArea::Component.new("
     assert_includes scenarios_view_source, 'text: "Open comment feed"'
     assert_includes scenarios_view_source,
                     "link_to recording_comments_path(recording)"
