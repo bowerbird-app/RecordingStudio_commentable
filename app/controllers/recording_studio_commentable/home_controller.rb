@@ -45,26 +45,56 @@ module RecordingStudioCommentable
     end
 
     def visible_comment_entries
+      top_level_comments = visible_top_level_comment_recordings
+      replies_by_parent = load_replies(top_level_comments)
+
+      top_level_comments.filter_map do |comment_recording|
+        parent_recording = root_recording_for(comment_recording.parent_recording)
+        next if workspace_recording?(parent_recording)
+
+        accessible = authorized_to_view?(parent_recording)
+
+        {
+          comment_recording: comment_recording,
+          parent_recording: parent_recording,
+          parent_title: recordable_display_title(parent_recording),
+          accessible: accessible,
+          replies: replies_by_parent.fetch(comment_recording.id, [])
+        }
+      end
+    end
+
+    def visible_top_level_comment_recordings
       return [] unless defined?(RecordingStudio::Recording)
 
+      comment_recordings = RecordingStudio::Recording
+                           .where(recordable_type: "RecordingStudioCommentable::Comment")
+                           .where(trashed_at: nil)
+                           .includes(:recordable, :parent_recording)
+                           .order(created_at: :desc)
+
+      comment_recordings.reject do |comment_recording|
+        comment_recording?(comment_recording.parent_recording)
+      end
+    end
+
+    def load_replies(top_level_comments)
+      return {} unless defined?(RecordingStudio::Recording)
+      return {} if top_level_comments.empty?
+
       RecordingStudio::Recording
+        .where(parent_recording_id: top_level_comments.map(&:id))
         .where(recordable_type: "RecordingStudioCommentable::Comment")
         .where(trashed_at: nil)
-        .includes(:recordable, :parent_recording)
-        .order(created_at: :desc)
-        .map do |comment_recording|
-          parent_recording = root_recording_for(comment_recording.parent_recording)
-          next if workspace_recording?(parent_recording)
+        .order(created_at: :asc)
+        .includes(:recordable)
+        .group_by(&:parent_recording_id)
+    end
 
-          accessible = authorized_to_view?(parent_recording)
+    def comment_recording?(recording)
+      return false unless recording
 
-          {
-            comment_recording: comment_recording,
-            parent_recording: parent_recording,
-            parent_title: recordable_display_title(parent_recording),
-            accessible: accessible
-          }
-        end.compact
+      recording.recordable_type == "RecordingStudioCommentable::Comment"
     end
 
     def authorized_to_view?(recording)

@@ -23,6 +23,7 @@
             comment: @comment,
           url: main_app.recording_comments_path(@parent_recording, return_to: params[:return_to]),
             cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path),
+            parent_comment_id: params[:parent_comment_id],
             force_composer: true %>
     <% end %>
   <% end %>

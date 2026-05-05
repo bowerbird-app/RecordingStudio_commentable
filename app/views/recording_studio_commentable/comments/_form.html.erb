@@ -3,10 +3,12 @@
 <% rich_text_comments_enabled = configuration.rich_text_comments_enabled? %>
 <% rich_text_options = configuration.rich_text_comment_editor_options(placeholder: "Write your comment...") %>
 <% force_composer = local_assigns.fetch(:force_composer, false) %>
+<% parent_comment_id = local_assigns[:parent_comment_id] %>
 <% submit_label = comment.new_record? ? "Post comment" : "Save changes" %>
 <% cancel_path = local_assigns[:cancel_path] %>
 <% actor_name = current_recording_studio_actor.respond_to?(:display_name) ? current_recording_studio_actor.display_name : current_recording_studio_actor.to_s.presence || "You" %>
 <%= form_with model: comment, url: url, local: false do |f| %>
+  <%= hidden_field_tag :parent_comment_id, parent_comment_id if parent_comment_id.present? %>
   <%= render FlatPack::Alert::Component.new(
     style: :danger,
     description: comment.errors.full_messages.join(", ")

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "action_view/helpers/text_helper"
+require "action_view/helpers"
 require "rails-html-sanitizer"
 
 module RecordingStudioCommentable
