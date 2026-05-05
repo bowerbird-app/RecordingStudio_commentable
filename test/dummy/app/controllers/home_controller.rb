@@ -266,6 +266,18 @@ class HomeController < ApplicationController
       .order(created_at: :asc)
       .first
 
+    paginated_feed_recording = RecordingStudio::Recording.unscoped
+      .where(recordable_type: "Page")
+      .where(trashed_at: nil)
+      .includes(:recordable)
+      .find do |recording|
+        RecordingStudio::Recording.unscoped
+          .where(parent_recording: recording)
+          .where(recordable_type: "RecordingStudioCommentable::Comment")
+          .where(trashed_at: nil)
+          .count > 1
+      end || example_recording
+
     return_to_path = example_recording.present? ? recording_browser_path(example_recording) : root_path
 
     @component_catalog = [
@@ -328,6 +340,66 @@ class HomeController < ApplicationController
         links: [
           { label: "Example recording", href: example_recording.present? ? recording_browser_path(example_recording) : root_path },
           { label: "Full comments page", href: example_recording.present? ? all_recording_comments_path(example_recording, return_to: return_to_path) : root_path }
+        ]
+      },
+      {
+        title: "RecordingStudioCommentable::CommentsFeed::Component",
+        source: "app/components/recording_studio_commentable/comments_feed/component.rb",
+        summary: "Reusable comment thread component that can render all comments at once, infinite-scroll top-level comments, or a Turbo-powered load-more flow while keeping direct replies grouped under each top-level comment.",
+        signature: "RecordingStudioCommentable::CommentsFeed::Component.new(recording:, mode: :all, page_size: 20, include_composer: false, return_to: nil, comment: nil, can_create_comment: nil)",
+        params: [
+          { name: "recording:", description: "Required RecordingStudio::Recording whose top-level comments and replies should be shown." },
+          { name: "mode:", description: "Loading strategy. Supports :all, :infinite, and :load_more. Defaults to :all." },
+          { name: "page_size:", description: "Top-level comments per page for paginated modes. Defaults to 20 and remains configurable per call." },
+          { name: "include_composer:", description: "Whether to render the composer above the thread. Defaults to false." },
+          { name: "return_to:", description: "Optional relative path passed through composer submissions and pagination links." },
+          { name: "comment:", description: "Optional comment form object, useful for redisplaying validation errors." },
+          { name: "can_create_comment:", description: "Optional override for composer visibility. Defaults to an authorization check for :edit." }
+        ],
+        examples: [
+          {
+            label: "Default full thread",
+            input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording)",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsFeed::Component.new(
+                recording: example_recording
+              )
+            }
+          },
+          {
+            label: "Infinite scroll thread",
+            input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, mode: :infinite, page_size: 2)",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsFeed::Component.new(
+                recording: paginated_feed_recording,
+                mode: :infinite,
+                page_size: 2
+              )
+            }
+          },
+          {
+            label: "Load more with composer",
+            input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, mode: :load_more, page_size: 2, include_composer: true, return_to: recording_comments_path(recording))",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsFeed::Component.new(
+                recording: paginated_feed_recording,
+                mode: :load_more,
+                page_size: 2,
+                include_composer: true,
+                return_to: recording_comments_path(paginated_feed_recording)
+              )
+            }
+          }
+        ],
+        notes: [
+          "Paginated modes page only top-level comments; each top-level comment still renders its direct replies together.",
+          "The component uses the current request's page param for follow-up frame requests and preserves mode/page_size in generated URLs.",
+          "include_composer defaults to false so host apps can use the thread without exposing write controls.",
+          "Turbo frame requests render only the requested comment-page frame, which keeps infinite-scroll and load-more responses small."
+        ],
+        links: [
+          { label: "Example threaded page", href: paginated_feed_recording.present? ? all_recording_comments_path(paginated_feed_recording, return_to: return_to_path, loading: :load_more, page_size: 2) : root_path },
+          { label: "Summary page", href: paginated_feed_recording.present? ? recording_comments_path(paginated_feed_recording) : root_path }
         ]
       }
     ]

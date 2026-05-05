@@ -25,9 +25,7 @@ module RecordingStudioCommentable
 
     def all
       @comment = Comment.new
-      @comments = comments_relation.to_a
       @comments_count = comment_count
-      @replies = load_replies(@comments)
     end
 
     def new
@@ -57,9 +55,7 @@ module RecordingStudioCommentable
           @replies = load_replies(@comments)
           render :index, status: :unprocessable_entity
         elsif inline_composer_request?
-          @comments = comments_relation.to_a
           @comments_count = comment_count
-          @replies = load_replies(@comments)
           render :all, status: :unprocessable_entity
         else
           render :new, status: :unprocessable_entity
@@ -232,7 +228,7 @@ module RecordingStudioCommentable
     end
 
     def host_comments_collection_path
-      main_app.all_recording_comments_path(@parent_recording, return_to_options)
+      main_app.all_recording_comments_path(@parent_recording, return_to_options.merge(feed_query_options))
     end
 
     def host_new_comment_path
@@ -259,6 +255,16 @@ module RecordingStudioCommentable
 
     def comment_count
       @comment_count ||= RecordingStudioCommentable::CommentCount.for_recording(@parent_recording)
+    end
+
+    def feed_query_options
+      options = {}
+      loading = params[:loading].to_s
+      options[:loading] = loading if %w[infinite load_more].include?(loading)
+
+      page_size = params[:page_size].to_i
+      options[:page_size] = page_size if page_size.positive?
+      options
     end
 
     def chronological_comments

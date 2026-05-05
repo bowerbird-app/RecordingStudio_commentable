@@ -1,0 +1,40 @@
+<%= render FlatPack::Comments::Thread::Component.new(
+  count: feed.comments_count,
+  title: "Comments",
+  empty_title: "No comments yet",
+  empty_body: "Be the first to leave a comment.",
+  id: "comments",
+  class: "max-w-none rounded-none bg-transparent p-0 shadow-none"
+) do |thread| %>
+  <% thread.header do %>
+    <div class="flex flex-col gap-6">
+      <% if feed.can_create_comment? %>
+        <%= render "recording_studio_commentable/comments/form",
+              comment: feed.composer_comment,
+              url: feed.composer_url,
+              force_composer: true %>
+      <% end %>
+
+      <h2 class="text-xl font-bold text-(--comments-thread-title-color)">
+        Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= feed.comments_count %>)</span>
+      </h2>
+    </div>
+  <% end %>
+
+  <% if feed.paginated? %>
+    <% if feed.current_page_comments.any? %>
+      <% thread.comment do %>
+        <%= render partial: "recording_studio_commentable/comments/feed_page", locals: feed.comments_page_locals %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <% feed.current_page_comments.each do |comment_recording| %>
+      <% thread.comment do %>
+        <%= render "recording_studio_commentable/comments/comment",
+              comment_recording: comment_recording,
+              parent_recording: feed.recording,
+              replies: feed.replies_for_current_page.fetch(comment_recording.id, []) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

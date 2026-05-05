@@ -1,0 +1,5 @@
+<% if render_page_only? %>
+  <%= render partial: "recording_studio_commentable/comments/feed_page", locals: comments_page_locals %>
+<% else %>
+  <%= render partial: "recording_studio_commentable/comments/feed", locals: { feed: self } %>
+<% end %>

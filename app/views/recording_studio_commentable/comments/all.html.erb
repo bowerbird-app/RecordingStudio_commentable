@@ -6,39 +6,13 @@
   <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
   <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
 
-  <%= render FlatPack::Comments::Thread::Component.new(
-    count: @comments_count,
-    title: "Comments",
-    empty_title: "No comments yet",
-    empty_body: "Be the first to leave a comment.",
-    id: "comments",
-    class: "max-w-none rounded-none bg-transparent p-0 shadow-none"
-  ) do |thread| %>
-    <% thread.header do %>
-      <div class="flex flex-col gap-6">
-        <% if @can_create_comment %>
-        <%= render "form",
-              comment: @comment,
-            url: main_app.recording_comments_path(
-              @parent_recording,
-              return_to: params[:return_to],
-              inline_composer: true
-            ),
-              force_composer: true %>
-        <% end %>
-
-        <h2 class="text-xl font-bold text-(--comments-thread-title-color)">
-          Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>
-        </h2>
-      </div>
-    <% end %>
-
-    <% @comments.each do |comment_recording| %>
-      <% thread.comment do %>
-        <%= render "comment",
-              comment_recording: comment_recording,
-              replies: (@replies || {}).fetch(comment_recording.id, []) %>
-      <% end %>
-    <% end %>
-  <% end %>
+  <%= render RecordingStudioCommentable::CommentsFeed::Component.new(
+        recording: @parent_recording,
+        mode: params[:loading],
+        page_size: params[:page_size],
+        include_composer: true,
+        return_to: params[:return_to],
+        comment: @comment,
+        can_create_comment: @can_create_comment
+      ) %>
 </div>
