@@ -112,14 +112,12 @@ module RecordingStudioCommentable
         )
       end
 
-      def recording
-        @recording
-      end
+      attr_reader :recording
 
       private
 
       def turbo_frame_request?
-        helpers.respond_to?(:turbo_frame_request?) ? helpers.turbo_frame_request? : helpers.request&.headers["Turbo-Frame"].present?
+        helpers.respond_to?(:turbo_frame_request?) ? helpers.turbo_frame_request? : helpers.request&.headers&.[]("Turbo-Frame").present?
       end
 
       def top_level_comments_relation

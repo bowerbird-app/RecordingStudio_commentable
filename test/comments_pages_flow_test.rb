@@ -156,7 +156,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "all_recording_comments_path(example_recording, return_to: return_to_path)"
     assert_includes controller_source, 'title: "RecordingStudioCommentable::CommentsFeed::Component"'
     assert_includes controller_source,
-            'signature: "RecordingStudioCommentable::CommentsFeed::Component.new(recording:, mode: :all, page_size: 20, include_composer: false, return_to: nil, comment: nil, can_create_comment: nil)"'
+                    'signature: "RecordingStudioCommentable::CommentsFeed::Component.new(recording:, mode: :all, page_size: 20, include_composer: false, return_to: nil, comment: nil, can_create_comment: nil)"'
     assert_includes controller_source, 'name: "mode:"'
     assert_includes controller_source, 'name: "page_size:"'
     assert_includes controller_source, 'name: "include_composer:"'
@@ -164,11 +164,11 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, 'name: "comment:"'
     assert_includes controller_source, 'name: "can_create_comment:"'
     assert_includes controller_source,
-            'render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording)'
+                    "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording)"
     assert_includes controller_source,
-            'render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, mode: :infinite, page_size: 2)'
+                    "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, mode: :infinite, page_size: 2)"
     assert_includes controller_source,
-            'render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, mode: :load_more, page_size: 2, include_composer: true, return_to: recording_comments_path(recording))'
+                    "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, mode: :load_more, page_size: 2, include_composer: true, return_to: recording_comments_path(recording))"
     assert_includes view_source, 'title: "Components"'
     assert_includes view_source, "@component_catalog.each do |component_entry|"
     assert_includes view_source, "title: component_entry[:title]"
@@ -352,12 +352,13 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes feed_partial_source, "FlatPack::Comments::Thread::Component.new("
     assert_includes feed_partial_source, 'render "recording_studio_commentable/comments/form"'
     assert_includes feed_partial_source, "force_composer: true"
-    assert_includes feed_partial_source, 'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= feed.comments_count %>)</span>'
-    assert_includes feed_page_partial_source, 'turbo_frame_tag feed.page_frame_id(page)'
+    assert_includes feed_partial_source,
+                    'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= feed.comments_count %>)</span>'
+    assert_includes feed_page_partial_source, "turbo_frame_tag feed.page_frame_id(page)"
     assert_includes feed_page_partial_source, 'data-controller="infinite-scroll"'
     assert_includes feed_page_partial_source, 'data-infinite-scroll-url-value="<%= feed.page_path(next_page) %>"'
     assert_includes feed_page_partial_source, 'text: "Load more"'
-    assert_includes feed_page_partial_source, 'turbo_frame: feed.page_frame_id(next_page)'
+    assert_includes feed_page_partial_source, "turbo_frame: feed.page_frame_id(next_page)"
     assert_includes controller_source, "options[:loading] = loading if %w[infinite load_more].include?(loading)"
     assert_includes controller_source, "options[:page_size] = page_size if page_size.positive?"
   end
