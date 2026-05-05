@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   get "/scenarios", to: "home#scenarios", as: :scenarios
   get "/gem-routes", to: "home#gem_routes", as: :gem_routes
   get "/helpers", to: "home#helpers", as: :helpers
+  get "/components", to: "home#components", as: :components
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

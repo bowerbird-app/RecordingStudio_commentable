@@ -46,6 +46,12 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Components",
+        href: "/components",
+        icon: :blocks
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Gem routes",
         href: "/gem-routes",
         icon: :git_branch

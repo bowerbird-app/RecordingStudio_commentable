@@ -1,9 +1,10 @@
 require "ostruct"
 
 class HomeController < ApplicationController
-  before_action :load_workspace_context, only: %i[index scenarios helpers recordings recording gem_routes]
+  before_action :load_workspace_context, only: %i[index scenarios helpers recordings recording gem_routes components]
   before_action :load_scenario_recordings, only: %i[index scenarios]
   before_action :load_helper_catalog, only: :helpers
+  before_action :load_component_catalog, only: :components
   before_action :load_recording_catalog, only: :recordings
   before_action :load_recording_detail, only: :recording
   before_action :load_gem_route_catalog, only: :gem_routes
@@ -15,6 +16,9 @@ class HomeController < ApplicationController
   end
 
   def helpers
+  end
+
+  def components
   end
 
   def recordings
@@ -248,6 +252,82 @@ class HomeController < ApplicationController
             input: 'recording_studio_commentable.root_path or /commentable',
             output: "Navigates to the installed addon UI"
           }
+        ]
+      }
+    ]
+  end
+
+  def load_component_catalog
+    example_recording = @scenario_recordings&.detect do |recording|
+      recording.recordable&.class&.include?(RecordingStudioCommentable::Commentable)
+    end || RecordingStudio::Recording.unscoped
+      .where(recordable_type: "Page")
+      .where(trashed_at: nil)
+      .order(created_at: :asc)
+      .first
+
+    return_to_path = example_recording.present? ? recording_browser_path(example_recording) : root_path
+
+    @component_catalog = [
+      {
+        title: "RecordingStudioCommentable::CommentsButton::Component",
+        source: "app/components/recording_studio_commentable/comments_button/component.rb",
+        summary: "Reusable FlatPack-backed button that routes to the full comments page, auto-counts comments plus nested replies, and disables itself when the actor cannot view the thread.",
+        signature: "RecordingStudioCommentable::CommentsButton::Component.new(recording:, count: nil, style: :primary, size: :lg, text: nil, **button_options)",
+        params: [
+          { name: "recording:", description: "Required RecordingStudio::Recording to scope the destination and recursive count." },
+          { name: "count:", description: "Optional override when the caller already has a precomputed total." },
+          { name: "style:", description: "FlatPack button style forwarded to FlatPack::Button::Component. Defaults to :primary." },
+          { name: "size:", description: "FlatPack button size. Defaults to :lg." },
+          { name: "text:", description: "Optional explicit button label. Defaults to \"N Comments\" with pluralization." },
+          { name: "**button_options", description: "Additional FlatPack button options such as class, id, data, or disabled-adjacent HTML attributes." }
+        ],
+        examples: [
+          {
+            label: "Default widget",
+            input: "render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording)",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsButton::Component.new(
+                recording: example_recording,
+                class: "w-full justify-center"
+              )
+            }
+          },
+          {
+            label: "Secondary compact button with explicit count",
+            input: "render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording, count: 12, style: :secondary, size: :sm, class: \"justify-center\")",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsButton::Component.new(
+                recording: example_recording,
+                count: 12,
+                style: :secondary,
+                size: :sm,
+                class: "justify-center"
+              )
+            }
+          },
+          {
+            label: "Custom label and data attributes",
+            input: "render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording, text: \"Open discussion\", class: \"w-full justify-center\", data: { turbo: false })",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsButton::Component.new(
+                recording: example_recording,
+                text: "Open discussion",
+                class: "w-full justify-center",
+                data: { turbo: false }
+              )
+            }
+          }
+        ],
+        notes: [
+          "The component currently accepts recording: only, by design.",
+          "When RecordingStudioAccessible is present, the component disables itself if the current actor lacks :view access.",
+          "The default auto-count traverses nested comment replies recursively and excludes trashed comment recordings.",
+          "The destination is the full comments collection page, with return_to set to the current request path when available."
+        ],
+        links: [
+          { label: "Example recording", href: example_recording.present? ? recording_browser_path(example_recording) : root_path },
+          { label: "Full comments page", href: example_recording.present? ? all_recording_comments_path(example_recording, return_to: return_to_path) : root_path }
         ]
       }
     ]

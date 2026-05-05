@@ -30,18 +30,10 @@
 
     <% unless @show_comments %>
       <footer class="border-t border-(--surface-border-color) pt-6">
-          <%= link_to(
-                @comments_count.positive? ?
-            @comments_collection_path :
-                  @new_comment_path
-              ) do %>
-          <%= render FlatPack::Button::Component.new(
-            text: @comments_count.positive? ? "#{@comments_count} Comments" : "Add comment",
-            style: :primary,
-            size: :lg,
-            class: "w-full justify-center"
-          ) %>
-        <% end %>
+        <%= render RecordingStudioCommentable::CommentsButton::Component.new(
+          recording: @parent_recording,
+          class: "w-full justify-center"
+        ) %>
       </footer>
     <% end %>
 

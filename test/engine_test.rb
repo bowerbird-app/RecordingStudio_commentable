@@ -13,6 +13,12 @@ class EngineTest < Minitest::Test
     RecordingStudioCommentable.instance_variable_set(:@configuration, @original_configuration)
   end
 
+  def test_engine_registers_component_path_for_autoloading
+    component_paths = RecordingStudioCommentable::Engine.paths["app/components"].existent
+
+    assert_includes component_paths, File.expand_path("../app/components", __dir__)
+  end
+
   def test_before_and_after_initialize_initializers_run_hooks
     before_called = false
     after_called = false

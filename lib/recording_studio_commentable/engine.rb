@@ -3,6 +3,7 @@
 module RecordingStudioCommentable
   class Engine < ::Rails::Engine
     isolate_namespace RecordingStudioCommentable
+    config.paths.add "app/components", eager_load: true
 
     class << self
       def apply_model_extensions(target)

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "recording_studio_commentable/version"
+require "recording_studio_commentable/comment_count"
 require "recording_studio_commentable/configuration"
 require "recording_studio_commentable/comment_body_helper"
 require "recording_studio_commentable/display_attribute_resolver"

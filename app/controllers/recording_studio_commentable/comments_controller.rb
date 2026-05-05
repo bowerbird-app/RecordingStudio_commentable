@@ -15,7 +15,7 @@ module RecordingStudioCommentable
 
     def index
       @show_comments = summary_show_comments_request?
-      @comments_count = comments_relation.count
+      @comments_count = comment_count
       return unless @show_comments
 
       @comment = Comment.new
@@ -26,7 +26,7 @@ module RecordingStudioCommentable
     def all
       @comment = Comment.new
       @comments = comments_relation.to_a
-      @comments_count = @comments.size
+      @comments_count = comment_count
       @replies = load_replies(@comments)
     end
 
@@ -53,12 +53,12 @@ module RecordingStudioCommentable
         if inline_composer_request? && summary_show_comments_request?
           @show_comments = true
           @comments = comments_relation.to_a
-          @comments_count = @comments.size
+          @comments_count = comment_count
           @replies = load_replies(@comments)
           render :index, status: :unprocessable_entity
         elsif inline_composer_request?
           @comments = comments_relation.to_a
-          @comments_count = @comments.size
+          @comments_count = comment_count
           @replies = load_replies(@comments)
           render :all, status: :unprocessable_entity
         else
@@ -111,7 +111,7 @@ module RecordingStudioCommentable
       uri = URI.parse(path)
       return if uri.host.present? || uri.path.nil? || !uri.path.start_with?("/")
 
-      uri.request_uri
+      uri.query.present? ? "#{uri.path}?#{uri.query}" : uri.path
     rescue URI::InvalidURIError
       nil
     end
@@ -255,6 +255,10 @@ module RecordingStudioCommentable
 
     def comments_relation
       @comments_relation ||= chronological_comments
+    end
+
+    def comment_count
+      @comment_count ||= RecordingStudioCommentable::CommentCount.for_recording(@parent_recording)
     end
 
     def chronological_comments

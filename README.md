@@ -68,6 +68,16 @@ mount RecordingStudioCommentable::Engine, at: "/commentable"
       recording_studio_commentable.recording_comments_path(recording) %>
 ```
 
+Or render the built-in widget button:
+
+```erb
+<%= render RecordingStudioCommentable::CommentsButton::Component.new(
+  recording: recording
+) %>
+```
+
+The widget routes to the full comments page, disables itself when the current actor cannot view comments, and auto-counts top-level comments plus nested replies. Pass `count:` when you already have a precomputed total.
+
 ## Access Control
 
 When `RecordingStudioAccessible` is loaded, the following role checks apply:
