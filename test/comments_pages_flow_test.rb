@@ -139,29 +139,33 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "def components"
     assert_includes controller_source, "def load_component_catalog"
     assert_includes controller_source, 'title: "RecordingStudioCommentable::CommentsButton::Component"'
-    assert_includes controller_source, 'signature: "RecordingStudioCommentable::CommentsButton::Component.new(recording:, count: nil, style: :primary, size: :lg, text: nil, **button_options)"'
+    assert_includes controller_source,
+                    'signature: "RecordingStudioCommentable::CommentsButton::Component.new(recording:, count: nil, style: :primary, size: :lg, text: nil, **button_options)"'
     assert_includes controller_source, 'name: "recording:"'
     assert_includes controller_source, 'name: "count:"'
     assert_includes controller_source, 'name: "style:"'
     assert_includes controller_source, 'name: "size:"'
     assert_includes controller_source, 'name: "text:"'
     assert_includes controller_source, 'name: "**button_options"'
-    assert_includes controller_source, 'render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording)'
-    assert_includes controller_source, 'render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording, count: 12, style: :secondary, size: :sm, class: "justify-center")'
-    assert_includes controller_source, 'render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording, text: "Open discussion", class: "w-full justify-center", data: { turbo: false })'
-    assert_includes controller_source, 'all_recording_comments_path(example_recording, return_to: return_to_path)'
+    assert_includes controller_source,
+                    "render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording)"
+    assert_includes controller_source,
+                    'render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording, count: 12, style: :secondary, size: :sm, class: "justify-center")'
+    assert_includes controller_source,
+                    'render RecordingStudioCommentable::CommentsButton::Component.new(recording: recording, text: "Open discussion", class: "w-full justify-center", data: { turbo: false })'
+    assert_includes controller_source, "all_recording_comments_path(example_recording, return_to: return_to_path)"
     assert_includes view_source, 'title: "Components"'
-    assert_includes view_source, '@component_catalog.each do |component_entry|'
-    assert_includes view_source, 'title: component_entry[:title]'
-    assert_includes view_source, 'Parameters'
-    assert_includes view_source, 'component_entry[:params].each do |param|'
-    assert_includes view_source, 'component_entry[:examples].each do |example|'
-    assert_includes view_source, 'render example[:preview].call'
+    assert_includes view_source, "@component_catalog.each do |component_entry|"
+    assert_includes view_source, "title: component_entry[:title]"
+    assert_includes view_source, "Parameters"
+    assert_includes view_source, "component_entry[:params].each do |param|"
+    assert_includes view_source, "component_entry[:examples].each do |example|"
+    assert_includes view_source, "render example[:preview].call"
     assert_includes view_source, 'title: "Notes"'
     assert_includes view_source, 'title: "Quick links"'
     assert_includes sidebar_source, 'label: "Components"'
     assert_includes sidebar_source, 'href: "/components"'
-    assert_includes sidebar_source, 'icon: :blocks'
+    assert_includes sidebar_source, "icon: :blocks"
     assert_includes routes_source, 'get "/components", to: "home#components", as: :components'
   end
 
@@ -290,9 +294,11 @@ class CommentsPagesFlowTest < Minitest::Test
                     'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
     assert_includes widget_source, "class Component < ViewComponent::Base"
     assert_includes widget_source, "'Comment'.pluralize(comments_count)"
-    assert_includes widget_source, "helpers.main_app.all_recording_comments_path(recording, return_to: current_request_path)"
+    assert_includes widget_source,
+                    "helpers.main_app.all_recording_comments_path(recording, return_to: current_request_path)"
     assert_includes widget_source, "RecordingStudioCommentable::CommentCount.for_recording(recording)"
-    assert_includes widget_source, "RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)"
+    assert_includes widget_source,
+                    "RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)"
     assert_includes count_source, 'COMMENT_RECORDABLE_TYPE = "RecordingStudioCommentable::Comment"'
     assert_includes count_source, "where(parent_recording_id: frontier_ids)"
     assert_includes count_source, "where(recordable_type: COMMENT_RECORDABLE_TYPE)"

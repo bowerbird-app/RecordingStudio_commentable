@@ -7,11 +7,13 @@ module RecordingStudioCommentable
 
     class << self
       def apply_model_extensions(target)
-        apply_extensions(target, RecordingStudioCommentable.configuration.hooks.model_extensions_for(extension_keys_for(target)))
+        apply_extensions(target,
+                         RecordingStudioCommentable.configuration.hooks.model_extensions_for(extension_keys_for(target)))
       end
 
       def apply_controller_extensions(target)
-        apply_extensions(target, RecordingStudioCommentable.configuration.hooks.controller_extensions_for(extension_keys_for(target)))
+        apply_extensions(target,
+                         RecordingStudioCommentable.configuration.hooks.controller_extensions_for(extension_keys_for(target)))
       end
 
       private
@@ -41,7 +43,8 @@ module RecordingStudioCommentable
       end
     end
 
-    initializer "recording_studio_commentable.before_initialize", before: "recording_studio_commentable.load_config" do |_app|
+    initializer "recording_studio_commentable.before_initialize",
+                before: "recording_studio_commentable.load_config" do |_app|
       RecordingStudioCommentable::Hooks.run(:before_initialize, self)
     end
 
@@ -73,7 +76,8 @@ module RecordingStudioCommentable
       RecordingStudioCommentable::Hooks.run(:on_configuration, RecordingStudioCommentable.configuration)
     end
 
-    initializer "recording_studio_commentable.after_initialize", after: "recording_studio_commentable.load_config" do |_app|
+    initializer "recording_studio_commentable.after_initialize",
+                after: "recording_studio_commentable.load_config" do |_app|
       RecordingStudioCommentable::Hooks.run(:after_initialize, self)
     end
 

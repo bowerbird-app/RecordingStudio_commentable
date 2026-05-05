@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require "set"
-
 module RecordingStudioCommentable
   module CommentCount
     COMMENT_RECORDABLE_TYPE = "RecordingStudioCommentable::Comment"
+
     module_function
 
     def for_recording(recording)
