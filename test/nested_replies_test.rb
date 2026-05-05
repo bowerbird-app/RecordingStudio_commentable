@@ -177,6 +177,7 @@ class NestedRepliesTest < Minitest::Test
     assert_includes source, "replies = local_assigns.fetch(:replies, [])"
     assert_includes source, "if replies.any?"
     assert_includes source, "replies.each do |reply_recording|"
+    assert_includes source, 'render "recording_studio_commentable/comments/comment"'
     assert_includes source, "comment_recording: reply_recording"
   end
 

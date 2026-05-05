@@ -142,10 +142,16 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "all_entries = visible_comment_entries"
     assert_includes controller_source, "@comment_entries = paginated_entries(all_entries)"
     assert_includes controller_source, "@next_page = next_page_for(all_entries)"
+    assert_includes controller_source, "top_level_comments = visible_top_level_comment_recordings"
+    assert_includes controller_source, "replies_by_parent = load_replies(top_level_comments)"
     assert_includes controller_source, "parent_recording = root_recording_for(comment_recording.parent_recording)"
+    assert_includes controller_source, "visible_top_level_comment_recordings"
+    assert_includes controller_source, "comment_recording?(comment_recording.parent_recording)"
+    assert_includes controller_source, "replies: replies_by_parent.fetch(comment_recording.id, [])"
     assert_includes controller_source, "next if workspace_recording?(parent_recording)"
-    assert_includes controller_source, "end.compact"
+    assert_includes controller_source, "group_by(&:parent_recording_id)"
     assert_includes controller_source, 'recording.recordable_type == "Workspace"'
+    assert_includes controller_source, 'recording.recordable_type == "RecordingStudioCommentable::Comment"'
     assert_includes controller_source,
                     'render partial: "comments_page", locals: comments_page_locals, layout: false if turbo_frame_request?'
     assert_includes controller_source,
@@ -160,9 +166,9 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes page_partial_source, 'controller: "infinite-scroll"'
     assert_includes page_partial_source, '"infinite-scroll-url-value": url_for(page: next_page)'
     assert_includes page_partial_source, "accessible: entry[:accessible]"
+    assert_includes page_partial_source, "replies: entry[:replies]"
     assert_includes comment_partial_source, "local_assigns.fetch(:accessible, true)"
-    assert_includes comment_partial_source,
-                    "configuration.respond_to?(:rich_text_comments_enabled?)"
+    assert_includes comment_partial_source, "configuration.rich_text_comments_enabled?"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
     assert_includes comment_partial_source, "Comment hidden"
     refute_includes comment_partial_source, 'text: "Show"'
