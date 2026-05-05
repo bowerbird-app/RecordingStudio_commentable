@@ -1,107 +1,115 @@
-<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+<div class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Components",
-    subtitle: "A dummy-app reference for reusable RecordingStudioCommentable view components and their supported parameters.",
+    subtitle: "A dummy-app reference for reusable RecordingStudioCommentable view components, presented in the same preview-first style FlatPack uses in its own demo app.",
     variant: :h1
   ) %>
 
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-    <div class="flex flex-col gap-6">
-      <% @component_catalog.each do |component_entry| %>
-        <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-          <% card.header do %>
-            <%= render FlatPack::PageTitle::Component.new(
-              title: component_entry[:title],
-              subtitle: component_entry[:source],
-              variant: :h2,
-              class: "mb-0 pb-0"
-            ) %>
-          <% end %>
+  <div class="space-y-12 pb-12">
+    <% @component_catalog.each do |component_entry| %>
+      <section class="space-y-6">
+        <%= render FlatPack::SectionTitle::Component.new(
+          title: component_entry[:title],
+          subtitle: component_entry[:summary],
+          anchor: component_entry[:title].parameterize,
+          anchor_link: true
+        ) %>
 
-          <% card.body do %>
-            <div class="space-y-5 text-sm leading-6 text-(--surface-content-color)">
-              <p><%= component_entry[:summary] %></p>
-
-              <div>
-                <p class="mb-2 font-medium text-(--surface-content-color)">Signature</p>
-                <div class="rounded-xl border border-(--surface-border-color) bg-(--surface-secondary-background-color) px-4 py-3 font-mono text-xs leading-5 text-(--surface-content-color)">
-                  <%= component_entry[:signature] %>
-                </div>
-              </div>
-
-              <div>
-                <p class="mb-2 font-medium text-(--surface-content-color)">Parameters</p>
-                <div class="space-y-3">
-                  <% component_entry[:params].each do |param| %>
-                    <div class="rounded-xl border border-(--surface-border-color) px-4 py-3">
-                      <p class="font-mono text-xs leading-5 text-(--surface-content-color)"><%= param[:name] %></p>
-                      <p class="mt-2"><%= param[:description] %></p>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
-
-              <div>
-                <p class="mb-2 font-medium text-(--surface-content-color)">Examples</p>
-                <div class="space-y-4">
-                  <% component_entry[:examples].each do |example| %>
-                    <div class="rounded-xl border border-(--surface-border-color) px-4 py-4">
-                      <p class="font-medium text-(--surface-content-color)"><%= example[:label] %></p>
-                      <p class="mt-2 font-mono text-xs leading-5 whitespace-pre-wrap text-(--surface-muted-content-color)"><%= example[:input] %></p>
-                      <div class="mt-4 rounded-xl bg-(--surface-secondary-background-color) p-4">
-                        <%= render example[:preview].call %>
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        <% end %>
-      <% end %>
-    </div>
-
-    <div class="flex flex-col gap-6">
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-        <% card.header do %>
-          <%= render FlatPack::PageTitle::Component.new(
-            title: "Notes",
-            subtitle: "Behavior and implementation details for the current component catalog.",
-            variant: :h3,
-            class: "mb-0 pb-0"
+        <section class="space-y-4">
+          <%= render FlatPack::SectionTitle::Component.new(
+            title: "Examples",
+            subtitle: "Live previews and copyable ERB calls.",
+            anchor_link: true
           ) %>
-        <% end %>
 
-        <% card.body do %>
-          <ul class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
-            <% @component_catalog.flat_map { |entry| entry[:notes] }.each do |note| %>
-              <li><%= note %></li>
-            <% end %>
-          </ul>
-        <% end %>
-      <% end %>
+          <div class="space-y-6">
+            <% component_entry[:examples].each do |example| %>
+              <%= render FlatPack::Card::Component.new do |card| %>
+                <% card.header do %>
+                  <%= render FlatPack::PageTitle::Component.new(
+                    title: example[:label],
+                    subtitle: "Live preview",
+                    variant: :h3,
+                    class: "mb-0 pb-0"
+                  ) %>
+                <% end %>
 
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-        <% card.header do %>
-          <%= render FlatPack::PageTitle::Component.new(
-            title: "Quick links",
-            subtitle: "Useful destinations related to the components being previewed.",
-            variant: :h3,
-            class: "mb-0 pb-0"
-          ) %>
-        <% end %>
+                <% card.body do %>
+                  <div class="space-y-4">
+                    <div class="rounded-xl border border-(--surface-border-color) bg-(--surface-secondary-background-color) p-4">
+                      <%= render example[:preview].call %>
+                    </div>
 
-        <% card.body do %>
-          <div class="space-y-3 text-sm leading-6 text-(--surface-content-color)">
-            <% @component_catalog.flat_map { |entry| entry[:links] }.each do |link| %>
-              <div>
-                <p class="text-(--surface-muted-content-color)"><%= link[:label] %></p>
-                <p><%= link_to link[:href], link[:href], class: "underline" %></p>
-              </div>
+                    <%= render FlatPack::CodeBlock::Component.new(
+                      title: example[:label],
+                      language: "erb",
+                      code: example[:input]
+                    ) %>
+                  </div>
+                <% end %>
+              <% end %>
             <% end %>
           </div>
+        </section>
+
+        <section class="space-y-4">
+          <%= render FlatPack::SectionTitle::Component.new(
+            title: "Parameters",
+            subtitle: "Supported arguments for this component.",
+            anchor_link: true
+          ) %>
+
+          <%= render FlatPack::Card::Component.new do |card| %>
+            <% card.body do %>
+              <div class="space-y-4">
+                <%= render FlatPack::CodeBlock::Component.new(
+                  title: "Signature",
+                  language: "ruby",
+                  code: component_entry[:signature]
+                ) %>
+
+                <div>
+                  <p class="mb-2 font-medium text-(--surface-content-color)">Source</p>
+                  <p class="font-mono text-xs leading-5 text-(--surface-muted-content-color)">
+                    <%= component_entry[:source] %>
+                  </p>
+                </div>
+
+                <div class="space-y-3">
+                <% component_entry[:params].each do |param| %>
+                  <div class="rounded-xl border border-(--surface-border-color) px-4 py-3 text-sm leading-6 text-(--surface-content-color)">
+                    <p class="font-mono text-xs leading-5 text-(--surface-content-color)"><%= param[:name] %></p>
+                    <p class="mt-2"><%= param[:description] %></p>
+                  </div>
+                <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </section>
+
+        <% if component_entry[:notes].present? %>
+          <section class="space-y-4">
+            <%= render FlatPack::SectionTitle::Component.new(
+              title: "Implementation details",
+              subtitle: "Behavior and implementation details to keep in mind.",
+              anchor_link: true
+            ) %>
+
+            <%= render FlatPack::Card::Component.new do |card| %>
+              <% card.body do %>
+                <%= render FlatPack::List::Component.new(class: "text-[var(--surface-content-color)]") do %>
+                  <% component_entry[:notes].each do |note| %>
+                    <%= render FlatPack::List::Item.new do %>
+                      <%= note %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          </section>
         <% end %>
-      <% end %>
-    </div>
+      </section>
+    <% end %>
   </div>
 </div>

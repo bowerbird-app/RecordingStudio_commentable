@@ -61,6 +61,12 @@ class HomeController < ApplicationController
   end
 
   def load_helper_catalog
+    reply_target_comment_recording = RecordingStudio::Recording.unscoped
+      .where(recordable_type: "RecordingStudioCommentable::Comment")
+      .where(trashed_at: nil)
+      .order(created_at: :asc)
+      .first
+
     @helper_catalog = [
       {
         title: "recordable_display_title",
@@ -110,12 +116,30 @@ class HomeController < ApplicationController
             output: current_recording_studio_actor&.email.to_s
           }
         ]
+      },
+      {
+        title: "commentable_reply_comment_path",
+        source: "RecordingStudioCommentable::CommentRoutesHelper",
+        summary: "Builds the mounted gem reply composer path for a comment recording, preserving an optional return_to destination.",
+        signature: 'commentable_reply_comment_path(comment_recording, return_to: "/commentable")',
+        examples: [
+          {
+            label: "Reply composer path",
+            input: 'commentable_reply_comment_path(comment_recording, return_to: "/commentable")',
+            output: if reply_target_comment_recording
+                      commentable_reply_comment_path(reply_target_comment_recording, return_to: "/commentable")
+                    else
+                      "No seeded comment available"
+                    end
+          }
+        ]
       }
     ]
 
     @helper_notes = [
       "RecordableDisplayHelper is included in both the dummy app controller and the engine controller.",
       "CommentBodyHelper is exposed in the dummy app so helper previews match the commentable pages.",
+      "CommentRoutesHelper exposes the mounted reply route helper used by the gem-owned reply composer flow.",
       "Each helper is available to ERB templates through helper_method wiring on the controller layer.",
       "These examples are intended as copyable reference snippets for future dummy pages and comment UI states."
     ]
@@ -278,6 +302,24 @@ class HomeController < ApplicationController
           .count > 1
       end || example_recording
 
+    replies_showcase_recording = RecordingStudio::Recording.unscoped
+      .where(recordable_type: "Page")
+      .where(trashed_at: nil)
+      .includes(:recordable)
+      .find do |recording|
+        top_level_comment_ids = RecordingStudio::Recording.unscoped
+          .where(parent_recording: recording)
+          .where(recordable_type: "RecordingStudioCommentable::Comment")
+          .where(trashed_at: nil)
+          .pluck(:id)
+
+        top_level_comment_ids.any? && RecordingStudio::Recording.unscoped
+          .where(parent_recording_id: top_level_comment_ids)
+          .where(recordable_type: "RecordingStudioCommentable::Comment")
+          .where(trashed_at: nil)
+          .exists?
+      end || paginated_feed_recording
+
     return_to_path = example_recording.present? ? recording_browser_path(example_recording) : root_path
 
     @component_catalog = [
@@ -345,8 +387,8 @@ class HomeController < ApplicationController
       {
         title: "RecordingStudioCommentable::CommentsFeed::Component",
         source: "app/components/recording_studio_commentable/comments_feed/component.rb",
-        summary: "Reusable comment thread component that can render all comments at once, infinite-scroll top-level comments, or a Turbo-powered load-more flow while keeping direct replies grouped under each top-level comment.",
-        signature: "RecordingStudioCommentable::CommentsFeed::Component.new(recording:, mode: :all, page_size: 20, include_composer: false, return_to: nil, comment: nil, can_create_comment: nil)",
+        summary: "Reusable comment thread component that can render all comments at once, infinite-scroll top-level comments, or a Turbo-powered load-more flow while keeping direct replies grouped under each top-level comment and allowing Reply actions to be overridden.",
+        signature: "RecordingStudioCommentable::CommentsFeed::Component.new(recording:, mode: :all, page_size: 20, include_composer: false, return_to: nil, comment: nil, can_create_comment: nil, reply_action: nil)",
         params: [
           { name: "recording:", description: "Required RecordingStudio::Recording whose top-level comments and replies should be shown." },
           { name: "mode:", description: "Loading strategy. Supports :all, :infinite, and :load_more. Defaults to :all." },
@@ -354,7 +396,8 @@ class HomeController < ApplicationController
           { name: "include_composer:", description: "Whether to render the composer above the thread. Defaults to false." },
           { name: "return_to:", description: "Optional relative path passed through composer submissions and pagination links." },
           { name: "comment:", description: "Optional comment form object, useful for redisplaying validation errors." },
-          { name: "can_create_comment:", description: "Optional override for composer visibility. Defaults to an authorization check for :edit." }
+          { name: "can_create_comment:", description: "Optional override for composer visibility. Defaults to an authorization check for :edit." },
+          { name: "reply_action:", description: "Optional Hash or callable that customizes each Reply button. Defaults to the engine's new-comment route and can be replaced with a custom URL or button action." }
         ],
         examples: [
           {
@@ -389,12 +432,40 @@ class HomeController < ApplicationController
                 return_to: recording_comments_path(paginated_feed_recording)
               )
             }
+          },
+          {
+            label: "Thread with replies",
+            input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording_with_replies, mode: :all)",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsFeed::Component.new(
+                recording: replies_showcase_recording,
+                mode: :all
+              )
+            }
+          },
+          {
+            label: "Custom reply action",
+            input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, reply_action: ->(comment_recording:, default_options:, **) { default_options.merge(url: recording_comments_path(recording, show_comments: true), text: \"Reply inline\") })",
+            preview: lambda {
+              RecordingStudioCommentable::CommentsFeed::Component.new(
+                recording: paginated_feed_recording,
+                reply_action: lambda do |default_options:, **|
+                  default_options.merge(
+                    url: recording_comments_path(paginated_feed_recording, show_comments: true),
+                    text: "Reply inline"
+                  )
+                end
+              )
+            }
           }
         ],
         notes: [
           "Paginated modes page only top-level comments; each top-level comment still renders its direct replies together.",
+          "Nested replies are rendered one level deep inside the shared comment partial, and nested reply rows do not expose a Reply action.",
           "The component uses the current request's page param for follow-up frame requests and preserves mode/page_size in generated URLs.",
           "include_composer defaults to false so host apps can use the thread without exposing write controls.",
+          "Reply defaults to the mounted gem reply composer route using the shared inline FlatPack comments-link style.",
+          "reply_action accepts a Hash for shared button options or a callable for per-comment customization, including client-side actions.",
           "Turbo frame requests render only the requested comment-page frame, which keeps infinite-scroll and load-more responses small."
         ],
         links: [
