@@ -419,13 +419,13 @@ class CommentsPagesFlowTest < Minitest::Test
     dummy_home_index_source = read_workspace_file("test/dummy/app/views/home/index.html.erb")
 
     assert_includes new_view_source,
-            '{ text: "Back", href: (@safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)) }'
+                    '{ text: "Back", href: (@safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)) }'
     assert_includes new_view_source, "FlatPack::Comments::Thread::Component.new("
     assert_includes new_view_source, "thread.header do"
     assert_includes new_view_source, "thread.comment do"
     assert_includes new_view_source, "composer_title = @composer_title.presence"
     assert_includes new_view_source,
-            "composer_url = @composer_url || main_app.recording_comments_path(@parent_recording, @safe_return_to_path.present? ? { return_to: @safe_return_to_path } : {})"
+                    "composer_url = @composer_url || main_app.recording_comments_path(@parent_recording, @safe_return_to_path.present? ? { return_to: @safe_return_to_path } : {})"
     refute_includes new_view_source,
                     "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "force_composer: true"

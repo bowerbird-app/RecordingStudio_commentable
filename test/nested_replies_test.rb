@@ -144,12 +144,12 @@ class NestedRepliesTest < Minitest::Test
   def test_controller_loads_replies_in_index_all_and_create_failure
     source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
 
-      # @replies is set in the summary page branch and inline summary validation failure path.
+    # @replies is set in the summary page branch and inline summary validation failure path.
     assert_includes source, "@replies = load_replies(@comments)"
-      # Verify it still appears in both places where the summary template renders nested replies.
+    # Verify it still appears in both places where the summary template renders nested replies.
     reply_count = source.scan("@replies = load_replies(@comments)").size
-      assert reply_count >= 2,
-        "Expected @replies = load_replies(@comments) to appear at least 2 times (index and create summary failure); found #{reply_count}"
+    assert reply_count >= 2,
+           "Expected @replies = load_replies(@comments) to appear at least 2 times (index and create summary failure); found #{reply_count}"
   end
 
   def test_controller_initializes_parent_comment_recording_in_new
@@ -168,7 +168,7 @@ class NestedRepliesTest < Minitest::Test
     assert_includes source, 'text: "Reply"'
     assert_includes source, "local_assigns.fetch(:allow_reply, true)"
     assert_includes source,
-            'link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]'
+                    "link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]"
     assert_includes source, "FlatPack::Button::Component.new(**reply_action_options)"
     assert_includes source, 'class: "text-sm font-medium text-[var(--color-primary)] hover:underline"'
     assert_includes source, 'data: { turbo_frame: "_top" }'

@@ -43,7 +43,8 @@ module RecordingStudioCommentable
       @comments_count = comment_count
       @composer_title = "Reply"
       @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
-      @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording, return_to_options)
+      @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording,
+                                                                      return_to_options)
 
       render :new
     end
@@ -97,7 +98,8 @@ module RecordingStudioCommentable
         @comments_count = comment_count
         @composer_title = "Reply"
         @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
-        @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording, return_to_options)
+        @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording,
+                                                                        return_to_options)
         render :new, status: :unprocessable_entity
       end
     end
@@ -196,7 +198,7 @@ module RecordingStudioCommentable
       @comments_collection_path = host_comments_collection_path
       @new_comment_path = host_new_comment_path
       @external_back_path = commentable_home_referer_path || external_return_to_path || main_app.root_path
-      @back_button_onclick = external_return_to_path.present? ? nil : 'if (window.history.length > 1) { event.preventDefault(); window.history.back(); }'
+      @back_button_onclick = external_return_to_path.present? ? nil : "if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"
       @can_create_comment = authorized?(:edit)
     end
 
