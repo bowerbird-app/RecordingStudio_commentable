@@ -214,7 +214,8 @@ class NestedRepliesTest < Minitest::Test
     source = read_workspace_file("app/views/recording_studio_commentable/comments/all.html.erb")
 
     assert_includes source, "RecordingStudioCommentable::CommentsFeed::Component.new("
-    assert_includes source, "include_composer: true"
+    assert_includes source, "include_composer: !show_new_comment_button"
+    assert_includes source, "return_to: @safe_return_to_path"
     assert_includes source, "comment: @comment"
     assert_includes source, "can_create_comment: @can_create_comment"
   end

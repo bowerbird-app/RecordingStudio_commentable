@@ -191,7 +191,9 @@ module RecordingStudioCommentable
       end
 
       def effective_return_to
-        @effective_return_to ||= @return_to.presence || helpers.params[:return_to].presence
+        @effective_return_to ||= RecordingStudioCommentable::PathSafety.normalize_relative_path(
+          @return_to.presence || helpers.params[:return_to].presence
+        )
       end
 
       def return_to_options

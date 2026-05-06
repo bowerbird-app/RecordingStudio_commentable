@@ -156,9 +156,19 @@ module RecordingStudioCommentable
 
     def load_comment_recording
       @comment_recording = find_recording(params[:id])
-      return if @comment_recording
+      unless @comment_recording
+        redirect_to(comments_collection_path, alert: "Comment not found.")
+        return
+      end
 
-      redirect_to(comments_collection_path, alert: "Comment not found.")
+      requested_parent_recording = @parent_recording
+      actual_parent_recording = comment_root_recording(@comment_recording)
+      unless requested_parent_recording == actual_parent_recording
+        redirect_to(return_to_path || main_app.root_path, alert: "Comment not found.")
+        return
+      end
+
+      @parent_recording = actual_parent_recording
     end
 
     def load_reply_target_comment_recording
@@ -181,6 +191,7 @@ module RecordingStudioCommentable
       @page_recordable = @parent_recording.try(:recordable)
       @page_title = recordable_display_title(@page_recordable, missing: "Missing recordable")
       @page_body = @page_recordable.try(:body).presence
+      @safe_return_to_path = return_to_path
       @summary_path = summary_path
       @comments_collection_path = host_comments_collection_path
       @new_comment_path = host_new_comment_path
@@ -281,14 +292,7 @@ module RecordingStudioCommentable
     end
 
     def normalize_relative_path(path)
-      return if path.blank?
-
-      uri = URI.parse(path)
-      return if uri.host.present? || uri.path.nil? || !uri.path.start_with?("/")
-
-      uri.query.present? ? "#{uri.path}?#{uri.query}" : uri.path
-    rescue URI::InvalidURIError
-      nil
+      RecordingStudioCommentable::PathSafety.normalize_relative_path(path)
     end
 
     def commentable_home_referer_path
@@ -422,6 +426,15 @@ module RecordingStudioCommentable
 
     def comment_from(comment_recording)
       comment_recording.try(:recordable) || comment_recording
+    end
+
+    def comment_root_recording(comment_recording)
+      return unless comment_recording.respond_to?(:parent_recording)
+
+      parent_recording = comment_recording.parent_recording
+      return unless parent_recording
+
+      root_recording_for(parent_recording)
     end
 
     def root_recording_for(recording)

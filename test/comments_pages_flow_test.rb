@@ -295,7 +295,11 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "params = Rack::Utils.parse_nested_query(uri.query.to_s)"
     assert_includes controller_source, "def comment_navigation_path?(path)"
     assert_includes controller_source, "def normalize_relative_path(path)"
-    assert_includes controller_source, "uri.query.present?"
+    assert_includes controller_source, "RecordingStudioCommentable::PathSafety.normalize_relative_path(path)"
+    assert_includes controller_source, "requested_parent_recording = @parent_recording"
+    assert_includes controller_source, "actual_parent_recording = comment_root_recording(@comment_recording)"
+    assert_includes controller_source, "unless requested_parent_recording == actual_parent_recording"
+    assert_includes controller_source, "@safe_return_to_path = return_to_path"
     assert_includes controller_source, "normalized_home_paths = [root_path, root_path.chomp(\"/\")].uniq"
     assert_includes controller_source,
                     "referer_uri.query.present? ? \"\#{referer_uri.path}?\#{referer_uri.query}\" : referer_uri.path"
@@ -366,6 +370,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source, "mode: params[:loading]"
     assert_includes view_source, "page_size: params[:page_size]"
     assert_includes view_source, "include_composer: !show_new_comment_button"
+    assert_includes view_source, "return_to: @safe_return_to_path"
     assert_includes view_source, "comment: @comment"
     assert_includes view_source, "can_create_comment: @can_create_comment"
     assert_includes component_source, "LOADING_MODES = %i[all infinite load_more].freeze"
@@ -382,6 +387,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_source, "def reply_button_options_for(comment_recording, parent_recording = recording)"
     assert_includes component_source, "default_reply_button_options_for(comment_recording, parent_recording)"
     assert_includes component_source, "resolve_reply_action(comment_recording, parent_recording, default_options)"
+    assert_includes component_source, "RecordingStudioCommentable::PathSafety.normalize_relative_path("
     assert_includes component_source, "helpers.main_app.recording_comments_path(recording, args)"
     assert_includes component_source, "helpers.main_app.all_recording_comments_path("
     assert_includes component_source, "helpers.recording_studio_commentable.reply_comment_path("
@@ -413,13 +419,13 @@ class CommentsPagesFlowTest < Minitest::Test
     dummy_home_index_source = read_workspace_file("test/dummy/app/views/home/index.html.erb")
 
     assert_includes new_view_source,
-                    '{ text: "Back", href: (params[:return_to].presence || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)) }'
+            '{ text: "Back", href: (@safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)) }'
     assert_includes new_view_source, "FlatPack::Comments::Thread::Component.new("
     assert_includes new_view_source, "thread.header do"
     assert_includes new_view_source, "thread.comment do"
     assert_includes new_view_source, "composer_title = @composer_title.presence"
     assert_includes new_view_source,
-                    "composer_url = @composer_url || main_app.recording_comments_path(@parent_recording, return_to: params[:return_to])"
+            "composer_url = @composer_url || main_app.recording_comments_path(@parent_recording, @safe_return_to_path.present? ? { return_to: @safe_return_to_path } : {})"
     refute_includes new_view_source,
                     "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "force_composer: true"
