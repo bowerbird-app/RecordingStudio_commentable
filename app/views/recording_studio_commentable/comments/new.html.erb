@@ -22,11 +22,11 @@
     <% end %>
 
     <% thread.comment do %>
-      <%= render "form",
+      <%= render RecordingStudioCommentable::CommentComposer::Component.new(
             comment: @comment,
-          url: composer_url,
-            parent_comment_id: params[:parent_comment_id],
-            force_composer: true %>
+            url: composer_url,
+            parent_comment_id: params[:parent_comment_id]
+          ) %>
     <% end %>
   <% end %>
 </div>

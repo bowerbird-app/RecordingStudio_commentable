@@ -9,9 +9,9 @@ require "active_model"
 #   - CreateComment service can target a comment recording as parent (reply flow)
 #   - Controller source encodes reply creation path and load_replies helper
 #   - Comment partial renders reply link and nested reply block
-#   - Form partial carries parent_comment_id hidden field
+#   - CommentComposer component carries parent_comment_id hidden field
 #   - All/index view templates pass replies to comment partial
-#   - new.html.erb wires parent_comment_id to the form partial
+#   - new.html.erb wires parent_comment_id to the composer component
 #   - Dummy routes remain unchanged (no new route surface)
 class NestedRepliesTest < Minitest::Test
   # ------------------------------------------------------------------ #
@@ -196,13 +196,12 @@ class NestedRepliesTest < Minitest::Test
   end
 
   # ------------------------------------------------------------------ #
-  # Form partial: parent_comment_id hidden field
+  # CommentComposer component: parent_comment_id hidden field
   # ------------------------------------------------------------------ #
 
-  def test_form_partial_includes_parent_comment_id_local
-    source = read_workspace_file("app/views/recording_studio_commentable/comments/_form.html.erb")
+  def test_comment_composer_component_includes_parent_comment_id_hidden_field
+    source = read_workspace_file("app/components/recording_studio_commentable/comment_composer/component.html.erb")
 
-    assert_includes source, "parent_comment_id = local_assigns[:parent_comment_id]"
     assert_includes source, "hidden_field_tag :parent_comment_id, parent_comment_id"
   end
 
@@ -233,7 +232,7 @@ class NestedRepliesTest < Minitest::Test
   end
 
   # ------------------------------------------------------------------ #
-  # new.html.erb: wires parent_comment_id to form partial
+  # new.html.erb: wires parent_comment_id to composer component
   # ------------------------------------------------------------------ #
 
   def test_new_template_passes_parent_comment_id_to_form

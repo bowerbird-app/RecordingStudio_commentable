@@ -354,6 +354,8 @@ class CommentsPagesFlowTest < Minitest::Test
   def test_all_comments_page_template_shows_back_button_and_comment_thread
     view_source = read_workspace_file("app/views/recording_studio_commentable/comments/all.html.erb")
     component_source = read_workspace_file("app/components/recording_studio_commentable/comments_feed/component.rb")
+    composer_component_source = read_workspace_file("app/components/recording_studio_commentable/comment_composer/component.rb")
+    composer_component_template_source = read_workspace_file("app/components/recording_studio_commentable/comment_composer/component.html.erb")
     component_template_source = read_workspace_file("app/components/recording_studio_commentable/comments_feed/component.html.erb")
     feed_partial_source = read_workspace_file("app/views/recording_studio_commentable/comments/_feed.html.erb")
     feed_page_partial_source = read_workspace_file("app/views/recording_studio_commentable/comments/_feed_page.html.erb")
@@ -396,10 +398,15 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_template_source, 'render partial: "recording_studio_commentable/comments/feed_page"'
     assert_includes component_template_source, 'render partial: "recording_studio_commentable/comments/feed"'
     assert_includes feed_partial_source, "FlatPack::Comments::Thread::Component.new("
-    assert_includes feed_partial_source, 'render "recording_studio_commentable/comments/form"'
-    assert_includes feed_partial_source, "force_composer: true"
+    assert_includes feed_partial_source, "RecordingStudioCommentable::CommentComposer::Component.new("
     assert_includes feed_partial_source,
                     'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= feed.comments_count %>)</span>'
+    assert_includes composer_component_source, "class Component < ViewComponent::Base"
+    assert_includes composer_component_source, "rich_text_comment_editor_options(placeholder: \"Write your comment...\")"
+    assert_includes composer_component_template_source, "FlatPack::Comments::Composer::Component.new("
+    assert_includes composer_component_template_source, "hidden_field_tag :parent_comment_id, parent_comment_id"
+    assert_includes composer_component_template_source, 'text: "Cancel"'
+    assert_includes composer_component_template_source, 'text: submit_label'
     assert_includes feed_page_partial_source, "turbo_frame_tag feed.page_frame_id(page)"
     assert_includes feed_page_partial_source, 'data-controller="infinite-scroll"'
     assert_includes feed_page_partial_source, 'data-infinite-scroll-url-value="<%= feed.page_path(next_page) %>"'
@@ -413,6 +420,8 @@ class CommentsPagesFlowTest < Minitest::Test
     new_view_source = read_workspace_file("app/views/recording_studio_commentable/comments/new.html.erb")
     comment_partial_source = read_workspace_file("app/views/recording_studio_commentable/comments/_comment.html.erb")
     form_partial_source = read_workspace_file("app/views/recording_studio_commentable/comments/_form.html.erb")
+    composer_component_source = read_workspace_file("app/components/recording_studio_commentable/comment_composer/component.rb")
+    composer_component_template_source = read_workspace_file("app/components/recording_studio_commentable/comment_composer/component.html.erb")
     dummy_initializer_source = read_workspace_file("test/dummy/config/initializers/recording_studio_commentable.rb")
     scenarios_view_source = read_workspace_file("test/dummy/app/views/home/scenarios.html.erb")
     dummy_home_controller_source = read_workspace_file("test/dummy/app/controllers/home_controller.rb")
@@ -428,7 +437,7 @@ class CommentsPagesFlowTest < Minitest::Test
                     "composer_url = @composer_url || main_app.recording_comments_path(@parent_recording, @safe_return_to_path.present? ? { return_to: @safe_return_to_path } : {})"
     refute_includes new_view_source,
                     "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
-    assert_includes new_view_source, "force_composer: true"
+    assert_includes new_view_source, "RecordingStudioCommentable::CommentComposer::Component.new("
     refute_includes new_view_source, "FlatPack::Card::Component.new(style: :outlined)"
     assert_includes dummy_initializer_source, 'config.layout = ""'
     assert_includes dummy_initializer_source, "config.rich_text_comments = :"
@@ -438,11 +447,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes dummy_initializer_source, '"Page" => :title'
     assert_includes dummy_initializer_source, '"User" => :display_name'
     assert_includes dummy_initializer_source, '"User" => :avatar_url'
-    assert_includes form_partial_source, "FlatPack::Comments::Composer::Component.new("
-    assert_includes form_partial_source, "rich_text_comment_editor_options(placeholder: \"Write your comment...\")"
-    assert_includes form_partial_source, "rich_text: rich_text_comments_enabled"
-    refute_includes form_partial_source, "force_composer = local_assigns.fetch(:force_composer, false)"
-    refute_includes form_partial_source, "rich_text_comments_enabled && force_composer"
+    assert_includes form_partial_source, "RecordingStudioCommentable::CommentComposer::Component.new("
+    assert_includes composer_component_source, "helpers.current_recording_studio_actor"
+    assert_includes composer_component_template_source, "FlatPack::Comments::Composer::Component.new("
+    assert_includes composer_component_template_source, "rich_text: rich_text_comments_enabled?"
     refute_includes form_partial_source, "FlatPack::TextArea::Component.new("
     assert_includes scenarios_view_source, 'text: "Open comment feed"'
     assert_includes scenarios_view_source,

@@ -9,10 +9,10 @@
   <% thread.header do %>
     <div class="flex flex-col gap-6">
       <% if feed.can_create_comment? %>
-        <%= render "recording_studio_commentable/comments/form",
+        <%= render RecordingStudioCommentable::CommentComposer::Component.new(
               comment: feed.composer_comment,
-              url: feed.composer_url,
-              force_composer: true %>
+              url: feed.composer_url
+            ) %>
       <% end %>
 
       <h2 class="text-xl font-bold text-(--comments-thread-title-color)">

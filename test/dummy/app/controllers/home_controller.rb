@@ -385,6 +385,58 @@ class HomeController < ApplicationController
         ]
       },
       {
+        title: "RecordingStudioCommentable::CommentComposer::Component",
+        source: "app/components/recording_studio_commentable/comment_composer/component.rb",
+        summary: "Reusable comment composer that wraps the FlatPack comments editor, validation alert, reply parent tracking, and optional cancel/save actions for create, reply, and edit flows.",
+        signature: "RecordingStudioCommentable::CommentComposer::Component.new(comment:, url:, cancel_path: nil, parent_comment_id: nil)",
+        params: [
+          { name: "comment:", description: "Required RecordingStudioCommentable::Comment form object, including validation errors when present." },
+          { name: "url:", description: "Required submission URL for create, reply, or update." },
+          { name: "cancel_path:", description: "Optional path that adds Cancel and Save Changes actions for edit-like flows." },
+          { name: "parent_comment_id:", description: "Optional reply target id that gets posted as a hidden field for nested replies." }
+        ],
+        examples: [
+          {
+            label: "New comment composer",
+            input: "render RecordingStudioCommentable::CommentComposer::Component.new(comment: RecordingStudioCommentable::Comment.new, url: recording_comments_path(recording))",
+            preview: lambda {
+              RecordingStudioCommentable::CommentComposer::Component.new(
+                comment: RecordingStudioCommentable::Comment.new,
+                url: recording_comments_path(example_recording)
+              )
+            }
+          },
+          {
+            label: "Reply composer",
+            input: "render RecordingStudioCommentable::CommentComposer::Component.new(comment: RecordingStudioCommentable::Comment.new, url: recording_comments_path(recording), parent_comment_id: \"comment-id\")",
+            preview: lambda {
+              RecordingStudioCommentable::CommentComposer::Component.new(
+                comment: RecordingStudioCommentable::Comment.new,
+                url: recording_comments_path(example_recording),
+                parent_comment_id: "preview-parent-comment"
+              )
+            }
+          },
+          {
+            label: "Edit composer with cancel action",
+            input: "render RecordingStudioCommentable::CommentComposer::Component.new(comment: comment, url: recording_comment_path(recording, comment_recording), cancel_path: all_recording_comments_path(recording))",
+            preview: lambda {
+              comment = RecordingStudioCommentable::Comment.new(body: "Existing comment body")
+              RecordingStudioCommentable::CommentComposer::Component.new(
+                comment: comment,
+                url: recording_comments_path(example_recording),
+                cancel_path: all_recording_comments_path(example_recording)
+              )
+            }
+          }
+        ],
+        notes: [
+          "This component centralizes the shared composer UI used by the new comment page, reply flow, inline composer, and edit page.",
+          "Reply state is carried by parent_comment_id, while the controller still decides which recording receives the comment.",
+          "cancel_path is optional; when present the component renders Cancel and Save Changes actions instead of a single submit affordance."
+        ]
+      },
+      {
         title: "RecordingStudioCommentable::CommentsFeed::Component",
         source: "app/components/recording_studio_commentable/comments_feed/component.rb",
         summary: "Reusable comment thread component that can render all comments at once, infinite-scroll top-level comments, or a Turbo-powered load-more flow while keeping direct replies grouped under each top-level comment and allowing Reply actions to be overridden.",

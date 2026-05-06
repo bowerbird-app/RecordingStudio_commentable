@@ -51,14 +51,14 @@
           <% thread.header do %>
             <div class="flex flex-col gap-6">
               <% if @can_create_comment %>
-                <%= render "form",
+                <%= render RecordingStudioCommentable::CommentComposer::Component.new(
                       comment: @comment,
                       url: main_app.recording_comments_path(
                         @parent_recording,
                         show_comments: true,
                         inline_composer: true
-                      ),
-                      force_composer: true %>
+                      )
+                    ) %>
               <% end %>
 
               <h2 class="text-xl font-bold text-(--comments-thread-title-color)">

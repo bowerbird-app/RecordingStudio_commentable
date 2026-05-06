@@ -1,0 +1,39 @@
+<%= form_with model: comment, url: url, local: false do |f| %>
+  <%= hidden_field_tag :parent_comment_id, parent_comment_id if parent_comment_id.present? %>
+  <%= render FlatPack::Alert::Component.new(
+    style: :danger,
+    description: comment.errors.full_messages.join(", ")
+  ) if comment.errors.any? %>
+
+  <%= render FlatPack::Comments::Composer::Component.new(
+    name: "comment[body]",
+    value: comment.body,
+    placeholder: "Write your comment...",
+    submit_label: submit_label,
+    rows: 4,
+    rich_text: rich_text_comments_enabled?,
+    rich_text_options: rich_text_options,
+    avatar: { name: actor_name }
+  ) do |composer| %>
+    <% if cancel_path.present? %>
+      <% composer.actions do %>
+        <div class="flex w-full items-center justify-end gap-2">
+          <%= render FlatPack::Button::Component.new(
+            text: "Cancel",
+            url: cancel_path,
+            style: :ghost,
+            size: :sm,
+            class: "rounded-xl"
+          ) %>
+          <%= render FlatPack::Button::Component.new(
+            text: submit_label,
+            style: :primary,
+            size: :sm,
+            type: "submit",
+            class: "rounded-xl"
+          ) %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
