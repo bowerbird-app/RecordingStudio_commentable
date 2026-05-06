@@ -24,30 +24,24 @@
 
           <div class="space-y-6">
             <% component_entry[:examples].each do |example| %>
-              <%= render FlatPack::Card::Component.new do |card| %>
-                <% card.header do %>
-                  <%= render FlatPack::PageTitle::Component.new(
-                    title: example[:label],
-                    subtitle: "Live preview",
-                    variant: :h3,
-                    class: "mb-0 pb-0"
-                  ) %>
-                <% end %>
+              <div class="space-y-4">
+                <%= render FlatPack::PageTitle::Component.new(
+                  title: example[:label],
+                  subtitle: "Live preview",
+                  variant: :h3,
+                  class: "mb-0 pb-0"
+                ) %>
 
-                <% card.body do %>
-                  <div class="space-y-4">
-                    <div class="rounded-xl border border-(--surface-border-color) bg-(--surface-secondary-background-color) p-4">
-                      <%= render example[:preview].call %>
-                    </div>
+                <div class="rounded-xl border border-(--surface-border-color) bg-(--surface-secondary-background-color) p-4">
+                  <%= render example[:preview].call %>
+                </div>
 
-                    <%= render FlatPack::CodeBlock::Component.new(
-                      title: example[:label],
-                      language: "erb",
-                      code: example[:input]
-                    ) %>
-                  </div>
-                <% end %>
-              <% end %>
+                <%= render FlatPack::CodeBlock::Component.new(
+                  title: example[:label],
+                  language: "erb",
+                  code: example[:input]
+                ) %>
+              </div>
             <% end %>
           </div>
         </section>
