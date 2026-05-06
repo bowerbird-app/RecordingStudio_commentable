@@ -53,7 +53,7 @@
               <% if @can_create_comment %>
                 <%= render "form",
                       comment: @comment,
-                      url: commentable_recording_comments_path(
+                      url: main_app.recording_comments_path(
                         @parent_recording,
                         show_comments: true,
                         inline_composer: true

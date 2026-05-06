@@ -26,10 +26,6 @@ module RecordingStudioCommentable
       end
     end
 
-    def commentable_reply_comment_path(comment_recording, **options)
-      recording_studio_commentable.reply_comment_path(comment_recording, options)
-    end
-
     def require_actor!
       return if current_recording_studio_actor
 
