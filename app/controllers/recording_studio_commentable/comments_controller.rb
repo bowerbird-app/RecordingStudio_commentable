@@ -198,7 +198,7 @@ module RecordingStudioCommentable
       @comments_collection_path = host_comments_collection_path
       @new_comment_path = host_new_comment_path
       @external_back_path = commentable_home_referer_path || external_return_to_path || main_app.root_path
-      @back_button_onclick = external_return_to_path.present? ? nil : "if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"
+      @back_button_onclick = external_return_to_path.present? ? nil : 'if (window.history.length > 1) { event.preventDefault(); window.history.back(); }'
       @can_create_comment = authorized?(:edit)
     end
 

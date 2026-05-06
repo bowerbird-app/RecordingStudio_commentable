@@ -4,8 +4,22 @@ Run the following after bundling:
 
 ```
 rails generate recording_studio_commentable:install
-rails recording_studio_commentable:install:migrations
+rails generate recording_studio_commentable:migrations
 rails db:migrate
+```
+
+The install generator mounts the engine at `/commentable`. Add the recording-scoped host routes if your app does not already define them:
+
+```ruby
+scope module: :recording_studio_commentable do
+  resources :recordings, only: [] do
+    resources :comments, only: %i[index new create edit update destroy] do
+      collection do
+        get :all, path: "all"
+      end
+    end
+  end
+end
 ```
 
 Then include the Commentable module in your recordable:
@@ -27,5 +41,5 @@ end
 Link to the comment feed from your views:
 
 ```erb
-<%= link_to "Comments", recording_studio_commentable.recording_comments_path(recording) %>
+<%= link_to "Comments", recording_comments_path(recording) %>
 ```

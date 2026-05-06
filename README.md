@@ -31,7 +31,7 @@ Run the install generator:
 
 ```bash
 rails generate recording_studio_commentable:install
-rails recording_studio_commentable:install:migrations
+rails generate recording_studio_commentable:migrations
 rails db:migrate
 ```
 
@@ -54,19 +54,34 @@ RecordingStudio.configure do |config|
 end
 ```
 
-### 3. Mount the engine
+### 3. Add the routes
 
 ```ruby
 # config/routes.rb
+# The install generator adds this mount for you.
 mount RecordingStudioCommentable::Engine, at: "/commentable"
+
+scope module: :recording_studio_commentable do
+  resources :recordings, only: [] do
+    resources :comments, only: %i[index new create edit update destroy] do
+      collection do
+        get :all, path: "all"
+      end
+    end
+  end
+end
 ```
+
+The mounted engine provides internal pages such as `/commentable`, while the host-app `recording_comments_path(recording)` helpers come from the nested `resources :recordings` routes above.
 
 ### 4. Link to the comment feed
 
 ```erb
 <%= link_to "Comments",
-      recording_studio_commentable.recording_comments_path(recording) %>
+      recording_comments_path(recording) %>
 ```
+
+The `recording` argument must be the `RecordingStudio::Recording` for the item being commented on.
 
 Or render the built-in widget button:
 

@@ -7,7 +7,7 @@
 The short version is:
 
 - your app keeps owning the real model being commented on, like `Page`
-- `RS_commentable` adds the UI, controller flow, and comment services
+- `RecordingStudioCommentable` adds the UI, controller flow, and comment services
 - `RecordingStudio` stores where the comment lives in the tree and keeps the history of create, edit, and delete actions
 
 So this gem is not a separate comments system sitting beside RecordingStudio. It works through RecordingStudio.
@@ -33,7 +33,7 @@ The generated initializer keeps rich text comments off by default:
 
 ```ruby
 RecordingStudioCommentable.configure do |config|
-  config.layout = "flat_pack_sidebar"
+  # config.layout = "flat_pack_sidebar"
   config.use_recording_studio_trashable_for_destroy = false
   config.rich_text_comments = false
 end
@@ -47,9 +47,9 @@ Set `config.rich_text_comments` to `:toolbar` if you want the current comment-fo
 
 What the install generator does:
 
-- mounts the engine in your routes
+- mounts the engine at `/commentable`
 - creates `config/initializers/recording_studio_commentable.rb`
-- tries to add the engine views and FlatPack components to your Tailwind source list
+- tries to add the engine views and FlatPack components to `app/assets/tailwind/application.css`
 
 ## Host app setup
 
@@ -80,21 +80,35 @@ Why this matters:
 - `Page` is your app model that receives comments
 - `RecordingStudioCommentable::Comment` is the actual comment recordable that RecordingStudio wraps in a recording
 
-### 3. Mount the engine
+### 3. Add recording-scoped host routes
 
-Your host app needs a mounted route:
+The install generator mounts the engine for you:
 
 ```ruby
 mount RecordingStudioCommentable::Engine, at: "/commentable"
 ```
 
-That creates routes like:
+To link a specific `RecordingStudio::Recording` into the comments UI, add recording-scoped routes in the host app too:
 
-```text
-/commentable/recordings/:recording_id/comments
+```ruby
+scope module: :recording_studio_commentable do
+  resources :recordings, only: [] do
+    resources :comments, only: %i[index new create edit update destroy] do
+      collection do
+        get :all, path: "all"
+      end
+    end
+  end
+end
 ```
 
-The comment feed is always attached to a `RecordingStudio::Recording`, not directly to a raw Active Record row.
+That gives you routes like:
+
+```text
+/recordings/:recording_id/comments
+```
+
+The comment feed is always attached to a `RecordingStudio::Recording`, not directly to a raw Active Record row. The `/commentable` mount still serves the engine home page and internal engine-only routes.
 
 ### 4. Link to the feed
 
@@ -102,7 +116,7 @@ From your app UI, link to the recording's comments page:
 
 ```erb
 <%= link_to "Comments",
-      recording_studio_commentable.recording_comments_path(recording) %>
+  recording_comments_path(recording) %>
 ```
 
 The important part is that `recording` here is a `RecordingStudio::Recording` for the thing being commented on.
@@ -139,7 +153,7 @@ Available modes:
 If you call:
 
 ```erb
-recording_studio_commentable.recording_comments_path(recording)
+recording_comments_path(recording)
 ```
 
 the request goes here:
@@ -292,9 +306,9 @@ RecordingStudioCommentable.configure do |config|
 end
 ```
 
-### `recording_studio_commentable.recording_comments_path(recording)`
+### `recording_comments_path(recording)`
 
-Use this route helper when you want to link users to the comment feed for a recording.
+Use this host-app route helper when you want to link users to the comment feed for a recording.
 
 ### Service calls
 
