@@ -55,6 +55,18 @@ jobs:
       env:
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
+    - name: Run dummy app component tests
+      run: bundle exec bin/rails test test/components
+      working-directory: test/dummy
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
+
+    - name: Run dummy app smoke test
+      run: bundle exec bin/rails test test/integration/recording_studio_commentable_smoke_test.rb
+      working-directory: test/dummy
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
+
     - name: Run RuboCop
       run: bundle exec rubocop
 
