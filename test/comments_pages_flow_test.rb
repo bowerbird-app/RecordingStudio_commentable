@@ -113,7 +113,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source,
                     "RecordableDisplayHelper is included in both the dummy app controller and the engine controller."
     assert_includes controller_source,
-            "CommentRoutesHelper exposes the mounted reply route helper used by the gem-owned reply composer flow."
+                    "CommentRoutesHelper exposes the mounted reply route helper used by the gem-owned reply composer flow."
     assert_includes view_source, 'title: "View helpers"'
     assert_includes view_source, 'title: "Exposed helper methods"'
     assert_includes view_source, 'title: "Public services"'
@@ -175,17 +175,17 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source,
                     "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, mode: :load_more, page_size: 2, include_composer: true, return_to: recording_comments_path(recording))"
     assert_includes controller_source,
-            'label: "Thread with replies"'
+                    'label: "Thread with replies"'
     assert_includes controller_source,
-            'input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording_with_replies, mode: :all)"'
+                    'input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording_with_replies, mode: :all)"'
     assert_includes controller_source,
                     'label: "Custom reply action"'
-    assert_includes controller_source, 'reply_action: lambda do |default_options:, **|'
+    assert_includes controller_source, "reply_action: lambda do |default_options:, **|"
     assert_includes controller_source, 'text: "Reply inline"'
     assert_includes controller_source,
-            'Nested replies are rendered one level deep inside the shared comment partial, and nested reply rows do not expose a Reply action.'
+                    "Nested replies are rendered one level deep inside the shared comment partial, and nested reply rows do not expose a Reply action."
     assert_includes controller_source,
-            'Reply defaults to the mounted gem reply composer route using the shared inline FlatPack comments-link style.'
+                    "Reply defaults to the mounted gem reply composer route using the shared inline FlatPack comments-link style."
     assert_includes view_source, 'title: "Components"'
     assert_includes view_source, "@component_catalog.each do |component_entry|"
     assert_includes view_source, "title: component_entry[:title]"
@@ -288,11 +288,11 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "return_to_options.merge(show_comments ? { show_comments: true } : {})"
     assert_includes controller_source, "main_app.recording_comments_path("
     assert_includes controller_source,
-              "main_app.all_recording_comments_path(@parent_recording, return_to_options.merge(feed_query_options))"
+                    "main_app.all_recording_comments_path(@parent_recording, return_to_options.merge(feed_query_options))"
     assert_includes controller_source, "main_app.new_recording_comment_path(@parent_recording, return_to_options)"
     assert_includes controller_source, "def external_return_to_path"
     assert_includes controller_source, "while (next_path = nested_comment_return_to_path(path))"
-    assert_includes controller_source, 'params = Rack::Utils.parse_nested_query(uri.query.to_s)'
+    assert_includes controller_source, "params = Rack::Utils.parse_nested_query(uri.query.to_s)"
     assert_includes controller_source, "def comment_navigation_path?(path)"
     assert_includes controller_source, "def normalize_relative_path(path)"
     assert_includes controller_source, "uri.query.present?"
@@ -319,17 +319,18 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source, 'text: "Back"'
     assert_includes view_source, "href: @external_back_path"
     assert_includes view_source, "onclick: @back_button_onclick"
-    assert_includes view_source, 'data: { turbo: false }'
+    assert_includes view_source, "data: { turbo: false }"
     assert_includes view_source, "}.compact"
     assert_includes view_source, "unless @show_comments"
     assert_includes view_source,
                     "RecordingStudioCommentable::CommentsButton::Component.new("
     assert_includes view_source, "recording: @parent_recording"
     refute_includes view_source,
-            "RecordingStudioCommentable::CommentsButton::Component.new(\n          recording: @parent_recording,\n          count: @comments_count"
+                    "RecordingStudioCommentable::CommentsButton::Component.new(\n          recording: @parent_recording,\n          count: @comments_count"
     assert_includes view_source, "if @show_comments"
     assert_includes view_source, "show_comments: true,"
     assert_includes view_source, "inline_composer: true"
+    assert_includes view_source, "main_app.recording_comments_path("
     assert_includes view_source,
                     'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
     assert_includes widget_source, "class Component < ViewComponent::Base"
@@ -355,10 +356,10 @@ class CommentsPagesFlowTest < Minitest::Test
     controller_source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
 
     assert_includes view_source, '{ text: "Back", href: @summary_path }'
-    assert_includes view_source, 'show_new_comment_button = ActiveModel::Type::Boolean.new.cast(params[:new_comment_button])'
+    assert_includes view_source, "show_new_comment_button = ActiveModel::Type::Boolean.new.cast(params[:new_comment_button])"
     assert_includes view_source, 'text: "Add comment"'
-    assert_includes view_source, 'url: @new_comment_path'
-    assert_includes view_source, 'style: :secondary'
+    assert_includes view_source, "url: @new_comment_path"
+    assert_includes view_source, "style: :secondary"
     assert_includes view_source, 'class: "justify-start"'
     assert_includes view_source, "RecordingStudioCommentable::CommentsFeed::Component.new("
     assert_includes view_source, "recording: @parent_recording"
@@ -418,9 +419,9 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes new_view_source, "thread.comment do"
     assert_includes new_view_source, "composer_title = @composer_title.presence"
     assert_includes new_view_source,
-            "composer_url = @composer_url || main_app.recording_comments_path(@parent_recording, return_to: params[:return_to])"
+                    "composer_url = @composer_url || main_app.recording_comments_path(@parent_recording, return_to: params[:return_to])"
     refute_includes new_view_source,
-            "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
+                    "cancel_path: (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "force_composer: true"
     refute_includes new_view_source, "FlatPack::Card::Component.new(style: :outlined)"
     assert_includes dummy_initializer_source, 'config.layout = ""'
@@ -452,7 +453,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source, "local_assigns.fetch(:allow_reply, true)"
     assert_includes comment_partial_source, "FlatPack::Comments::Item::Component.new("
     assert_includes comment_partial_source,
-            'link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]'
+                    "link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]"
     assert_includes comment_partial_source, "FlatPack::Button::Component.new(**reply_action_options)"
     assert_includes comment_partial_source, "comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil"
     assert_includes comment_partial_source, "avatar: { name: author_name, src: author_avatar_url }"
@@ -477,8 +478,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes seeds_source, 'viewer.avatar_url = "https://i.pravatar.cc/160?u=view@admin.com"'
     assert_includes seeds_source, "public_page_recording => [[user, :edit], [quinn, :edit], [viewer, :view]]"
     assert_includes seeds_source, "RecordingStudioCommentable::Services::CreateComment.call("
-    assert_includes seeds_source, 'body: "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."'
-    assert_includes seeds_source, 'body: "Reply sample: Quinn can respond here, which makes the feed show a threaded conversation immediately."'
+    assert_includes seeds_source,
+                    'body: "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."'
+    assert_includes seeds_source,
+                    'body: "Reply sample: Quinn can respond here, which makes the feed show a threaded conversation immediately."'
     assert_includes seeds_source, 'puts "Seeded: view@admin.com / Password"'
     assert_includes seeds_source, 'puts "Seeded: Sample comments for the scenario pages"'
     assert_includes session_view_source, 'text: "View-only: view@admin.com / Password"'
