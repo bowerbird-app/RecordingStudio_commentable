@@ -41,6 +41,12 @@ rails db:migrate
 
 ```ruby
 class Page < ApplicationRecord
+  recording_studio_recordable(
+    label: "Page",
+    plural_label: "Pages",
+    root: true
+  )
+
   include RecordingStudioCommentable::Commentable
 end
 ```
@@ -50,9 +56,13 @@ end
 ```ruby
 # config/initializers/recording_studio.rb
 RecordingStudio.configure do |config|
-  config.recordable_types += ["Page", "RecordingStudioCommentable::Comment"]
+  config.recordable_types += ["Page"]
 end
 ```
+
+`RecordingStudioCommentable::Comment` is registered by the addon itself as a capability-owned child recordable in
+RecordingStudio 3.0.0+. Host apps only need to register their own parent recordable types and declare them with
+`recording_studio_recordable(...)`.
 
 ### 3. Add the routes
 
@@ -290,7 +300,7 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | v0.1.0-alpha (pinned in `test/dummy/Gemfile`) |
+| RecordingStudio | recording_studio/v3.0.0 (pinned in `test/dummy/Gemfile`) |
 | FlatPack        | v0.1.33 (pinned in `test/dummy/Gemfile`) |
 | Devise          | latest  |
 

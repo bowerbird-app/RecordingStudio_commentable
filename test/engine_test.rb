@@ -6,11 +6,16 @@ class EngineTest < Minitest::Test
   def setup
     @original_configuration = RecordingStudioCommentable.instance_variable_get(:@configuration)
     RecordingStudioCommentable.instance_variable_set(:@configuration, RecordingStudioCommentable::Configuration.new)
+    @original_recordable_types = RecordingStudio.configuration.recordable_types.dup
+    @original_registered_capabilities = RecordingStudio.registered_capabilities.deep_dup
   end
 
   def teardown
     RecordingStudioCommentable.configuration.hooks.clear!
     RecordingStudioCommentable.instance_variable_set(:@configuration, @original_configuration)
+    RecordingStudio.configuration.recordable_types = @original_recordable_types
+    RecordingStudio.registered_capabilities.clear
+    RecordingStudio.registered_capabilities.merge!(@original_registered_capabilities)
   end
 
   def test_engine_registers_component_path_for_autoloading
@@ -189,6 +194,20 @@ class EngineTest < Minitest::Test
 
     instance = controller_class.new
     assert_equal :applied, instance.commentable_controller_extension
+  end
+
+  def test_register_recording_studio_capability_initializer_registers_comment_child_type
+    RecordingStudio.configuration.recordable_types = ["Page"]
+    RecordingStudio.registered_capabilities.clear
+
+    find_initializer("recording_studio_commentable.register_recording_studio_capability").block.call
+
+    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioCommentable::Comment"
+
+    registration = RecordingStudio.registered_capabilities[:commentable]
+    refute_nil registration
+    assert_equal "recording_studio_commentable", registration[:source]
+    assert_equal ["RecordingStudioCommentable::Comment"], registration[:child_recordables]
   end
 
   private

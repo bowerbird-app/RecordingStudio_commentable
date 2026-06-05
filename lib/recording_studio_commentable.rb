@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "recording_studio"
 require "recording_studio_commentable/version"
 require "recording_studio_commentable/comment_count"
 require "recording_studio_commentable/configuration"
@@ -30,6 +31,7 @@ module RecordingStudioCommentable
       timeout
       use_recording_studio_trashable_for_destroy
       layout
+      route_anchor
       rich_text_comments
       recordable_display_attributes
       author_display_attributes

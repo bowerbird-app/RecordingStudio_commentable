@@ -34,26 +34,42 @@ viewer.save!
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 
 # Create the root recording
-root_recording = RecordingStudio::Recording.unscoped.find_or_create_by!(
-  recordable: workspace,
-  parent_recording_id: nil
-)
+root_recording = RecordingStudio.root_recording_for(workspace)
+
+grant_access_result = lambda do |recording:, actor:, role:, manager_actor:|
+  root_recording = RecordingStudio.root_recording_or_self(recording)
+
+  RecordingStudioAccessible::AccessCreationContext.allow do
+    existing_recording = RecordingStudio::Recording.unscoped
+      .where(
+        root_recording_id: root_recording.id,
+        parent_recording_id: recording.id,
+        recordable_type: "RecordingStudio::Access"
+      )
+      .includes(:recordable)
+      .detect { |access_recording| access_recording.recordable&.actor == actor }
+
+    if existing_recording
+      access = existing_recording.recordable
+      return existing_recording if access&.actor == actor && access.role == role.to_s
+
+      root_recording.revise(existing_recording, actor: manager_actor) do |updated_access|
+        updated_access.actor = actor
+        updated_access.role = role
+      end
+    else
+      root_recording.record(RecordingStudio::Access, actor: manager_actor, parent_recording: recording) do |access|
+        access.actor = actor
+        access.role = role
+      end
+    end
+  end
+end
 
 # Grant root-level admin access to the admin user
 Current.actor = user
-access = RecordingStudio::Access.find_or_create_by!(actor: user, role: :admin)
-RecordingStudio::Recording.unscoped.find_or_create_by!(
-  root_recording_id: root_recording.id,
-  parent_recording_id: root_recording.id,
-  recordable: access
-)
-
-quinn_root_access = RecordingStudio::Access.find_or_create_by!(actor: quinn, role: :edit)
-RecordingStudio::Recording.unscoped.find_or_create_by!(
-  root_recording_id: root_recording.id,
-  parent_recording_id: root_recording.id,
-  recordable: quinn_root_access
-)
+grant_access_result.call(recording: root_recording, actor: user, role: :admin, manager_actor: user)
+grant_access_result.call(recording: root_recording, actor: quinn, role: :edit, manager_actor: user)
 
 # Create a sample folder (not commentable)
 folder = Folder.find_or_create_by!(name: "Reference Folder")
@@ -99,34 +115,23 @@ end
 if recording_ids_to_remove.any?
   scoped_recordings = RecordingStudio::Recording.unscoped.where(id: recording_ids_to_remove)
   comment_recordings = scoped_recordings.where(recordable_type: "RecordingStudioCommentable::Comment")
+  access_recordings = scoped_recordings.where(recordable_type: "RecordingStudio::Access")
 
   RecordingStudio::Event.where(recording_id: recording_ids_to_remove).delete_all
   RecordingStudioCommentable::Comment.where(id: comment_recordings.select(:recordable_id)).delete_all
-  RecordingStudio::AccessBoundary.where(
-    id: scoped_recordings.where(recordable_type: "RecordingStudio::AccessBoundary").select(:recordable_id)
-  ).delete_all
+  RecordingStudio::Access.where(id: access_recordings.select(:recordable_id)).delete_all if defined?(RecordingStudio::Access)
+  if defined?(RecordingStudio::AccessBoundary)
+    RecordingStudio::AccessBoundary.where(
+      id: scoped_recordings.where(recordable_type: "RecordingStudio::AccessBoundary").select(:recordable_id)
+    ).delete_all
+  end
   scoped_recordings.delete_all
 end
 
-folder_recording = RecordingStudio::Recording.unscoped.create!(
-  parent_recording_id: nil,
-  recordable: folder
-)
-
-quinn_page_recording = RecordingStudio::Recording.unscoped.create!(
-  parent_recording_id: nil,
-  recordable: quinn_page
-)
-
-admin_page_recording = RecordingStudio::Recording.unscoped.create!(
-  parent_recording_id: nil,
-  recordable: admin_page
-)
-
-public_page_recording = RecordingStudio::Recording.unscoped.create!(
-  parent_recording_id: nil,
-  recordable: public_page
-)
+folder_recording = RecordingStudio.root_recording_for(folder)
+quinn_page_recording = RecordingStudio.root_recording_for(quinn_page)
+admin_page_recording = RecordingStudio.root_recording_for(admin_page)
+public_page_recording = RecordingStudio.root_recording_for(public_page)
 
 {
   folder_recording => [[user, :edit], [quinn, :edit]],
@@ -135,12 +140,7 @@ public_page_recording = RecordingStudio::Recording.unscoped.create!(
   public_page_recording => [[user, :edit], [quinn, :edit], [viewer, :view]]
 }.each do |recording, grants|
   grants.each do |actor, role|
-    access_record = RecordingStudio::Access.find_or_create_by!(actor: actor, role: role)
-    RecordingStudio::Recording.unscoped.create!(
-      root_recording_id: recording.id,
-      parent_recording_id: recording.id,
-      recordable: access_record
-    )
+    grant_access_result.call(recording: recording, actor: actor, role: role, manager_actor: user)
   end
 end
 

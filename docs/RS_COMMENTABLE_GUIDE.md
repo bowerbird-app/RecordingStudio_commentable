@@ -59,11 +59,20 @@ Include the marker module in any recordable model that should allow comments:
 
 ```ruby
 class Page < ApplicationRecord
+  recording_studio_recordable(
+    label: "Page",
+    plural_label: "Pages",
+    root: true
+  )
+
   include RecordingStudioCommentable::Commentable
 end
 ```
 
 This is the main opt-in. If a model does not include this module, the engine will refuse comment actions for it.
+
+With `RecordingStudio` 3.0.0+, every configured host recordable type is also expected to declare
+`recording_studio_recordable(...)`.
 
 ### 2. Register the comment recordable with RecordingStudio
 
@@ -71,7 +80,7 @@ In your `RecordingStudio` initializer:
 
 ```ruby
 RecordingStudio.configure do |config|
-  config.recordable_types += ["Page", "RecordingStudioCommentable::Comment"]
+  config.recordable_types += ["Page"]
 end
 ```
 
@@ -79,6 +88,8 @@ Why this matters:
 
 - `Page` is your app model that receives comments
 - `RecordingStudioCommentable::Comment` is the actual comment recordable that RecordingStudio wraps in a recording
+- the addon registers that child recordable through `RecordingStudio.register_capability(..., source:, child_recordables:)`
+  so RecordingStudio can derive allowed parent types from the enabled `:commentable` capability
 
 ### 3. Add recording-scoped host routes
 

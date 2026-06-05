@@ -234,8 +234,8 @@ class HomeController < ApplicationController
         examples: [
           {
             label: "Opt a model into comments",
-            input: 'class Page < ApplicationRecord\n  include RecordingStudioCommentable::Commentable\nend',
-            output: "Adds class- and instance-level commentable? checks"
+            input: 'class Page < ApplicationRecord\n  recording_studio_recordable(label: "Page", plural_label: "Pages", root: true)\n  include RecordingStudioCommentable::Commentable\nend',
+            output: "Declares the host recordable for RecordingStudio and enables the commentable capability"
           }
         ]
       },

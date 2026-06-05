@@ -4,7 +4,8 @@ source "https://rubygems.org"
 gem "recording_studio_commentable", path: "../.."
 
 # RecordingStudio engine
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v0.1.0-alpha"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "recording_studio/v3.0.0"
+gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "0.3.1"
 
 # Devise authentication
 gem "devise"

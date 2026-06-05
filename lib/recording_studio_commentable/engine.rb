@@ -5,6 +5,17 @@ module RecordingStudioCommentable
     isolate_namespace RecordingStudioCommentable
     config.paths.add "app/components", eager_load: true
 
+    initializer "recording_studio_commentable.register_recording_studio_capability" do
+      next unless defined?(RecordingStudio)
+
+      RecordingStudio.register_recordable_type("RecordingStudioCommentable::Comment")
+      RecordingStudio.register_capability(
+        :commentable,
+        source: "recording_studio_commentable",
+        child_recordables: ["RecordingStudioCommentable::Comment"]
+      )
+    end
+
     class << self
       def apply_model_extensions(target)
         apply_extensions(target,

@@ -19,6 +19,13 @@ module RecordingStudioCommentable
   class Comment < ApplicationRecord
     self.table_name = "recording_studio_comments"
 
+    recording_studio_recordable(
+      label: "Comment",
+      plural_label: "Comments",
+      root: false,
+      allowed_parent_types: ["RecordingStudioCommentable::Comment"]
+    ) if respond_to?(:recording_studio_recordable)
+
     # Polymorphic author — typically a User or service account
     belongs_to :author, polymorphic: true, optional: true
 

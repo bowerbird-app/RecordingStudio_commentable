@@ -3,11 +3,9 @@
 module RecordingStudioAccessible
   class << self
     def authorized?(actor:, recording:, role:)
-      RecordingStudio::Services::AccessCheck.allowed?(
-        actor: actor,
-        recording: recording,
-        role: role
-      )
+      return Authorization.allowed?(actor: actor, recording: recording, role: role) if const_defined?(:Authorization)
+
+      false
     end
   end
 end

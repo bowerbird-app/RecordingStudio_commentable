@@ -17,6 +17,14 @@ class CapabilityTest < Minitest::Test
     include RecordingStudioCommentable::Commentable
   end
 
+  def setup
+    @original_capabilities = RecordingStudio.configuration.instance_variable_get(:@capabilities).deep_dup
+  end
+
+  def teardown
+    RecordingStudio.configuration.instance_variable_set(:@capabilities, @original_capabilities)
+  end
+
   def test_commentable_module_exists
     assert defined?(RecordingStudioCommentable::Commentable), "Commentable module should be defined"
   end
@@ -46,5 +54,9 @@ class CapabilityTest < Minitest::Test
   rescue TypeError
     # Expected: PlainModel doesn't mix in the Commentable concern
     pass
+  end
+
+  def test_including_commentable_enables_recording_studio_capability_for_type
+    assert RecordingStudio.configuration.capability_enabled?(:commentable, for_type: AnotherCommentableModel.name)
   end
 end

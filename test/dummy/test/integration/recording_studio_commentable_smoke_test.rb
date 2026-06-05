@@ -5,6 +5,7 @@ require_relative "../test_helper"
 class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
   setup do
     Rails.application.load_seed
+    host! "example.com"
 
     @admin = User.find_by!(email: "admin@admin.com")
     @public_page = Page.find_by!(title: "Quinn and Admin User can comment")
@@ -58,6 +59,15 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     refute_includes response.body, updated_body
+  end
+
+  def test_comment_recordable_is_registered_as_a_capability_owned_child_type
+    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioCommentable::Comment"
+    assert RecordingStudio.configuration.capability_enabled?(:commentable, for_type: "Page")
+    assert_includes RecordingStudio.child_recordable_types_for("Page"), "RecordingStudioCommentable::Comment"
+    assert_includes RecordingStudio.allowed_parent_types_for("RecordingStudioCommentable::Comment"), "Page"
+    assert_includes RecordingStudio.allowed_parent_types_for("RecordingStudioCommentable::Comment"),
+                    "RecordingStudioCommentable::Comment"
   end
 
   private

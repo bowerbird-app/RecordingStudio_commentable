@@ -18,8 +18,9 @@ module RecordingStudioCommentable
     extend ActiveSupport::Concern
 
     included do
-      # Marker — presence of this module signals that the recordable type
-      # supports comments. No extra columns needed on the host model.
+      # RecordingStudio 3.0.0 derives comment child allowances from the
+      # enabled capability on the parent recordable type.
+      RecordingStudio.enable_capability(:commentable, on: name) if defined?(RecordingStudio)
     end
 
     # Returns true so controllers can check `recordable.commentable?`
