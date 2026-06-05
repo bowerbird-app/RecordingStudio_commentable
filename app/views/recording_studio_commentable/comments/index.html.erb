@@ -1,12 +1,8 @@
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
-  <%= render FlatPack::Breadcrumb::Component.new(items: [
-    {
-      text: "Back",
-      href: @external_back_path,
-      onclick: @back_button_onclick,
-      data: { turbo: false }
-    }.compact
-  ]) %>
+  <%= render FlatPack::PageNav::Component.new(
+    anchor_url: @external_back_path,
+    anchor_label: "Back"
+  ) %>
 
   <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
   <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
@@ -46,14 +42,14 @@
           empty_title: "No comments yet",
           empty_body: "Be the first to leave a comment.",
           id: "comments",
-          class: "max-w-none rounded-none bg-transparent p-0 shadow-none"
+          class: "max-w-none bg-transparent p-0 shadow-none"
         ) do |thread| %>
           <% thread.header do %>
             <div class="flex flex-col gap-6">
               <% if @can_create_comment %>
                 <%= render RecordingStudioCommentable::CommentComposer::Component.new(
                       comment: @comment,
-                      url: main_app.recording_comments_path(
+                      url: commentable_recording_comments_path(
                         @parent_recording,
                         show_comments: true,
                         inline_composer: true

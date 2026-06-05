@@ -13,10 +13,8 @@
 elsif allow_reply
   {
     text: "Reply",
-    href: recording_studio_commentable.reply_comment_path(
-      comment_recording,
-      default_reply_return_to.present? ? { return_to: default_reply_return_to } : {}
-    ),
+    href: commentable_reply_comment_path(comment_recording,
+                                         **(default_reply_return_to.present? ? { return_to: default_reply_return_to } : {})),
     class: "text-sm font-medium text-[var(--color-primary)] hover:underline",
     data: { turbo_frame: "_top" }
   }

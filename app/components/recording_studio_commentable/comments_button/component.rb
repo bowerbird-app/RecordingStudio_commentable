@@ -37,7 +37,7 @@ module RecordingStudioCommentable
       end
 
       def destination_path
-        helpers.main_app.all_recording_comments_path(recording, return_to: current_request_path)
+        helpers.commentable_all_recording_comments_path(recording, return_to: current_request_path)
       end
 
       def current_request_path

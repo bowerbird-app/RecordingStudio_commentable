@@ -10,6 +10,7 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from FlatPack::Engine.root.join("app/javascript/flat_pack/controllers"), under: "controllers/flat_pack", to: "flat_pack/controllers"
 pin_all_from FlatPack::Engine.root.join("app/javascript/flat_pack/tiptap"), under: "flat_pack/tiptap", to: "flat_pack/tiptap"
 pin "flat_pack/heroicons", to: "flat_pack/heroicons.js"
+pin "controllers/flat_pack/page_nav_controller", to: "controllers/flat_pack/page_nav_controller.js"
 
 TIPTAP_VERSION = "2.11.5"
 

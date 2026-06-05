@@ -17,13 +17,14 @@ module RecordingStudioCommentable
 
     attr_accessor :timeout, :use_recording_studio_trashable_for_destroy
     attr_reader :rich_text_comments, :hooks, :recordable_display_attributes, :author_display_attributes,
-                :author_avatar_attributes, :layout
+                :author_avatar_attributes, :layout, :route_anchor
 
     def initialize
       @timeout = 5
       @use_recording_studio_trashable_for_destroy = false
       @rich_text_comments = false
       @layout = nil
+      @route_anchor = nil
       @recordable_display_attributes = {}
       @author_display_attributes = {}
       @author_avatar_attributes = {}
@@ -36,6 +37,10 @@ module RecordingStudioCommentable
 
     def rich_text_comments=(value)
       @rich_text_comments = normalize_rich_text_comments(value)
+    end
+
+    def route_anchor=(value)
+      @route_anchor = value.to_s.strip.presence
     end
 
     def rich_text_comments_enabled?
@@ -72,6 +77,7 @@ module RecordingStudioCommentable
         use_recording_studio_trashable_for_destroy: use_recording_studio_trashable_for_destroy,
         rich_text_comments: rich_text_comments,
         layout: layout,
+        route_anchor: route_anchor,
         recordable_display_attributes: recordable_display_attributes.dup,
         author_display_attributes: author_display_attributes.dup,
         author_avatar_attributes: author_avatar_attributes.dup,

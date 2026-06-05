@@ -59,7 +59,7 @@ module RecordingStudioCommentable
 
       def composer_url
         args = { inline_composer: true }.merge(return_to_options).merge(feed_query_options)
-        helpers.main_app.recording_comments_path(recording, args)
+        helpers.commentable_recording_comments_path(recording, **args)
       end
 
       def comments_count
@@ -119,9 +119,9 @@ module RecordingStudioCommentable
       end
 
       def page_path(page)
-        helpers.main_app.all_recording_comments_path(
+        helpers.commentable_all_recording_comments_path(
           recording,
-          return_to_options.merge(feed_query_options).merge(page: page)
+          **return_to_options.merge(feed_query_options).merge(page: page)
         )
       end
 
@@ -217,10 +217,7 @@ module RecordingStudioCommentable
 
       def default_reply_button_options_for(comment_recording, _parent_recording)
         DEFAULT_REPLY_BUTTON_OPTIONS.merge(
-          url: helpers.recording_studio_commentable.reply_comment_path(
-            comment_recording,
-            reply_return_to_options
-          )
+          url: helpers.commentable_reply_comment_path(comment_recording, **reply_return_to_options)
         )
       end
 

@@ -1,7 +1,8 @@
 <div class="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
-  <%= render FlatPack::Breadcrumb::Component.new(items: [
-    { text: "Back", href: @external_back_path }
-  ]) %>
+  <%= render FlatPack::PageNav::Component.new(
+    anchor_url: @external_back_path,
+    anchor_label: "Back"
+  ) %>
 
   <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
   <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>

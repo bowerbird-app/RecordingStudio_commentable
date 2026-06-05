@@ -34,7 +34,7 @@ module RecordingStudioCommentable
       @comment = Comment.new
       @parent_comment_recording = find_parent_comment_recording
       @composer_title = "Add comment"
-      @composer_url = main_app.recording_comments_path(@parent_recording, return_to_options)
+      @composer_url = commentable_recording_comments_path(@parent_recording, **return_to_options)
     end
 
     def reply
@@ -43,8 +43,7 @@ module RecordingStudioCommentable
       @comments_count = comment_count
       @composer_title = "Reply"
       @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
-      @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording,
-                                                                      return_to_options)
+      @composer_url = commentable_reply_comment_path(@reply_target_comment_recording, **return_to_options)
 
       render :new
     end
@@ -75,7 +74,7 @@ module RecordingStudioCommentable
           render :all, status: :unprocessable_entity
         else
           @composer_title = "Add comment"
-          @composer_url = main_app.recording_comments_path(@parent_recording, return_to_options)
+          @composer_url = commentable_recording_comments_path(@parent_recording, **return_to_options)
           render :new, status: :unprocessable_entity
         end
       end
@@ -98,8 +97,7 @@ module RecordingStudioCommentable
         @comments_count = comment_count
         @composer_title = "Reply"
         @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
-        @composer_url = recording_studio_commentable.reply_comment_path(@reply_target_comment_recording,
-                                                                        return_to_options)
+        @composer_url = commentable_reply_comment_path(@reply_target_comment_recording, **return_to_options)
         render :new, status: :unprocessable_entity
       end
     end
@@ -285,9 +283,9 @@ module RecordingStudioCommentable
       uri = URI.parse(path)
 
       [
-        main_app.recording_comments_path(@parent_recording),
-        main_app.all_recording_comments_path(@parent_recording),
-        main_app.new_recording_comment_path(@parent_recording)
+        commentable_recording_comments_path(@parent_recording),
+        commentable_all_recording_comments_path(@parent_recording),
+        commentable_new_recording_comment_path(@parent_recording)
       ].include?(uri.path)
     rescue URI::InvalidURIError
       false
@@ -318,18 +316,18 @@ module RecordingStudioCommentable
     end
 
     def summary_path(show_comments: false)
-      main_app.recording_comments_path(
+      commentable_recording_comments_path(
         @parent_recording,
-        return_to_options.merge(show_comments ? { show_comments: true } : {})
+        **return_to_options.merge(show_comments ? { show_comments: true } : {})
       )
     end
 
     def host_comments_collection_path
-      main_app.all_recording_comments_path(@parent_recording, return_to_options.merge(feed_query_options))
+      commentable_all_recording_comments_path(@parent_recording, **return_to_options.merge(feed_query_options))
     end
 
     def host_new_comment_path
-      main_app.new_recording_comment_path(@parent_recording, return_to_options)
+      commentable_new_recording_comment_path(@parent_recording, **return_to_options)
     end
 
     def inline_composer_request?
