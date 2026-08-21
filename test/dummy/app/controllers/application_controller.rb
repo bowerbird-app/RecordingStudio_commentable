@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   include RecordingStudioCommentable::CommentBodyHelper
   include RecordingStudioCommentable::CommentRoutesHelper
   include RecordingStudioCommentable::RecordableDisplayHelper
+  include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern unless Rails.env.test?
@@ -29,7 +30,7 @@ class ApplicationController < ActionController::Base
   private
 
   def application_layout
-    devise_controller? ? "application" : "flat_pack_sidebar"
+    devise_controller? ? "devise" : "recording_studio/default_layout"
   end
 
   def set_current_actor

@@ -4,11 +4,21 @@
 @source "../../views/**/*.erb";
 
 /* Include RecordingStudio engine views for Tailwind CSS */
-@source "../../vendor/bundle/**/recording_studio/app/views/**/*.erb";
+@source "../../vendor/bundle/**/recording_studio*/app/views/**/*.erb";
+@source "../../vendor/bundle/**/RecordingStudio*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "../../../../../../home/**/.local/share/mise/installs/ruby/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "../../../../../../home/**/.local/share/mise/installs/ruby/**/bundler/gems/recording_studio-*/app/views/**/*.erb";
 
+/* Include this engine's views and components */
+@source "../../../../../app/views/**/*.erb";
+@source "../../../../../app/components/**/*.{rb,erb}";
 
 /* Tailwind CSS - Scan FlatPack components for classes */
+@source "../../vendor/bundle/**/flatpack*/app/components/**/*.{rb,erb}";
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "../../../../../../home/**/.local/share/mise/installs/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 
 /* Extend Tailwind theme with FlatPack design tokens */
 @theme {

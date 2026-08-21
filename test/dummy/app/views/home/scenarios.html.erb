@@ -1,12 +1,20 @@
-<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-12"
+<% recording_studio_page_nav(
+  title: "Scenarios",
+  page_nav_back_url: root_path,
+  page_nav_back_label: "Home",
+  page_nav_anchor_url: root_path,
+  page_nav_anchor_label: "Close"
+) %>
+
+<div class="flex w-full flex-col gap-8"
   data-controller="scroll-anchor"
   data-action="submit->scroll-anchor#remember"
   data-scroll-anchor-hash-value="comment-scenarios"
   data-scroll-anchor-offset-value="12"
   data-scroll-anchor-storage-key-value="comment-scenarios-scroll">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "RecordingStudio Commentable",
-    subtitle: "Threaded comment feeds for Recording Studio recordables. Include the Commentable module to opt a recordable into comments.",
+    title: "Comment scenarios",
+    subtitle: "Include Commentable.to on a page to open a comment thread. Folders stay quiet.",
     variant: :h1
   ) %>
 
@@ -16,12 +24,7 @@
     <%= render FlatPack::Badge::Component.new(text: "v#{RecordingStudioCommentable::VERSION}", style: :warning, size: :sm) %>
   </div>
 
-  <div class="flex flex-col gap-4 scroll-mt-6"
-    id="comment-scenarios"
-    data-scroll-anchor-target="anchor">
-    <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
-    <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
-  </div>
+  <div class="scroll-mt-6" id="comment-scenarios" data-scroll-anchor-target="anchor"></div>
 
   <div class="grid gap-4 lg:grid-cols-2">
     <% @scenario_recordings.each do |recording| %>
@@ -30,7 +33,7 @@
       <% title = is_folder ? recordable.name : recordable.title %>
       <% body = is_folder ? "Folders are visible in Recording Studio but are not commentable in this addon." : recordable.body %>
       <% actor_name = current_recording_studio_actor.respond_to?(:display_name) ? current_recording_studio_actor.display_name : current_recording_studio_actor.to_s %>
-      <% commentable = recordable.class.include?(RecordingStudioCommentable::Commentable) %>
+      <% commentable = recordable.class && RecordingStudio.capability_enabled?(:commentable, for: recordable.class) %>
       <% view_access = !defined?(RecordingStudioAccessible) || RecordingStudioAccessible.authorized?(actor: current_recording_studio_actor, recording: recording, role: :view) %>
       <% edit_access = commentable && (!defined?(RecordingStudioAccessible) || RecordingStudioAccessible.authorized?(actor: current_recording_studio_actor, recording: recording, role: :edit)) %>
       <% expectation = if is_folder

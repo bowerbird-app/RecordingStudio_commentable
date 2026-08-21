@@ -208,7 +208,7 @@ class HomeController < ApplicationController
         examples: [
           {
             label: "Configure layout and rich text",
-            input: 'RecordingStudioCommentable.configure do |config|\n  config.layout = "flat_pack_sidebar"\n  config.use_recording_studio_trashable_for_destroy = true\n  config.rich_text_comments = :selection\nend',
+            input: 'RecordingStudioCommentable.configure do |config|\n  config.layout = "recording_studio/default_layout"\n  config.use_recording_studio_trashable_for_destroy = true\n  config.rich_text_comments = :selection\nend',
             output: "Updates the shared Configuration object used by the engine"
           }
         ]
@@ -227,15 +227,15 @@ class HomeController < ApplicationController
         ]
       },
       {
-        title: "Commentable concern",
-        source: "RecordingStudioCommentable::Commentable",
-        summary: "Include this concern in a host model to mark it as commentable.",
-        signature: "include RecordingStudioCommentable::Commentable",
+        title: "Commentable.to",
+        source: "RecordingStudio::Capabilities::Commentable",
+        summary: "Include this factory module on a host model to enable comments. Installing the gem does not turn comments on.",
+        signature: "include RecordingStudio::Capabilities::Commentable.to(**opts)",
         examples: [
           {
             label: "Opt a model into comments",
-            input: 'class Page < ApplicationRecord\n  recording_studio_recordable(label: "Page", plural_label: "Pages", root: true)\n  include RecordingStudioCommentable::Commentable\nend',
-            output: "Declares the host recordable for RecordingStudio and enables the commentable capability"
+            input: 'class Page < ApplicationRecord\n  recording_studio_recordable(label: "Page", plural_label: "Pages", root: true)\n  include RecordingStudio::Capabilities::Commentable.to\nend',
+            output: "Declares the host recordable for Recording Studio and enables the commentable capability"
           }
         ]
       },
@@ -283,7 +283,7 @@ class HomeController < ApplicationController
 
   def load_component_catalog
     example_recording = @scenario_recordings&.detect do |recording|
-      recording.recordable&.class&.include?(RecordingStudioCommentable::Commentable)
+      recording.recordable&.class && RecordingStudio.capability_enabled?(:commentable, for: recording.recordable.class)
     end || RecordingStudio::Recording.unscoped
       .where(recordable_type: "Page")
       .where(trashed_at: nil)

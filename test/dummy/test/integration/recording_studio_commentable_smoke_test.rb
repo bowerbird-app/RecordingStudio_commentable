@@ -35,7 +35,7 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     post recording_comments_path(@public_recording), params: {
       comment: { body: created_body }
     }
-    assert_redirected_to all_recording_comments_path(@public_recording)
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
 
     created_recording = comment_recording_for_body!(created_body)
 
@@ -46,7 +46,7 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     patch recording_comment_path(@public_recording, created_recording), params: {
       comment: { body: updated_body }
     }
-    assert_redirected_to all_recording_comments_path(@public_recording)
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
 
     follow_redirect!
     assert_response :success
@@ -54,7 +54,7 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     refute_includes response.body, created_body
 
     delete recording_comment_path(@public_recording, created_recording)
-    assert_redirected_to all_recording_comments_path(@public_recording)
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
 
     follow_redirect!
     assert_response :success

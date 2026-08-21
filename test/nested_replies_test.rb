@@ -172,7 +172,7 @@ class NestedRepliesTest < Minitest::Test
     assert_includes source, "FlatPack::Button::Component.new(**reply_action_options)"
     assert_includes source, 'class: "text-sm font-medium text-[var(--color-primary)] hover:underline"'
     assert_includes source, 'data: { turbo_frame: "_top" }'
-    assert_includes source, "recording_studio_commentable.reply_comment_path"
+    assert_includes source, "commentable_reply_comment_path"
     assert_includes source, "local_assigns[:reply_button_resolver]"
     assert_includes source, "elsif allow_reply"
   end

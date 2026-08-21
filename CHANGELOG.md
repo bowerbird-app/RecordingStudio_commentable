@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-21
+
+### Added
+- Canonical host verb `include RecordingStudio::Capabilities::Commentable.to(**opts)`, a thin wrapper around Recording Studio 4.2 `Capabilities.include_for(:commentable, **options)`
+- Option validation stays in this gem; `.to` does not register the capability
+
+### Changed
+- Requires Recording Studio `~> 4.2` (Gemfile and dummy pin `v4.2.0`)
+- Dummy Page enables comments with `.to`; Folder and Workspace stay off
+- Dummy and engine screens use Recording Studio's default layout and Flatpack PageNav
+- `include RecordingStudioCommentable::Commentable` remains an alias that calls through to `.to`
+- Without `recording_studio_trashable`, deleting a comment purges the recording tree because 4.x recordables cannot be destroyed through Active Record
+
+### Upgrade notes
+See [docs/UPGRADING.md](docs/UPGRADING.md).
+
 ## [0.1.1] - 2026-04-28
 
 ### Changed
@@ -25,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/gem_template/compare/v0.1.1...HEAD
-[0.1.1]: https://github.com/bowerbird-app/gem_template/releases/tag/v0.1.1
-[0.1.0]: https://github.com/bowerbird-app/gem_template/releases/tag/v0.1.0
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.3.0
+[0.1.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.1.1
+[0.1.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.1.0
