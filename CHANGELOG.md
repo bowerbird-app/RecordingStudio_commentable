@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy and engine screens use Recording Studio's default layout and Flatpack PageNav
 - `include RecordingStudioCommentable::Commentable` remains an alias that calls through to `.to`
 - Without `recording_studio_trashable`, deleting a comment purges the recording tree because 4.x recordables cannot be destroyed through Active Record
+- CI inherits `.rubocop_todo.yml` for pre-existing style offenses so the suite can run
 
 ### Upgrade notes
 See [docs/UPGRADING.md](docs/UPGRADING.md).

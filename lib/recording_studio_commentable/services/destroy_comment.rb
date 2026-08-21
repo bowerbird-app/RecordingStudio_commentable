@@ -118,7 +118,9 @@ module RecordingStudioCommentable
       end
 
       def recording_studio_trashable_missing_error
-        "recording_studio_trashable destroy integration is enabled, but the comment recording does not support recording_studio_trashable_trash!. Install and configure recording_studio_trashable before enabling this option."
+        "recording_studio_trashable destroy integration is enabled, but the " \
+          "comment recording does not support recording_studio_trashable_trash!. " \
+          "Install and configure recording_studio_trashable before enabling this option."
       end
 
       def service_args
