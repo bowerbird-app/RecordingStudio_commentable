@@ -1,77 +1,75 @@
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_url: @external_back_path,
-    anchor_label: "Back"
-  ) %>
+<% recording_studio_page_nav(
+  title: @page_title,
+  page_nav_back_url: @back_button_onclick.present? ? nil : @external_back_path,
+  page_nav_back_label: "Go back",
+  page_nav_anchor_url: @external_back_path,
+  page_nav_anchor_label: "Close"
+) %>
 
-  <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
-  <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
+<article class="flex w-full max-w-3xl flex-col gap-8">
+  <header class="space-y-2">
+    <%= render FlatPack::PageTitle::Component.new(
+      title: @page_title,
+      subtitle: "Leave a note, or just read along.",
+      variant: :h1,
+      class: "mb-0 pb-0"
+    ) %>
+  </header>
 
-  <article class="flex flex-col gap-4">
-    <header class="space-y-2 border-(--surface-border-color)">
-      <%= render FlatPack::PageTitle::Component.new(
-        title: @page_title,
-        subtitle: "Commentable item",
-        variant: :h1,
-        class: "mb-0 pb-0"
+  <% if @page_body.present? %>
+    <section>
+      <div class="max-w-none space-y-4 text-lg leading-8 whitespace-pre-wrap text-(--surface-content-color)">
+        <p><%= @page_body %></p>
+      </div>
+    </section>
+  <% end %>
+
+  <% unless @show_comments %>
+    <footer class="border-t border-(--surface-border-color) pt-8">
+      <%= render RecordingStudioCommentable::CommentsButton::Component.new(
+        recording: @parent_recording,
+        class: "w-full justify-center"
       ) %>
-    </header>
+    </footer>
+  <% end %>
 
-    <% if @page_body.present? %>
-      <section>
-        <div class="max-w-none space-y-4 text-lg leading-8 whitespace-pre-wrap text-(--surface-content-color)">
-          <p><%= @page_body %></p>
-        </div>
-      </section>
-    <% end %>
-
-    <% unless @show_comments %>
-      <footer class="border-t border-(--surface-border-color) pt-6">
-        <%= render RecordingStudioCommentable::CommentsButton::Component.new(
-          recording: @parent_recording,
-          class: "w-full justify-center"
-        ) %>
-      </footer>
-    <% end %>
-
-    <% if @show_comments %>
-      <section class="border-t border-(--surface-border-color) pt-6">
-        <%= render FlatPack::Comments::Thread::Component.new(
-          count: @comments_count,
-          title: "Comments",
-          empty_title: "No comments yet",
-          empty_body: "Be the first to leave a comment.",
-          id: "comments",
-          class: "max-w-none bg-transparent p-0 shadow-none"
-        ) do |thread| %>
-          <% thread.header do %>
-            <div class="flex flex-col gap-6">
-              <% if @can_create_comment %>
-                <%= render RecordingStudioCommentable::CommentComposer::Component.new(
-                      comment: @comment,
-                      url: commentable_recording_comments_path(
-                        @parent_recording,
-                        show_comments: true,
-                        inline_composer: true
-                      )
-                    ) %>
-              <% end %>
-
-              <h2 class="text-xl font-bold text-(--comments-thread-title-color)">
-                Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>
-              </h2>
-            </div>
-          <% end %>
-
-          <% @comments.each do |comment_recording| %>
-            <% thread.comment do %>
-              <%= render "comment",
-                    comment_recording: comment_recording,
-                    replies: (@replies || {}).fetch(comment_recording.id, []) %>
+  <% if @show_comments %>
+    <section class="border-t border-(--surface-border-color) pt-8">
+      <%= render FlatPack::Comments::Thread::Component.new(
+        count: @comments_count,
+        title: "Comments",
+        empty_title: "No comments yet",
+        empty_body: "Be the first to leave a comment.",
+        id: "comments",
+        class: "max-w-none bg-transparent p-0 shadow-none"
+      ) do |thread| %>
+        <% thread.header do %>
+          <div class="flex flex-col gap-6">
+            <% if @can_create_comment %>
+              <%= render RecordingStudioCommentable::CommentComposer::Component.new(
+                    comment: @comment,
+                    url: commentable_recording_comments_path(
+                      @parent_recording,
+                      show_comments: true,
+                      inline_composer: true
+                    )
+                  ) %>
             <% end %>
+
+            <h2 class="text-xl font-bold text-(--comments-thread-title-color)">
+              Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>
+            </h2>
+          </div>
+        <% end %>
+
+        <% @comments.each do |comment_recording| %>
+          <% thread.comment do %>
+            <%= render "comment",
+                  comment_recording: comment_recording,
+                  replies: (@replies || {}).fetch(comment_recording.id, []) %>
           <% end %>
         <% end %>
-      </section>
-    <% end %>
-  </article>
-</div>
+      <% end %>
+    </section>
+  <% end %>
+</article>

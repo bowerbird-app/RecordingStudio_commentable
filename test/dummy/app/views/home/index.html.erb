@@ -1,12 +1,37 @@
-<div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+<% recording_studio_page_nav(
+  title: @workspace&.name || "Comments",
+  page_nav_anchor_url: root_path,
+  page_nav_anchor_label: "Home"
+) %>
+
+<% recording_studio_page_nav_right do %>
+  <%= render FlatPack::Button::Component.new(
+    text: "Sign out",
+    style: :ghost,
+    size: :sm,
+    url: destroy_user_session_path,
+    data: { turbo_method: :delete }
+  ) %>
+<% end %>
+
+<div class="flex w-full flex-col gap-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: @workspace&.name || "RecordingStudio Commentable",
-    subtitle: "Use this root page for demo credentials and workspace context, then open /scenarios for the seeded comment scenarios.",
+    title: @workspace&.name || "Comments",
+    subtitle: "Sign in, pick a page, and try the comment feeds.",
     variant: :h1
   ) %>
 
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-    <div class="flex flex-col gap-6">
+  <div class="flex flex-wrap gap-3">
+    <%= render FlatPack::Button::Component.new(text: "Scenarios", style: :primary, size: :sm, url: scenarios_path) %>
+    <%= render FlatPack::Button::Component.new(text: "All comments", style: :secondary, size: :sm, url: "/commentable") %>
+    <%= render FlatPack::Button::Component.new(text: "Recordings", style: :secondary, size: :sm, url: recordings_browser_path) %>
+    <%= render FlatPack::Button::Component.new(text: "Helpers", style: :ghost, size: :sm, url: helpers_path) %>
+    <%= render FlatPack::Button::Component.new(text: "Components", style: :ghost, size: :sm, url: components_path) %>
+    <%= render FlatPack::Button::Component.new(text: "Gem routes", style: :ghost, size: :sm, url: gem_routes_path) %>
+  </div>
+
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+    <div class="flex flex-col gap-8">
       <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
@@ -18,7 +43,7 @@
         <% end %>
 
         <% card.body do %>
-          <div class="space-y-3 text-sm">
+          <div class="space-y-3 text-sm leading-6">
             <p><strong>Current user:</strong> <%= current_user.display_name %> (<%= current_user.email %>)</p>
             <p><strong>Admin:</strong> admin@admin.com / Password</p>
             <p><strong>Quinn:</strong> quinn@admin.com / Password</p>
@@ -57,7 +82,7 @@
       <% end %>
 
       <% card.body do %>
-        <dl class="space-y-3 text-sm">
+        <dl class="space-y-3 text-sm leading-6">
           <div>
             <dt class="text-(--surface-muted-content-color)">Workspace</dt>
             <dd class="font-medium"><%= @workspace&.name || "Not seeded" %></dd>

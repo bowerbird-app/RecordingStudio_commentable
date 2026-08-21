@@ -206,7 +206,8 @@ module RecordingStudioCommentable
 
     def require_commentable!
       recordable = @parent_recording.try(:recordable)
-      return if recordable&.class&.include?(RecordingStudioCommentable::Commentable)
+      type = recordable&.class
+      return if type && RecordingStudio.capability_enabled?(:commentable, for: type)
 
       redirect_to(return_to_path || main_app.root_path, alert: "Comments are not enabled for this resource.")
     end

@@ -1,20 +1,20 @@
-<div class="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_url: @external_back_path,
-    anchor_label: "Back"
-  ) %>
+<% recording_studio_page_nav(
+  title: "All comments",
+  page_nav_back_url: @external_back_path,
+  page_nav_back_label: "Go back",
+  page_nav_anchor_url: @external_back_path,
+  page_nav_anchor_label: "Close"
+) %>
 
-  <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
-  <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
-
+<div class="flex w-full max-w-4xl flex-col gap-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Recording Studio Commentable",
-    subtitle: "All comments",
+    title: "All comments",
+    subtitle: "Every thread in this workspace, in one place.",
     variant: :h1
   ) %>
 
   <% if @comment_entries.any? %>
-    <div class="flex flex-col gap-3" id="comments">
+    <div class="flex flex-col gap-4" id="comments">
       <%= render "comments_page",
             comment_entries: @comment_entries,
             page: @page,

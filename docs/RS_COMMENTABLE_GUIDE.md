@@ -39,7 +39,7 @@ RecordingStudioCommentable.configure do |config|
 end
 ```
 
-Leave `config.layout` unset to keep the engine's default blank layout. Set it to a host layout path when commentable pages should render inside your app shell, for example a sidebar layout.
+Leave `config.layout` unset to keep Recording Studio's default layout. Set it to a host layout path when comment pages should render inside your app shell.
 
 Set `config.use_recording_studio_trashable_for_destroy` to `true` only when your host app also installs `recording_studio_trashable` and wants comment deletion to use that gem's namespaced trash lifecycle method on the comment recording. Leave it `false` to keep the default destroy behavior in this addon.
 
@@ -55,7 +55,7 @@ What the install generator does:
 
 ### 1. Make a model commentable
 
-Include the marker module in any recordable model that should allow comments:
+Include the host verb on any recordable model that should allow comments:
 
 ```ruby
 class Page < ApplicationRecord
@@ -65,14 +65,16 @@ class Page < ApplicationRecord
     root: true
   )
 
-  include RecordingStudioCommentable::Commentable
+  include RecordingStudio::Capabilities::Commentable.to
 end
 ```
 
-This is the main opt-in. If a model does not include this module, the engine will refuse comment actions for it.
+This is the main opt-in. Installing the gem does not enable comments. If a model does not include `.to`, the engine will refuse comment actions for it.
 
-With `RecordingStudio` 3.0.0+, every configured host recordable type is also expected to declare
-`recording_studio_recordable(...)`.
+`include RecordingStudioCommentable::Commentable` still works and calls through to the same `.to` / `include_for` path.
+
+With `RecordingStudio` 4.2.0+, every configured host recordable type is also expected to declare
+`recording_studio_recordable(...)`. Parent rules stay there, not on the mixin.
 
 ### 2. Register the comment recordable with RecordingStudio
 
@@ -175,7 +177,7 @@ the request goes here:
 What happens next:
 
 1. the controller loads the parent recording from `params[:recording_id]`
-2. it checks that the underlying recordable included `RecordingStudioCommentable::Commentable`
+2. it checks that the underlying recordable enabled `:commentable` with `Commentable.to`
 3. it checks whether the current actor can view comments there
 4. it loads comment recordings under that parent recording
 5. it renders the comment feed
@@ -303,7 +305,7 @@ What it does:
 
 These are the main public methods and entry points you are likely to touch.
 
-### `include RecordingStudioCommentable::Commentable`
+### `include RecordingStudio::Capabilities::Commentable.to`
 
 Put this on a model to opt it into comments.
 

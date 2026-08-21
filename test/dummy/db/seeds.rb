@@ -37,12 +37,12 @@ workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 root_recording = RecordingStudio.root_recording_for(workspace)
 
 grant_access_result = lambda do |recording:, actor:, role:, manager_actor:|
-  root_recording = RecordingStudio.root_recording_or_self(recording)
+  access_root = RecordingStudio.root_recording_or_self(recording)
 
   RecordingStudioAccessible::AccessCreationContext.allow do
     existing_recording = RecordingStudio::Recording.unscoped
       .where(
-        root_recording_id: root_recording.id,
+        root_recording_id: access_root.id,
         parent_recording_id: recording.id,
         recordable_type: "RecordingStudio::Access"
       )
@@ -53,12 +53,12 @@ grant_access_result = lambda do |recording:, actor:, role:, manager_actor:|
       access = existing_recording.recordable
       return existing_recording if access&.actor == actor && access.role == role.to_s
 
-      root_recording.revise(existing_recording, actor: manager_actor) do |updated_access|
+      access_root.revise(existing_recording, actor: manager_actor) do |updated_access|
         updated_access.actor = actor
         updated_access.role = role
       end
     else
-      root_recording.record(RecordingStudio::Access, actor: manager_actor, parent_recording: recording) do |access|
+      access_root.record(RecordingStudio::Access, actor: manager_actor, parent_recording: recording) do |access|
         access.actor = actor
         access.role = role
       end

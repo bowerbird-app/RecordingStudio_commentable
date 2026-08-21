@@ -1,13 +1,13 @@
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_url: @summary_path,
-    anchor_label: "Back"
-  ) %>
+<% recording_studio_page_nav(
+  title: "Comments",
+  page_nav_back_url: @summary_path,
+  page_nav_back_label: "Go back",
+  page_nav_anchor_url: @summary_path,
+  page_nav_anchor_label: "Close"
+) %>
 
+<div class="flex w-full max-w-3xl flex-col gap-8">
   <% show_new_comment_button = ActiveModel::Type::Boolean.new.cast(params[:new_comment_button]) %>
-
-  <%= render FlatPack::Alert::Component.new(style: :success, description: notice) if notice.present? %>
-  <%= render FlatPack::Alert::Component.new(style: :danger, description: alert) if alert.present? %>
 
   <% if show_new_comment_button && @can_create_comment %>
     <div class="flex justify-start">
@@ -26,7 +26,7 @@
         mode: params[:loading],
         page_size: params[:page_size],
         include_composer: !show_new_comment_button,
-      return_to: @safe_return_to_path,
+        return_to: @safe_return_to_path,
         comment: @comment,
         can_create_comment: @can_create_comment
       ) %>

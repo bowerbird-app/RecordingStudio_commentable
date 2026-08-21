@@ -1,11 +1,14 @@
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_url: @comments_collection_path,
-    anchor_label: "Back"
-  ) %>
+<% recording_studio_page_nav(
+  title: "Edit comment",
+  page_nav_back_url: @comments_collection_path,
+  page_nav_back_label: "Go back",
+  page_nav_anchor_url: @comments_collection_path,
+  page_nav_anchor_label: "Close"
+) %>
 
+<div class="flex w-full max-w-3xl flex-col gap-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Edit Comment",
+    title: "Edit comment",
     subtitle: @page_title,
     variant: :h1
   ) %>

@@ -22,19 +22,19 @@ scope module: :recording_studio_commentable do
 end
 ```
 
-Then include the Commentable module in your recordable:
+Then include Commentable.to on your recordable:
 
 ```ruby
 class Page < ApplicationRecord
-  include RecordingStudioCommentable::Commentable
+  include RecordingStudio::Capabilities::Commentable.to
 end
 ```
 
-And add your recordable type to the RecordingStudio initializer:
+And add your recordable type to the RecordingStudio initializer. The addon registers `RecordingStudioCommentable::Comment` itself:
 
 ```ruby
 RecordingStudio.configure do |config|
-  config.recordable_types += ["Page", "RecordingStudioCommentable::Comment"]
+  config.recordable_types += ["Page"]
 end
 ```
 

@@ -4,7 +4,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 
 ## Features
 
-- **Opt-in per recordable** — include `RecordingStudioCommentable::Commentable` in any model to enable comment feeds
+- **Opt-in per recordable** — include `RecordingStudio::Capabilities::Commentable.to` on the types that should have comment feeds. Installing the gem does not turn comments on.
 - **RecordingStudio-native** — comments are child recordings; create/update/delete go through the `record`/`revise`/`trash` API
 - **Access-control aware** — integrates with `RecordingStudioAccessible` roles (view, edit, manage) when available
 - **FlatPack UI** — all views built with FlatPack components; no raw HTML needed
@@ -17,7 +17,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, FlatPack sidebar layout, and sample Page (commentable) and Folder (not commentable) recordables
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables
 
 ## Installation
 
@@ -39,6 +39,8 @@ rails db:migrate
 
 ### 1. Opt a recordable into comments
 
+Installing this gem registers `:commentable`. It does not enable it. Opt each recordable type in explicitly:
+
 ```ruby
 class Page < ApplicationRecord
   recording_studio_recordable(
@@ -47,9 +49,11 @@ class Page < ApplicationRecord
     root: true
   )
 
-  include RecordingStudioCommentable::Commentable
+  include RecordingStudio::Capabilities::Commentable.to
 end
 ```
+
+Parent rules stay on `recording_studio_recordable`. `include RecordingStudioCommentable::Commentable` still works and calls through to the same `.to` path.
 
 ### 2. Register the recordable type with RecordingStudio
 
@@ -61,7 +65,7 @@ end
 ```
 
 `RecordingStudioCommentable::Comment` is registered by the addon itself as a capability-owned child recordable in
-RecordingStudio 3.0.0+. Host apps only need to register their own parent recordable types and declare them with
+RecordingStudio 4.2.0+. Host apps only need to register their own parent recordable types and declare them with
 `recording_studio_recordable(...)`.
 
 ### 3. Add the routes
@@ -160,7 +164,7 @@ result = RecordingStudioCommentable::Services::DestroyComment.call(
 RecordingStudioCommentable.configure do |config|
   config.timeout = 5
   config.use_recording_studio_trashable_for_destroy = false
-  config.layout = "flat_pack_sidebar"
+  # config.layout = "recording_studio/default_layout"
   config.rich_text_comments = :toolbar
   config.recordable_display_attributes = {
     "Page" => :title,
@@ -182,7 +186,7 @@ RecordingStudioCommentable.configure do |config|
 end
 ```
 
-Leave `config.layout` unset to use the engine's default blank layout. Set it to a host layout path, such as `flat_pack_sidebar`, when you want the commentable pages and `/commentable` home feed to render inside your app shell.
+Leave `config.layout` unset to use Recording Studio's default layout (back and close). Set it to a host layout path when you want the comment pages and `/commentable` home feed to render inside your app shell.
 
 Set `config.use_recording_studio_trashable_for_destroy` to `true` only when the host app installs and configures `recording_studio_trashable` and wants comment deletion to call `recording_studio_trashable_trash!` on the comment recording. The default is `false`, which keeps the existing `RecordingStudio` trash or direct-destroy fallback behavior. If this option is `true` and the comment recording does not support `recording_studio_trashable_trash!`, comment deletion now fails with a clear configuration error instead of silently falling back.
 
@@ -238,8 +242,7 @@ To add new recordable types:
 3. Leave optional behavior off by default, then opt into capabilities on the specific recordable models that need them:
    ```ruby
    class YourNewType < ApplicationRecord
-     include RecordingStudio::Capabilities::Movable.to("Workspace")
-     include RecordingStudio::Capabilities::Copyable.to("Workspace")
+     include RecordingStudio::Capabilities::Commentable.to
    end
    ```
 4. If you want per-device root persistence, wire it explicitly in your controller layer:
@@ -257,25 +260,17 @@ To add new recordable types:
 
 ### Capabilities
 
-This template uses the current RecordingStudio approach: built-in capabilities are off by default and are enabled per recordable type by including the relevant module on the model.
-
-- `movable`
-- `copyable`
-
-Device session persistence is separate from capabilities. It is enabled only when you include `RecordingStudio::Concerns::DeviceSessionConcern` in your controller layer.
-
-Enable behavior intentionally where it belongs:
+Comments are off until you enable them on a recordable type:
 
 ```ruby
-class RecordingStudioPage < ApplicationRecord
-  include RecordingStudio::Capabilities::Movable.to("Workspace")
-  include RecordingStudio::Capabilities::Copyable.to("Workspace")
-end
+class Page < ApplicationRecord
+  recording_studio_recordable label: "Page", root: true
 
-class ApplicationController < ActionController::Base
-  include RecordingStudio::Concerns::DeviceSessionConcern
+  include RecordingStudio::Capabilities::Commentable.to
 end
 ```
+
+Installing `recording_studio_commentable` registers `:commentable` at boot. It does not enable it.
 
 ### FlatPack UI Components
 
@@ -300,12 +295,12 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | recording_studio/v3.0.0 (pinned in `test/dummy/Gemfile`) |
+| RecordingStudio | v4.2.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | FlatPack        | v0.1.33 (pinned in `test/dummy/Gemfile`) |
 | Devise          | latest  |
 
 ## Documentation
 
-For a host-app focused walkthrough of installation, request flow, service methods, and hooks, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md).
+For a host-app focused walkthrough of installation, request flow, service methods, and hooks, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md). Upgrade notes for 0.3.0 live in [docs/UPGRADING.md](docs/UPGRADING.md).
 
 The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. Use it as background on the engine conventions; the README and dummy app are the source of truth for the Recording Studio addon workflow.

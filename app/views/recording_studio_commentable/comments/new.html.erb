@@ -1,12 +1,16 @@
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_url: (@safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)),
-    anchor_label: "Back"
-  ) %>
+<% composer_title = @composer_title.presence || (@parent_comment_recording.present? ? "Reply" : "Add comment") %>
+<% composer_url = @composer_url || commentable_recording_comments_path(@parent_recording, **(@safe_return_to_path.present? ? { return_to: @safe_return_to_path } : {})) %>
+<% back_path = @safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path) %>
 
-  <% composer_title = @composer_title.presence || (@parent_comment_recording.present? ? "Reply" : "Add comment") %>
-  <% composer_url = @composer_url || commentable_recording_comments_path(@parent_recording, **(@safe_return_to_path.present? ? { return_to: @safe_return_to_path } : {})) %>
+<% recording_studio_page_nav(
+  title: composer_title,
+  page_nav_back_url: back_path,
+  page_nav_back_label: "Go back",
+  page_nav_anchor_url: back_path,
+  page_nav_anchor_label: "Close"
+) %>
 
+<div class="flex w-full max-w-3xl flex-col gap-8">
   <%= render FlatPack::Comments::Thread::Component.new(
     count: @comments_count,
     title: composer_title,

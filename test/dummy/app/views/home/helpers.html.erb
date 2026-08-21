@@ -1,4 +1,12 @@
-<div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
+<% recording_studio_page_nav(
+  title: "View helpers",
+  page_nav_back_url: root_path,
+  page_nav_back_label: "Home",
+  page_nav_anchor_url: root_path,
+  page_nav_anchor_label: "Close"
+) %>
+
+<div class="flex w-full flex-col gap-8">
   <%= render FlatPack::PageTitle::Component.new(
     title: "View helpers",
     subtitle: "A dummy-app reference for the helper methods exposed by RecordingStudioCommentable and the host controller layer.",
