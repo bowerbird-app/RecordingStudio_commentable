@@ -217,6 +217,15 @@ The dummy app includes FlatPack generator output and a pre-seeded Page recordabl
 
 The login form is prefilled with these credentials for fast access.
 
+## Cloud Agent boot
+
+Cloud Agent Builds run `.cursor/install.sh`, then `.cursor/fetch-skills.sh`.
+The install hook provisions a cold image. On a warm snapshot it skips apt,
+ruby-build, db:prepare, and tailwind when Ruby, bundle, and Postgres are
+already usable. Fetch-skills always runs last. `.cursor/start.sh` starts
+PostgreSQL on each boot. Rebuild with Draft off to load a new pack. See
+[Cursor skills in Cloud Agents](docs/cursor-skills.md).
+
 ## Architecture
 
 ### Root Recording Pattern
@@ -301,6 +310,6 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 
 ## Documentation
 
-For a host-app focused walkthrough of installation, request flow, service methods, and hooks, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md). Upgrade notes for 0.3.0 live in [docs/UPGRADING.md](docs/UPGRADING.md).
+For a host-app focused walkthrough of installation, request flow, service methods, and hooks, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md). Upgrade notes live in [docs/UPGRADING.md](docs/UPGRADING.md). Cloud Agent boot and the fetched skill pack are in [docs/cursor-skills.md](docs/cursor-skills.md).
 
 The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. Use it as background on the engine conventions; the README and dummy app are the source of truth for the Recording Studio addon workflow.

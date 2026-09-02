@@ -1,5 +1,14 @@
 # Upgrade Guide
 
+## Upgrading to 0.3.1
+
+No host or schema changes. Comment enablement, services, and screens stay on
+the 0.3.0 contract.
+
+If you use Cloud Agents on this repository, rebuild the environment with Draft
+off so Build runs `.cursor/install.sh` and loads the fetched skill pack. See
+[Cursor skills in Cloud Agents](cursor-skills.md).
+
 ## Upgrading to 0.3.0
 
 This release pins Recording Studio 4.2 and switches comment enablement to the core factory.
