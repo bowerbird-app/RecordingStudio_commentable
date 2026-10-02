@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Bumped Recording Studio pin from `v4.2.0` to `v4.2.2` in `Gemfile` and `test/dummy/Gemfile`
+
 ## [0.3.1] - 2026-09-02
 
 Cloud Agent install no longer fails a warm environment rebuild. Skills still
