@@ -17,9 +17,9 @@ class AccessibleGrantsTest < ActiveSupport::TestCase
 
     assert(grants.any?)
     assert(grants.all? { |access| access.role.is_a?(String) })
-    assert_equal "admin", RecordingStudioAccessible.role_for(actor: @admin, recording: @public_recording)
-    assert_equal "edit", RecordingStudioAccessible.role_for(actor: @quinn, recording: @public_recording)
-    assert_equal "view", RecordingStudioAccessible.role_for(actor: @viewer, recording: @public_recording)
+    assert_equal "admin", RecordingStudioAccessible.role_for(actor: @admin, recording: @public_recording).to_s
+    assert_equal "edit", RecordingStudioAccessible.role_for(actor: @quinn, recording: @public_recording).to_s
+    assert_equal "view", RecordingStudioAccessible.role_for(actor: @viewer, recording: @public_recording).to_s
   end
 
   test "grant_access upserts a string role without writing Access rows directly" do

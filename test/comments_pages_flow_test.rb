@@ -485,9 +485,13 @@ class CommentsPagesFlowTest < Minitest::Test
     seeds_source = read_workspace_file("test/dummy/db/seeds.rb")
     session_view_source = read_workspace_file("test/dummy/app/views/devise/sessions/new.html.erb")
 
-    assert_includes seeds_source, 'viewer = User.find_or_initialize_by(email: "view@admin.com")'
-    assert_includes seeds_source, 'viewer.avatar_url = "https://i.pravatar.cc/160?u=view@admin.com"'
-    assert_includes seeds_source, "public_page_recording => [[user, :edit], [quinn, :edit], [viewer, :view]]"
+    assert_includes seeds_source, 'email: "view@admin.com"'
+    assert_includes seeds_source, 'avatar_url: "https://i.pravatar.cc/160?u=view@admin.com"'
+    assert_includes seeds_source, "RecordingStudioAccessible.bootstrap_owner_access!"
+    assert_includes seeds_source, "RecordingStudioAccessible.grant_access("
+    refute_includes seeds_source, "AccessCreationContext"
+    refute_includes seeds_source, "record(RecordingStudio::Access"
+    assert_includes seeds_source, "ensure_access_grant!(recording: public_page_recording, actor: viewer, role: :view"
     assert_includes seeds_source, "RecordingStudioCommentable::Services::CreateComment.call("
     assert_includes seeds_source,
                     'body: "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."'

@@ -11,6 +11,8 @@ require "recording_studio_commentable"
 module CommentableMinitestStub
   def stub(name, val = nil)
     name = name.to_sym
+    singleton = singleton_class
+    had_singleton = singleton.method_defined?(name, false) || singleton.private_method_defined?(name, false)
     original = begin
       method(name)
     rescue NameError
@@ -27,12 +29,10 @@ module CommentableMinitestStub
 
     yield
   ensure
-    if original
-      define_singleton_method(name, original)
-    elsif singleton_class.method_defined?(name, false) ||
-          singleton_class.private_method_defined?(name, false)
-      singleton_class.remove_method(name)
+    if singleton.method_defined?(name, false) || singleton.private_method_defined?(name, false)
+      singleton.remove_method(name)
     end
+    define_singleton_method(name, original) if had_singleton && original
   end
 end
 
