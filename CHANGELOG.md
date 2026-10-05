@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Bumped Recording Studio pin from `v4.2.0` to `v4.2.2` in `Gemfile` and `test/dummy/Gemfile`
-- Bumped `recording_studio_accessible` pin from `v0.6.0` to `v0.11.1` in `Gemfile` and `test/dummy/Gemfile`
+- Bumped `recording_studio_accessible` pin from `v0.6.0` to `v0.11.1` in `Gemfile` and `test/dummy/Gemfile` (dummy still needs Accessible `0.8`–`0.11` migrations before grants work against the new role API)
 
 ## [0.3.1] - 2026-09-02
 
