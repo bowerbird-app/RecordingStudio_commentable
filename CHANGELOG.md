@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Bumped Recording Studio pin from `v4.2.0` to `v4.2.2` in `Gemfile` and `test/dummy/Gemfile`
-- Bumped `recording_studio_accessible` pin from `v0.6.0` to `v0.11.1` in `Gemfile` and `test/dummy/Gemfile` (dummy still needs Accessible `0.8`–`0.11` migrations before grants work against the new role API)
+- Bumped `recording_studio_accessible` pin from `v0.6.0` to `v0.11.1` in `Gemfile` and `test/dummy/Gemfile`
+- Dummy app now installs Accessible `0.8`–`0.11` migrations (`depends_on`, invitations, string `role`) and seeds grants through `bootstrap_owner_access!` / `grant_access`
+- Gem tests restore `Object#stub` for Minitest 6 (pulled in by the Rails patch bump)
 
 ## [0.3.1] - 2026-09-02
 
