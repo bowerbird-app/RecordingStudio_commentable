@@ -17,7 +17,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Accessible `v0.11.1`, runs its `0.8`–`0.11` migrations, and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -305,6 +305,7 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
 | RecordingStudio | v4.2.2 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudioAccessible | v0.11.1 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | FlatPack        | v0.1.33 (pinned in `test/dummy/Gemfile`) |
 | Devise          | latest  |
 
