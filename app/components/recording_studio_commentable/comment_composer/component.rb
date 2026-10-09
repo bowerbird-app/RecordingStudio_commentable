@@ -28,14 +28,22 @@ module RecordingStudioCommentable
       end
 
       def submit_label
-        comment.new_record? ? I18n.t("recording_studio.commentable.composer.post") : I18n.t("recording_studio.commentable.composer.save")
+        if comment.new_record?
+          I18n.t("recording_studio.commentable.composer.post")
+        else
+          I18n.t("recording_studio.commentable.composer.save")
+        end
       end
 
       def actor_name
         actor = helpers.current_recording_studio_actor
-        return I18n.t("recording_studio.commentable.common.you") unless actor
+        return you_label unless actor
 
-        actor.respond_to?(:display_name) ? actor.display_name : actor.to_s.presence || I18n.t("recording_studio.commentable.common.you")
+        actor.respond_to?(:display_name) ? actor.display_name : actor.to_s.presence || you_label
+      end
+
+      def you_label
+        I18n.t("recording_studio.commentable.common.you")
       end
     end
   end

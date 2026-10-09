@@ -28,8 +28,9 @@ class LocalesTest < Minitest::Test
     "recording_studio.commentable.composer.placeholder" => "Write your comment...",
     "recording_studio.commentable.composer.post" => "Post comment",
     "recording_studio.commentable.composer.save" => "Save changes",
-    "recording_studio.commentable.button.comments.one" => "%{count} Comment",
-    "recording_studio.commentable.button.comments.other" => "%{count} Comments"
+    # I18n pluralization tokens use %{count}, not Ruby format annotations.
+    "recording_studio.commentable.button.comments.one" => "%{count} Comment", # rubocop:disable Style/FormatStringToken
+    "recording_studio.commentable.button.comments.other" => "%{count} Comments" # rubocop:disable Style/FormatStringToken
   }.freeze
 
   def setup
@@ -80,8 +81,9 @@ class LocalesTest < Minitest::Test
     assert_equal "Go back", tree.fetch("navigation").fetch("go_back")
     assert_equal "All comments", tree.fetch("home").fetch("title")
     assert_equal "Write your comment...", tree.fetch("composer").fetch("placeholder")
-    assert_equal "%{count} Comment", tree.fetch("button").fetch("comments").fetch("one")
-    assert_equal "%{count} Comments", tree.fetch("button").fetch("comments").fetch("other")
+    comments = tree.fetch("button").fetch("comments")
+    assert_equal EXPECTED_LEAVES.fetch("recording_studio.commentable.button.comments.one"), comments.fetch("one")
+    assert_equal EXPECTED_LEAVES.fetch("recording_studio.commentable.button.comments.other"), comments.fetch("other")
   end
 
   def test_gemspec_does_not_depend_on_internationalization
