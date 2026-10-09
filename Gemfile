@@ -9,7 +9,7 @@ gemspec
 # Because it is hosted on GitHub (not rubygems.org), it must also be listed
 # here so bundler can resolve it in the development/test environment.
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v4.4.0"
-gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.11.1"
+gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.13.0"
 
 gem "puma"
 gem "sprockets-rails"
