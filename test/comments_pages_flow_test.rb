@@ -380,6 +380,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_source, "loading_mode != :all"
     assert_includes component_source, "reply_action: nil"
     assert_includes component_source, "DEFAULT_REPLY_BUTTON_STYLE = {"
+    assert_includes component_source, "DEFAULT_REPLY_BUTTON_OPTIONS ="
+    assert_includes component_source,
+                    'DEFAULT_REPLY_BUTTON_OPTIONS = DEFAULT_REPLY_BUTTON_STYLE.merge(text: "Reply").freeze'
+    assert_includes component_source, 'text: "Reply"'
     assert_includes component_source, 'data: { turbo_frame: "_top" }'
     assert_includes component_source, 'I18n.t("recording_studio.commentable.common.reply")'
     assert_includes component_source, "def reply_button_resolver"
