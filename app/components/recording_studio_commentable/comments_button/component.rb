@@ -33,7 +33,10 @@ module RecordingStudioCommentable
       end
 
       def button_text
-        text.presence || "#{comments_count} #{'Comment'.pluralize(comments_count)}"
+        text.presence || I18n.t(
+          "recording_studio.commentable.button.comments",
+          count: comments_count
+        )
       end
 
       def destination_path

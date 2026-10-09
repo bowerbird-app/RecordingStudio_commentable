@@ -1,16 +1,16 @@
 <% recording_studio_page_nav(
   title: @page_title,
   page_nav_back_url: @back_button_onclick.present? ? nil : @external_back_path,
-  page_nav_back_label: "Go back",
+  page_nav_back_label: t("recording_studio.commentable.navigation.go_back"),
   page_nav_anchor_url: @external_back_path,
-  page_nav_anchor_label: "Close"
+  page_nav_anchor_label: t("recording_studio.commentable.navigation.close")
 ) %>
 
 <article class="flex w-full max-w-3xl flex-col gap-8">
   <header class="space-y-2">
     <%= render FlatPack::PageTitle::Component.new(
       title: @page_title,
-      subtitle: "Leave a note, or just read along.",
+      subtitle: t("recording_studio.commentable.index.subtitle"),
       variant: :h1,
       class: "mb-0 pb-0"
     ) %>
@@ -37,9 +37,9 @@
     <section class="border-t border-(--surface-border-color) pt-8">
       <%= render FlatPack::Comments::Thread::Component.new(
         count: @comments_count,
-        title: "Comments",
-        empty_title: "No comments yet",
-        empty_body: "Be the first to leave a comment.",
+        title: t("recording_studio.commentable.common.comments"),
+        empty_title: t("recording_studio.commentable.empty.title"),
+        empty_body: t("recording_studio.commentable.empty.body"),
         id: "comments",
         class: "max-w-none bg-transparent p-0 shadow-none"
       ) do |thread| %>
@@ -57,7 +57,7 @@
             <% end %>
 
             <h2 class="text-xl font-bold text-(--comments-thread-title-color)">
-              Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>
+              <%= t("recording_studio.commentable.common.comments") %> <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>
             </h2>
           </div>
         <% end %>

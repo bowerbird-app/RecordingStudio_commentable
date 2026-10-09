@@ -6,8 +6,7 @@ module RecordingStudioCommentable
       COMMENT_RECORDABLE_TYPE = "RecordingStudioCommentable::Comment"
       LOADING_MODES = %i[all infinite load_more].freeze
       DEFAULT_PAGE_SIZE = 20
-      DEFAULT_REPLY_BUTTON_OPTIONS = {
-        text: "Reply",
+      DEFAULT_REPLY_BUTTON_STYLE = {
         style: :ghost,
         size: :sm,
         data: { turbo_frame: "_top" }
@@ -216,7 +215,8 @@ module RecordingStudioCommentable
       end
 
       def default_reply_button_options_for(comment_recording, _parent_recording)
-        DEFAULT_REPLY_BUTTON_OPTIONS.merge(
+        DEFAULT_REPLY_BUTTON_STYLE.merge(
+          text: I18n.t("recording_studio.commentable.common.reply"),
           url: helpers.commentable_reply_comment_path(comment_recording, **reply_return_to_options)
         )
       end

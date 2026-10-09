@@ -229,8 +229,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "@external_back_path = main_app.root_path"
     assert_includes view_source, "recording_studio_page_nav"
     assert_includes view_source, "page_nav_back_url: @external_back_path"
-    assert_includes view_source, 'title: "All comments"'
-    assert_includes view_source, 'subtitle: "Every thread in this workspace, in one place."'
+    assert_includes view_source, 't("recording_studio.commentable.home.title")'
+    assert_includes view_source, 't("recording_studio.commentable.home.subtitle")'
     assert_includes view_source, 'render "comments_page"'
     assert_includes page_partial_source, 'turbo_frame_tag "comments_page_#{page}"'
     assert_includes page_partial_source, 'class: (page.to_i > 1 ? "mt-3" : nil)'
@@ -242,7 +242,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source, "local_assigns.fetch(:accessible, true)"
     assert_includes comment_partial_source, "configuration.rich_text_comments_enabled?"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
-    assert_includes comment_partial_source, "Comment hidden"
+    assert_includes comment_partial_source, 't("recording_studio.commentable.comment.hidden")'
     refute_includes comment_partial_source, 'text: "Show"'
     refute_includes comment_partial_source, 'text: "Edit"'
     refute_includes comment_partial_source, 'text: "Delete"'
@@ -330,10 +330,11 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source, "show_comments: true,"
     assert_includes view_source, "inline_composer: true"
     assert_includes view_source, "commentable_recording_comments_path("
-    assert_includes view_source,
-                    'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= @comments_count %>)</span>'
+    assert_includes view_source, 't("recording_studio.commentable.common.comments")'
+    assert_includes view_source, "(<%= @comments_count %>)"
     assert_includes widget_source, "class Component < ViewComponent::Base"
-    assert_includes widget_source, "'Comment'.pluralize(comments_count)"
+    assert_includes widget_source, 'I18n.t('
+    assert_includes widget_source, '"recording_studio.commentable.button.comments"'
     assert_includes widget_source,
                     "helpers.commentable_all_recording_comments_path(recording, return_to: current_request_path)"
     assert_includes widget_source, "RecordingStudioCommentable::CommentCount.for_recording(recording)"
@@ -359,7 +360,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source, "recording_studio_page_nav"
     assert_includes view_source, "page_nav_back_url: @summary_path"
     assert_includes view_source, "show_new_comment_button = ActiveModel::Type::Boolean.new.cast(params[:new_comment_button])"
-    assert_includes view_source, 'text: "Add comment"'
+    assert_includes view_source, 't("recording_studio.commentable.common.add_comment")'
     assert_includes view_source, "url: @new_comment_path"
     assert_includes view_source, "style: :secondary"
     assert_includes view_source, 'class: "justify-start"'
@@ -378,8 +379,9 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_source, "include_composer: false"
     assert_includes component_source, "loading_mode != :all"
     assert_includes component_source, "reply_action: nil"
-    assert_includes component_source, "DEFAULT_REPLY_BUTTON_OPTIONS = {"
+    assert_includes component_source, "DEFAULT_REPLY_BUTTON_STYLE = {"
     assert_includes component_source, 'data: { turbo_frame: "_top" }'
+    assert_includes component_source, 'I18n.t("recording_studio.commentable.common.reply")'
     assert_includes component_source, "def reply_button_resolver"
     assert_includes component_source, "return if @reply_action.nil?"
     assert_includes component_source, "def reply_button_options_for(comment_recording, parent_recording = recording)"
@@ -395,18 +397,19 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_template_source, 'render partial: "recording_studio_commentable/comments/feed"'
     assert_includes feed_partial_source, "FlatPack::Comments::Thread::Component.new("
     assert_includes feed_partial_source, "RecordingStudioCommentable::CommentComposer::Component.new("
-    assert_includes feed_partial_source,
-                    'Comments <span class="font-medium text-(--comments-thread-count-color)">(<%= feed.comments_count %>)</span>'
+    assert_includes feed_partial_source, 't("recording_studio.commentable.common.comments")'
+    assert_includes feed_partial_source, "(<%= feed.comments_count %>)"
     assert_includes composer_component_source, "class Component < ViewComponent::Base"
-    assert_includes composer_component_source, "rich_text_comment_editor_options(placeholder: \"Write your comment...\")"
+    assert_includes composer_component_source, "rich_text_comment_editor_options(placeholder: placeholder_text)"
+    assert_includes composer_component_source, 'I18n.t("recording_studio.commentable.composer.placeholder")'
     assert_includes composer_component_template_source, "FlatPack::Comments::Composer::Component.new("
     assert_includes composer_component_template_source, "hidden_field_tag :parent_comment_id, parent_comment_id"
-    assert_includes composer_component_template_source, 'text: "Cancel"'
+    assert_includes composer_component_template_source, 't("recording_studio.commentable.common.cancel")'
     assert_includes composer_component_template_source, 'text: submit_label'
     assert_includes feed_page_partial_source, "turbo_frame_tag feed.page_frame_id(page)"
     assert_includes feed_page_partial_source, 'data-controller="infinite-scroll"'
     assert_includes feed_page_partial_source, 'data-infinite-scroll-url-value="<%= feed.page_path(next_page) %>"'
-    assert_includes feed_page_partial_source, 'text: "Load more"'
+    assert_includes feed_page_partial_source, 't("recording_studio.commentable.feed.load_more")'
     assert_includes feed_page_partial_source, "turbo_frame: feed.page_frame_id(next_page)"
     assert_includes controller_source, "options[:loading] = loading if %w[infinite load_more].include?(loading)"
     assert_includes controller_source, "options[:page_size] = page_size if page_size.positive?"
@@ -469,7 +472,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source, "comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil"
     assert_includes comment_partial_source, "avatar: { name: author_name, src: author_avatar_url }"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
-    assert_includes comment_partial_source, 'text: "Reply"'
+    assert_includes comment_partial_source, 't("recording_studio.commentable.common.reply")'
     assert_includes comment_partial_source, "commentable_reply_comment_path"
     assert_includes comment_partial_source, 'class: "text-sm font-medium text-[var(--color-primary)] hover:underline"'
     assert_includes comment_partial_source, 'data: { turbo_frame: "_top" }'

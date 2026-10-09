@@ -17,12 +17,12 @@
           data-controller="infinite-scroll"
           data-infinite-scroll-url-value="<%= feed.page_path(next_page) %>"
         >
-          <p>Loading more comments...</p>
+          <p><%= t("recording_studio.commentable.feed.loading_more") %></p>
         </div>
       <% elsif feed.loading_mode == :load_more %>
         <div class="flex justify-center pt-4">
           <%= render FlatPack::Button::Component.new(
-            text: "Load more",
+            text: t("recording_studio.commentable.feed.load_more"),
             url: feed.page_path(next_page),
             style: :secondary,
             size: :sm,

@@ -20,18 +20,22 @@ module RecordingStudioCommentable
       end
 
       def rich_text_options
-        RecordingStudioCommentable.configuration.rich_text_comment_editor_options(placeholder: "Write your comment...")
+        RecordingStudioCommentable.configuration.rich_text_comment_editor_options(placeholder: placeholder_text)
+      end
+
+      def placeholder_text
+        I18n.t("recording_studio.commentable.composer.placeholder")
       end
 
       def submit_label
-        comment.new_record? ? "Post comment" : "Save changes"
+        comment.new_record? ? I18n.t("recording_studio.commentable.composer.post") : I18n.t("recording_studio.commentable.composer.save")
       end
 
       def actor_name
         actor = helpers.current_recording_studio_actor
-        return "You" unless actor
+        return I18n.t("recording_studio.commentable.common.you") unless actor
 
-        actor.respond_to?(:display_name) ? actor.display_name : actor.to_s.presence || "You"
+        actor.respond_to?(:display_name) ? actor.display_name : actor.to_s.presence || I18n.t("recording_studio.commentable.common.you")
       end
     end
   end

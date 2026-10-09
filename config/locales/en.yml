@@ -1,0 +1,38 @@
+en:
+  recording_studio:
+    commentable:
+      layout:
+        title: "RecordingStudio Commentable"
+        application_name: "RecordingStudio Commentable"
+      navigation:
+        go_back: "Go back"
+        close: "Close"
+      common:
+        cancel: "Cancel"
+        reply: "Reply"
+        comments: "Comments"
+        add_comment: "Add comment"
+        edit_comment: "Edit comment"
+        anonymous: "Anonymous"
+        you: "You"
+      home:
+        title: "All comments"
+        subtitle: "Every thread in this workspace, in one place."
+      index:
+        subtitle: "Leave a note, or just read along."
+      empty:
+        title: "No comments yet"
+        body: "Be the first to leave a comment."
+      feed:
+        loading_more: "Loading more comments..."
+        load_more: "Load more"
+      comment:
+        hidden: "Comment hidden"
+      composer:
+        placeholder: "Write your comment..."
+        post: "Post comment"
+        save: "Save changes"
+      button:
+        comments:
+          one: "%{count} Comment"
+          other: "%{count} Comments"
