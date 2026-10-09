@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   backward-compatible alias of `DEFAULT_REPLY_BUTTON_STYLE` with `text: "Reply"`
 - Corrected the 0.4.0 CHANGELOG Recording Studio pin note to `v4.4.0` (was
   stale `v4.2.2`)
+- Removed the engine `i18n.load_path` append so host locale files load after
+  the gem and can override English defaults
 
 ### Changed
 - Version `0.4.0` → `0.4.1`.
