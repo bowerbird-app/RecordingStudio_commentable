@@ -5,14 +5,6 @@ module RecordingStudioCommentable
     isolate_namespace RecordingStudioCommentable
     config.paths.add "app/components", eager_load: true
 
-    # Rails engines already add config/locales to the I18n load path; keep an
-    # explicit append so hosts always see the gem English file even if load
-    # order differs.
-    initializer "recording_studio_commentable.locales", before: :load_config_initializers do |app|
-      locale_files = root.glob("config/locales/**/*.{rb,yml}")
-      app.config.i18n.load_path |= locale_files.map(&:to_s)
-    end
-
     initializer "recording_studio_commentable.register_recording_studio_capability" do
       next unless defined?(RecordingStudio)
 

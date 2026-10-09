@@ -45,12 +45,11 @@ class LocalesTest < Minitest::Test
     assert_equal ["en.yml"], files.sort
   end
 
-  def test_engine_initializer_appends_locale_files_to_i18n_load_path
+  def test_engine_does_not_reappend_locales_to_i18n_load_path
     engine_source = File.read(File.expand_path("../lib/recording_studio_commentable/engine.rb", __dir__))
 
-    assert_includes engine_source, 'initializer "recording_studio_commentable.locales"'
-    assert_includes engine_source, "app.config.i18n.load_path"
-    assert_includes engine_source, 'root.glob("config/locales/**/*.{rb,yml}")'
+    refute_includes engine_source, 'initializer "recording_studio_commentable.locales"'
+    refute_includes engine_source, "app.config.i18n.load_path"
   end
 
   def test_english_keys_resolve_without_missing_translations

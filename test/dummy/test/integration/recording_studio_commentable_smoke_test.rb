@@ -32,7 +32,7 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Comments"
     assert_includes response.body, "Post comment"
     assert_includes response.body, "Write your comment..."
-    assert_includes response.body, "Reply"
+    assert_includes response.body, "HOST Reply"
     assert_includes response.body, "Welcome to the shared thread"
 
     get recording_comments_path(@public_recording, show_comments: true)
