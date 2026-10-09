@@ -12,7 +12,7 @@
   reply_button_resolver.call(comment_recording, parent_recording)
 elsif allow_reply
   {
-    text: "Reply",
+    text: t("recording_studio.commentable.common.reply"),
     href: commentable_reply_comment_path(comment_recording,
                                          **(default_reply_return_to.present? ? { return_to: default_reply_return_to } : {})),
     class: "text-sm font-medium text-[var(--color-primary)] hover:underline",
@@ -21,14 +21,14 @@ elsif allow_reply
 else
   nil
 end %>
-<% author_name = comment.respond_to?(:author_display_name) ? comment.author_display_name : "Anonymous" %>
+<% author_name = comment.respond_to?(:author_display_name) ? comment.author_display_name : t("recording_studio.commentable.common.anonymous") %>
 <% author_avatar_url = comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil %>
 <% created_at = comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
 <% body_html = accessible && rich_text_comments_enabled ? FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe : nil %>
 <% body_text = if accessible
   rich_text_comments_enabled ? nil : comment.body.to_s
 else
-  "Comment hidden"
+  t("recording_studio.commentable.comment.hidden")
 end %>
 
 <div class="<%= accessible ? "" : "opacity-60" %>">

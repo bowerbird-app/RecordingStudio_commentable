@@ -1,14 +1,14 @@
 <% recording_studio_page_nav(
-  title: "Edit comment",
+  title: t("recording_studio.commentable.common.edit_comment"),
   page_nav_back_url: @comments_collection_path,
-  page_nav_back_label: "Go back",
+  page_nav_back_label: t("recording_studio.commentable.navigation.go_back"),
   page_nav_anchor_url: @comments_collection_path,
-  page_nav_anchor_label: "Close"
+  page_nav_anchor_label: t("recording_studio.commentable.navigation.close")
 ) %>
 
 <div class="flex w-full max-w-3xl flex-col gap-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Edit comment",
+    title: t("recording_studio.commentable.common.edit_comment"),
     subtitle: @page_title,
     variant: :h1
   ) %>

@@ -7,11 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-09
+
+### Added
+- English Rails I18n keys for static interface copy in the gem's own views,
+  partials, components, and engine layout (`config/locales/en.yml` under
+  `recording_studio.commentable`)
+
 ### Changed
+- Version `0.3.1` → `0.4.0`.
+- Comment screens, feed/composer components, and the engine layout resolve
+  static chrome through `t("recording_studio.commentable...")` (English output
+  unchanged).
 - Bumped Recording Studio pin from `v4.2.0` to `v4.2.2` in `Gemfile` and `test/dummy/Gemfile`
 - Bumped `recording_studio_accessible` pin from `v0.6.0` to `v0.11.1` in `Gemfile` and `test/dummy/Gemfile`
 - Dummy app now installs Accessible `0.8`–`0.11` migrations (`depends_on`, invitations, string `role`) and seeds grants through `bootstrap_owner_access!` / `grant_access`
 - Gem tests restore `Object#stub` for Minitest 6 (pulled in by the Rails patch bump)
+
+### Upgrade notes
+See [docs/UPGRADING.md](docs/UPGRADING.md).
 
 ## [0.3.1] - 2026-09-02
 
@@ -67,7 +81,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.0
 [0.3.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.3.1
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.3.0
 [0.1.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.1.1

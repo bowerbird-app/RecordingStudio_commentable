@@ -165,7 +165,7 @@ class NestedRepliesTest < Minitest::Test
   def test_comment_partial_reply_button_defaults_to_engine_aware_comment_path
     source = read_workspace_file("app/views/recording_studio_commentable/comments/_comment.html.erb")
 
-    assert_includes source, 'text: "Reply"'
+    assert_includes source, 't("recording_studio.commentable.common.reply")'
     assert_includes source, "local_assigns.fetch(:allow_reply, true)"
     assert_includes source,
                     "link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]"

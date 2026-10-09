@@ -30,7 +30,31 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     get all_recording_comments_path(@public_recording)
     assert_response :success
     assert_includes response.body, "Comments"
+    assert_includes response.body, "Post comment"
+    assert_includes response.body, "Write your comment..."
+    assert_includes response.body, "Reply"
     assert_includes response.body, "Welcome to the shared thread"
+
+    get recording_comments_path(@public_recording, show_comments: true)
+    assert_response :success
+    assert_includes response.body, "Leave a note, or just read along."
+    assert_includes response.body, "Comments"
+
+    get new_recording_comment_path(@public_recording)
+    assert_response :success
+    assert_includes response.body, "Add comment"
+    assert_includes response.body, "Post comment"
+
+    get all_recording_comments_path(@public_recording, loading: "load_more", page_size: 1)
+    assert_response :success
+    assert_includes response.body, "Load more"
+
+    get all_recording_comments_path(@public_recording, loading: "infinite", page_size: 1)
+    assert_response :success
+    assert_includes response.body, "Loading more comments..."
+
+    locale_path = RecordingStudioCommentable::Engine.root.join("config/locales/en.yml").to_s
+    assert_includes I18n.load_path.map { |path| File.expand_path(path) }, File.expand_path(locale_path)
 
     post recording_comments_path(@public_recording), params: {
       comment: { body: created_body }

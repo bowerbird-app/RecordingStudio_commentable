@@ -1,9 +1,9 @@
 <% recording_studio_page_nav(
-  title: "Comments",
+  title: t("recording_studio.commentable.common.comments"),
   page_nav_back_url: @summary_path,
-  page_nav_back_label: "Go back",
+  page_nav_back_label: t("recording_studio.commentable.navigation.go_back"),
   page_nav_anchor_url: @summary_path,
-  page_nav_anchor_label: "Close"
+  page_nav_anchor_label: t("recording_studio.commentable.navigation.close")
 ) %>
 
 <div class="flex w-full max-w-3xl flex-col gap-8">
@@ -12,7 +12,7 @@
   <% if show_new_comment_button && @can_create_comment %>
     <div class="flex justify-start">
       <%= render FlatPack::Button::Component.new(
-            text: "Add comment",
+            text: t("recording_studio.commentable.common.add_comment"),
             url: @new_comment_path,
             style: :secondary,
             size: :sm,

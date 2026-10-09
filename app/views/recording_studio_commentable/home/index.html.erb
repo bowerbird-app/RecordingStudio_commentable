@@ -1,15 +1,15 @@
 <% recording_studio_page_nav(
-  title: "All comments",
+  title: t("recording_studio.commentable.home.title"),
   page_nav_back_url: @external_back_path,
-  page_nav_back_label: "Go back",
+  page_nav_back_label: t("recording_studio.commentable.navigation.go_back"),
   page_nav_anchor_url: @external_back_path,
-  page_nav_anchor_label: "Close"
+  page_nav_anchor_label: t("recording_studio.commentable.navigation.close")
 ) %>
 
 <div class="flex w-full max-w-4xl flex-col gap-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "All comments",
-    subtitle: "Every thread in this workspace, in one place.",
+    title: t("recording_studio.commentable.home.title"),
+    subtitle: t("recording_studio.commentable.home.subtitle"),
     variant: :h1
   ) %>
 

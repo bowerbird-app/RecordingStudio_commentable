@@ -19,7 +19,7 @@
             "infinite-scroll-url-value": url_for(page: next_page)
           } do %>
       <div class="py-4 text-center text-sm text-(--surface-muted-content-color)">
-        <p>Loading more comments...</p>
+        <p><%= t("recording_studio.commentable.feed.loading_more") %></p>
       </div>
     <% end %>
   <% end %>

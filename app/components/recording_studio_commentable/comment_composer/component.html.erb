@@ -8,7 +8,7 @@
   <%= render FlatPack::Comments::Composer::Component.new(
     name: "comment[body]",
     value: comment.body,
-    placeholder: "Write your comment...",
+    placeholder: placeholder_text,
     submit_label: submit_label,
     rows: 4,
     rich_text: rich_text_comments_enabled?,
@@ -19,7 +19,7 @@
       <% composer.actions do %>
         <div class="flex w-full items-center justify-end gap-2">
           <%= render FlatPack::Button::Component.new(
-            text: "Cancel",
+            text: t("recording_studio.commentable.common.cancel"),
             url: cancel_path,
             style: :ghost,
             size: :sm,

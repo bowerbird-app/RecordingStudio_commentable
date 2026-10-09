@@ -96,7 +96,7 @@ class RecordingStudioCommentableTest < Minitest::Test
     view_path = File.expand_path("../app/views/recording_studio_commentable/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_includes view_source, 'title: "All comments"'
+    assert_includes view_source, 't("recording_studio.commentable.home.title")'
     assert_includes view_source, "recording_studio_page_nav"
     assert_includes view_source, 'render "comments_page"'
     refute_includes view_source, "FlatPack::SidebarLayout::Component"

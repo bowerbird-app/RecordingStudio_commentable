@@ -1,5 +1,23 @@
 # Upgrade Guide
 
+## Upgrading to 0.4.0
+
+Static interface copy in this gem's own views, partials, components, and engine
+layout now resolves through Rails I18n under `recording_studio.commentable`.
+English is the only locale shipped by the gem. Rendered English output is
+unchanged.
+
+### Upgrade steps
+
+1. No migration or host code change is required for English.
+2. To translate or override the defaults, add keys under
+   `recording_studio.commentable` in the host's locale files.
+3. There is no dependency on `recording_studio_internationalization`.
+
+Intentionally left untranslated: controller flash notices/alerts, comment
+bodies and other database content, caller-provided titles/labels (including
+`@composer_title` when set), icon/style tokens, and dummy app views.
+
 ## Upgrading to 0.3.1
 
 No host or schema changes. Comment enablement, services, and screens stay on
