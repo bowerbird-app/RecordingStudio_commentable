@@ -62,7 +62,7 @@ module CommentableI18nBackendHelpers
   def deep_plain_i18n_copy(value)
     case value
     when Hash
-      value.each_with_object({}) { |(key, nested), copy| copy[key] = deep_plain_i18n_copy(nested) }
+      value.transform_values { |nested| deep_plain_i18n_copy(nested) }
     when Array
       value.map { |nested| deep_plain_i18n_copy(nested) }
     else

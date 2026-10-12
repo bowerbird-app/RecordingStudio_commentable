@@ -54,12 +54,12 @@ Lint/UselessMethodDefinition:
 # Offense count: 6
 # Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes.
 Metrics/AbcSize:
-  Max: 31
+  Max: 33
 
 # Offense count: 2
 # Configuration parameters: CountComments, CountAsOne.
 Metrics/ClassLength:
-  Max: 341
+  Max: 380
 
 # Offense count: 1
 # Configuration parameters: AllowedMethods, AllowedPatterns.

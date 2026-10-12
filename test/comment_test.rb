@@ -98,14 +98,14 @@ class CommentTest < Minitest::Test
     previous_locales = I18n.available_locales
     I18n.available_locales = (previous_locales + [:fr]).uniq
     I18n.backend.store_translations(:fr, {
-      recording_studio: {
-        commentable: {
-          common: {
-            anonymous: "Anonyme"
-          }
-        }
-      }
-    })
+                                      recording_studio: {
+                                        commentable: {
+                                          common: {
+                                            anonymous: "Anonyme"
+                                          }
+                                        }
+                                      }
+                                    })
 
     comment = StubComment.new(body: "Hello", author: nil)
     I18n.with_locale(:fr) do

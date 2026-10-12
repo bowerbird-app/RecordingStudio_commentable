@@ -22,7 +22,9 @@ class HostLocaleOverrideTest < ActionDispatch::IntegrationTest
     assert_equal "Reply", I18n.t("recording_studio.commentable.common.reply")
   end
 
-  def test_test_only_host_locale_fixture_overrides_reply_on_comments_page
+  # Stricter retarget of main's test_host_locale_file_overrides_gem_reply_label_on_comments_page:
+  # always-loaded override no longer changes Reply; test-only fixture proves host override wins.
+  def test_host_locale_file_overrides_gem_reply_label_on_comments_page
     with_restored_i18n_backend do
       I18n.load_path << HOST_OVERRIDE_LOCALE
       I18n.backend.load_translations(HOST_OVERRIDE_LOCALE)

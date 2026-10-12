@@ -97,14 +97,14 @@ class RecordableDisplayHelperTest < Minitest::Test
     previous_locales = I18n.available_locales
     I18n.available_locales = (previous_locales + [:fr]).uniq
     I18n.backend.store_translations(:fr, {
-      recording_studio: {
-        commentable: {
-          display: {
-            unknown_item: "Élément inconnu"
-          }
-        }
-      }
-    })
+                                      recording_studio: {
+                                        commentable: {
+                                          display: {
+                                            unknown_item: "Élément inconnu"
+                                          }
+                                        }
+                                      }
+                                    })
 
     I18n.with_locale(:fr) do
       assert_equal "Élément inconnu", @helper.recordable_display_title(nil)
