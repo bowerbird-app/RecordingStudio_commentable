@@ -1,5 +1,37 @@
 # Upgrade Guide
 
+## Upgrading to 0.5.0
+
+Wave 2 finishes host-overridable copy outside views: controller flash
+notices/alerts, composer headings, service error strings, and display labels
+passed at render/call sites. Keys stay under `recording_studio.commentable.*`.
+English output is unchanged.
+
+### Upgrade steps
+
+1. Install Commentable `0.5.0`. No migration.
+2. Copy new `recording_studio.commentable.flashes.*`, `errors.*`, and
+   `display.*` keys into host locale files when translating.
+3. Hosts override by defining the same nested keys in their own
+   `config/locales`. `Comment#author_display_name` still returns the literal
+   `"Anonymous"`; the comment partial translates that case via
+   `t("recording_studio.commentable.common.anonymous", default: "Anonymous")`.
+   `recordable_display_title` still defaults to literal `"Unknown item"`;
+   callers pass `missing: t("recording_studio.commentable.display.*", default: ...)`.
+   `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` remains.
+4. There is no dependency on `recording_studio_internationalization`.
+
+When a service failure string is added via `errors.add(:base, result.error)`,
+`errors.details` carries that translated string in non-English locales
+(ActiveModel String error types).
+
+Intentionally left untranslated: comment bodies and other database content,
+`recording_studio_recordable label:` / `plural_label:` (class-load DSL),
+`Comment#author_display_name` / `recordable_display_title` return values
+(translated at render), comment timestamp `strftime` output, generator CLI
+text, developer `ArgumentError` / trashable-integration messages, icon/style
+tokens, and dummy app views.
+
 ## Upgrading to 0.4.0
 
 Static interface copy in this gem's own views, partials, components, and engine
@@ -14,9 +46,10 @@ unchanged.
    `recording_studio.commentable` in the host's locale files.
 3. There is no dependency on `recording_studio_internationalization`.
 
-Intentionally left untranslated: controller flash notices/alerts, comment
-bodies and other database content, caller-provided titles/labels (including
-`@composer_title` when set), icon/style tokens, and dummy app views.
+Controller flash notices/alerts, service errors, and anonymous author labels
+moved to I18n in 0.5.0. Comment bodies and other database content,
+caller-provided titles/labels, icon/style tokens, and dummy app views stay
+host-owned.
 
 ## Upgrading to 0.3.1
 

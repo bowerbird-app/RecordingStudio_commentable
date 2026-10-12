@@ -37,3 +37,38 @@ module CommentableMinitestStub
 end
 
 Object.include(CommentableMinitestStub) unless Object.method_defined?(:stub)
+
+module CommentableI18nBackendHelpers
+  def i18n_backend_translations_snapshot
+    backend = I18n.backend
+    backend.send(:init_translations) unless backend.initialized?
+    translations =
+      if backend.respond_to?(:translations)
+        backend.translations
+      else
+        backend.instance_variable_get(:@translations)
+      end
+    return unless translations
+
+    deep_plain_i18n_copy(translations)
+  end
+
+  def restore_i18n_backend_translations(snapshot)
+    backend = I18n.backend
+    backend.instance_variable_set(:@translations, snapshot)
+    backend.instance_variable_set(:@initialized, true) if backend.instance_variable_defined?(:@initialized)
+  end
+
+  def deep_plain_i18n_copy(value)
+    case value
+    when Hash
+      value.transform_values { |nested| deep_plain_i18n_copy(nested) }
+    when Array
+      value.map { |nested| deep_plain_i18n_copy(nested) }
+    else
+      value
+    end
+  end
+end
+
+Minitest::Test.include(CommentableI18nBackendHelpers)

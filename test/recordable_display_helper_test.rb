@@ -88,6 +88,10 @@ class RecordableDisplayHelperTest < Minitest::Test
     assert_equal "Missing recordable", @helper.recordable_display_title(nil, missing: "Missing recordable")
   end
 
+  def test_default_missing_label_is_literal_unknown_item
+    assert_equal "Unknown item", @helper.recordable_display_title(nil)
+  end
+
   def test_tolerates_legacy_configuration_without_display_attribute_accessor
     legacy_config = Class.new do
       attr_accessor :timeout

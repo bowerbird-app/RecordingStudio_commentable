@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-12
+
+### Added
+- English Rails I18n keys for controller flash notices/alerts, composer
+  headings, service error strings, anonymous author label, and missing-item
+  display labels under `recording_studio.commentable.flashes.*`,
+  `errors.*`, and `display.*`
+- Locale regression: every `lib/**/*.rb` file must not mention
+  `i18n.load_path` / `I18n.load_path`. Unit tests seed gem English via
+  `I18n.backend.store_translations`
+- Render-level literal-English asserts for Add comment / Comment added. /
+  Body cannot be blank / Anonymous (alongside `comments_pages_flow_test`
+  source greps)
+
+### Changed
+- Version `0.4.1` → `0.5.0`.
+- Controller notices/alerts, composer titles, and Create/UpdateComment failure
+  strings resolve through `t(..., default: <main English>)` (English output
+  unchanged).
+- Anonymous author copy and missing-item titles translate at render/call sites
+  (`_comment` partial / `missing:` args). Public
+  `Comment#author_display_name` and `recordable_display_title` keep main’s
+  literal English return values (`"Anonymous"`, default `missing: "Unknown item"`).
+- When a translated service failure string is added as
+  `errors.add(:base, result.error)`, `errors.details` carries that translated
+  string in non-English locales (ActiveModel String error types).
+
+### Upgrade notes
+See [docs/UPGRADING.md](docs/UPGRADING.md).
+
 ## [0.4.1] - 2026-10-09
 
 ### Fixed
@@ -94,7 +124,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.1
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.0
 [0.3.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.3.1

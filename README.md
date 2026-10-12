@@ -188,6 +188,28 @@ end
 
 Leave `config.layout` unset to use Recording Studio's default layout (back and close). Set it to a host layout path when you want the comment pages and `/commentable` home feed to render inside your app shell.
 
+## Internationalization
+
+Static interface copy (views, flash notices/alerts, service errors, and
+render-site display labels) resolves through Rails I18n under
+`recording_studio.commentable.*`. English is the only locale shipped by the gem.
+Hosts override by defining the same nested keys in their own `config/locales`.
+There is no dependency on `recording_studio_internationalization`.
+
+`Comment#author_display_name` and `recordable_display_title` keep main’s literal
+English return values; the comment partial and caller `missing:` args translate
+at render. `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stays for API
+compatibility.
+
+### Upgrading to 0.5.0
+
+1. Install Commentable `0.5.0`. No migration.
+2. Copy new `flashes.*`, `errors.*`, and `display.*` keys into host locale files
+   when translating.
+3. `recording_studio_recordable label:` / `plural_label:` stay English
+   (class-load DSL). Comment timestamp `strftime` output, generator CLI text,
+   and developer `ArgumentError`s stay English.
+
 Set `config.use_recording_studio_trashable_for_destroy` to `true` only when the host app installs and configures `recording_studio_trashable` and wants comment deletion to call `recording_studio_trashable_trash!` on the comment recording. The default is `false`, which keeps the existing `RecordingStudio` trash or direct-destroy fallback behavior. If this option is `true` and the comment recording does not support `recording_studio_trashable_trash!`, comment deletion now fails with a clear configuration error instead of silently falling back.
 
 Set `config.rich_text_comments` to `false`, `:toolbar`, or `:selection`. `:toolbar` keeps the visible editor toolbar, while `:selection` hides it and uses the selection bubble menu instead. `true` is still accepted as a backwards-compatible alias for `:toolbar`.

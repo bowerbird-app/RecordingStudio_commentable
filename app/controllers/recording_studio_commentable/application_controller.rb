@@ -35,7 +35,10 @@ module RecordingStudioCommentable
       return if current_recording_studio_actor
 
       if request.format.html?
-        redirect_to(main_app.root_path, alert: "You must be signed in.")
+        redirect_to(
+          main_app.root_path,
+          alert: t("recording_studio.commentable.flashes.must_sign_in", default: "You must be signed in.")
+        )
       else
         head :unauthorized
       end

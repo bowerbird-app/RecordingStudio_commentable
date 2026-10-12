@@ -27,14 +27,28 @@ module RecordingStudioCommentable
       private
 
       def perform
-        return failure("Body cannot be blank") if @body.blank?
+        return failure(body_blank_error) if @body.blank?
 
         comment = build_comment
-        return failure("Comment is invalid", errors: comment.errors.full_messages) unless comment.valid?
+        return failure(comment_invalid_error, errors: comment.errors.full_messages) unless comment.valid?
 
         record_comment(comment)
       rescue StandardError => e
         failure(e)
+      end
+
+      def body_blank_error
+        I18n.t(
+          "recording_studio.commentable.errors.body_blank",
+          default: "Body cannot be blank"
+        )
+      end
+
+      def comment_invalid_error
+        I18n.t(
+          "recording_studio.commentable.errors.comment_invalid",
+          default: "Comment is invalid"
+        )
       end
 
       def build_comment

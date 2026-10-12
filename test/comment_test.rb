@@ -157,6 +157,7 @@ class CommentTest < Minitest::Test
     assert_includes content, "class Comment"
     assert_includes content, "validates :body, presence: true"
     assert_includes content, "def author_display_name"
+    assert_includes content, 'return "Anonymous" unless author'
     assert_includes content, "def author_avatar_url"
   end
 end
