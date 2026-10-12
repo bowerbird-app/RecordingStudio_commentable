@@ -90,7 +90,6 @@ class RecordableDisplayHelperTest < Minitest::Test
 
   def test_default_missing_label_is_literal_unknown_item
     assert_equal "Unknown item", @helper.recordable_display_title(nil)
-    assert_equal "Unknown item", RecordingStudioCommentable::RecordableDisplayHelper::UNKNOWN_ITEM
   end
 
   def test_tolerates_legacy_configuration_without_display_attribute_accessor

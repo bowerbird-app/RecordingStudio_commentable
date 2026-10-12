@@ -21,11 +21,7 @@ elsif allow_reply
 else
   nil
 end %>
-<% author_name = if comment.respond_to?(:author) && comment.author.present?
-  comment.respond_to?(:author_display_name) ? comment.author_display_name : comment.author.to_s
-else
-  t("recording_studio.commentable.common.anonymous", default: "Anonymous")
-end %>
+<% author_name = comment.respond_to?(:author_display_name) ? (name = comment.author_display_name; name == "Anonymous" ? t("recording_studio.commentable.common.anonymous", default: "Anonymous") : name) : t("recording_studio.commentable.common.anonymous") %>
 <% author_avatar_url = comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil %>
 <% created_at = comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
 <% body_html = accessible && rich_text_comments_enabled ? FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe : nil %>

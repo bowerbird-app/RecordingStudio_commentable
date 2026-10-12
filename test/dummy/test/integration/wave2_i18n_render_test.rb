@@ -59,8 +59,10 @@ class Wave2I18nRenderTest < ActionDispatch::IntegrationTest
     )
 
     assert_includes partial_source,
-                    't("recording_studio.commentable.common.anonymous", default: "Anonymous")'
-    assert_includes partial_source, "comment.author.present?"
+                    'name == "Anonymous" ? t("recording_studio.commentable.common.anonymous", default: "Anonymous") : name'
+    assert_includes partial_source, "comment.respond_to?(:author_display_name)"
+    refute_includes partial_source, "author.present?"
+    refute_includes partial_source, "author.to_s"
   end
 
   def test_service_error_string_type_english_details_match_main

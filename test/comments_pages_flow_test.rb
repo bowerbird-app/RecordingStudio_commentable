@@ -521,7 +521,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes render_source, 'assert_includes response.body, "Body cannot be blank"'
     assert_includes render_source, 'assert_equal "Anonymous", comment.author_display_name'
     assert_includes render_source,
-                    't("recording_studio.commentable.common.anonymous", default: "Anonymous")'
+                    'name == "Anonymous" ? t("recording_studio.commentable.common.anonymous", default: "Anonymous") : name'
   end
 
   private

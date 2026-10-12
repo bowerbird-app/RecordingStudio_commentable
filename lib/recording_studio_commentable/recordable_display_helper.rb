@@ -4,8 +4,6 @@ require "recording_studio_commentable/display_attribute_resolver"
 
 module RecordingStudioCommentable
   module RecordableDisplayHelper
-    UNKNOWN_ITEM = "Unknown item"
-
     def recordable_display_title(recordable_or_recording, missing: "Unknown item")
       recordable = extract_recordable(recordable_or_recording)
       return missing unless recordable
