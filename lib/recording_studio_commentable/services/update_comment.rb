@@ -26,7 +26,7 @@ module RecordingStudioCommentable
       private
 
       def perform
-        return failure("Body cannot be blank") if @body.blank?
+        return failure(body_blank_error) if @body.blank?
 
         if revise_available?
           revise_via_recording_studio
@@ -49,10 +49,24 @@ module RecordingStudioCommentable
       def update_directly
         comment = @comment_recording.respond_to?(:recordable) ? @comment_recording.recordable : @comment_recording
         comment.body = @body
-        return failure("Comment is invalid", errors: comment.errors.full_messages) unless comment.valid?
+        return failure(comment_invalid_error, errors: comment.errors.full_messages) unless comment.valid?
 
         comment.save!
         success(comment)
+      end
+
+      def body_blank_error
+        I18n.t(
+          "recording_studio.commentable.errors.body_blank",
+          default: "Body cannot be blank"
+        )
+      end
+
+      def comment_invalid_error
+        I18n.t(
+          "recording_studio.commentable.errors.comment_invalid",
+          default: "Comment is invalid"
+        )
       end
 
       def revise_available?

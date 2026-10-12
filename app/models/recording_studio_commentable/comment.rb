@@ -31,9 +31,11 @@ module RecordingStudioCommentable
 
     validates :body, presence: true
 
+    ANONYMOUS_DISPLAY_NAME = "Anonymous"
+
     # Friendly display of the author's identity
     def author_display_name
-      return "Anonymous" unless author
+      return anonymous_display_name unless author
 
       configured_name = RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
         author,
@@ -50,6 +52,15 @@ module RecordingStudioCommentable
       RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
         author,
         mappings: RecordingStudioCommentable::DisplayAttributeResolver.mapping_for_configuration(:author_avatar_attributes)
+      )
+    end
+
+    private
+
+    def anonymous_display_name
+      I18n.t(
+        "recording_studio.commentable.common.anonymous",
+        default: ANONYMOUS_DISPLAY_NAME
       )
     end
   end

@@ -385,7 +385,8 @@ class CommentsPagesFlowTest < Minitest::Test
                     'DEFAULT_REPLY_BUTTON_OPTIONS = DEFAULT_REPLY_BUTTON_STYLE.merge(text: "Reply").freeze'
     assert_includes component_source, 'text: "Reply"'
     assert_includes component_source, 'data: { turbo_frame: "_top" }'
-    assert_includes component_source, 'I18n.t("recording_studio.commentable.common.reply")'
+    assert_includes component_source,
+                    'I18n.t("recording_studio.commentable.common.reply", default: "Reply")'
     assert_includes component_source, "def reply_button_resolver"
     assert_includes component_source, "return if @reply_action.nil?"
     assert_includes component_source, "def reply_button_options_for(comment_recording, parent_recording = recording)"
@@ -507,6 +508,18 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes seeds_source, 'puts "Seeded: view@admin.com / Password"'
     assert_includes seeds_source, 'puts "Seeded: Sample comments for the scenario pages"'
     assert_includes session_view_source, 'text: "View-only: view@admin.com / Password"'
+  end
+
+  # Render-level literal-English asserts for the pages this file greps live in
+  # test/dummy/test/integration/wave2_i18n_render_test.rb (wired in CI).
+  def test_wave2_render_level_english_asserts_live_alongside_in_dummy_integration
+    render_test_path = File.expand_path("dummy/test/integration/wave2_i18n_render_test.rb", __dir__)
+    assert File.exist?(render_test_path), "Expected #{render_test_path} for render-level English asserts"
+    render_source = File.read(render_test_path)
+    assert_includes render_source, 'assert_includes response.body, "Add comment"'
+    assert_includes render_source, 'assert_includes response.body, "Comment added."'
+    assert_includes render_source, 'assert_includes response.body, "Body cannot be blank"'
+    assert_includes render_source, 'assert_equal "Anonymous", comment.author_display_name'
   end
 
   private

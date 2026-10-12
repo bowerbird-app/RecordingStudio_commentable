@@ -1,5 +1,7 @@
+# Always-loaded boot-order guard: overrides a rarely shown key only.
+# Do not override common.reply or other default UI chrome here.
 en:
   recording_studio:
     commentable:
-      common:
-        reply: "HOST Reply"
+      comment:
+        hidden: "HOST Comment hidden"

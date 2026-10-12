@@ -33,7 +33,7 @@ module RecordingStudioCommentable
     def new
       @comment = Comment.new
       @parent_comment_recording = find_parent_comment_recording
-      @composer_title = "Add comment"
+      @composer_title = add_comment_heading
       @composer_url = commentable_recording_comments_path(@parent_recording, **return_to_options)
     end
 
@@ -41,7 +41,7 @@ module RecordingStudioCommentable
       @comment = Comment.new
       @parent_comment_recording = @reply_target_comment_recording
       @comments_count = comment_count
-      @composer_title = "Reply"
+      @composer_title = reply_heading
       @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
       @composer_url = commentable_reply_comment_path(@reply_target_comment_recording, **return_to_options)
 
@@ -59,7 +59,7 @@ module RecordingStudioCommentable
 
       if result.success?
         redirect_to post_create_redirect_path,
-                    notice: "Comment added."
+                    notice: t("recording_studio.commentable.flashes.comment_added", default: "Comment added.")
       else
         @comment = Comment.new(body: comment_params[:body])
         @comment.errors.add(:base, result.error) if result.error
@@ -73,7 +73,7 @@ module RecordingStudioCommentable
           @comments_count = comment_count
           render :all, status: :unprocessable_entity
         else
-          @composer_title = "Add comment"
+          @composer_title = add_comment_heading
           @composer_url = commentable_recording_comments_path(@parent_recording, **return_to_options)
           render :new, status: :unprocessable_entity
         end
@@ -89,13 +89,13 @@ module RecordingStudioCommentable
 
       if result.success?
         redirect_to post_reply_redirect_path,
-                    notice: "Comment added."
+                    notice: t("recording_studio.commentable.flashes.comment_added", default: "Comment added.")
       else
         @comment = Comment.new(body: comment_params[:body])
         @comment.errors.add(:base, result.error) if result.error
         @parent_comment_recording = @reply_target_comment_recording
         @comments_count = comment_count
-        @composer_title = "Reply"
+        @composer_title = reply_heading
         @composer_subtitle = truncate_comment_body(comment_from(@reply_target_comment_recording), length: 120)
         @composer_url = commentable_reply_comment_path(@reply_target_comment_recording, **return_to_options)
         render :new, status: :unprocessable_entity
@@ -117,7 +117,7 @@ module RecordingStudioCommentable
 
       if result.success?
         redirect_to comments_collection_path,
-                    notice: "Comment updated."
+                    notice: t("recording_studio.commentable.flashes.comment_updated", default: "Comment updated.")
       else
         @comment = comment_from(@comment_recording)
         @comment.errors.add(:base, result.error) if result.error
@@ -134,7 +134,7 @@ module RecordingStudioCommentable
       )
 
       redirect_to commentable_home_referer_path || comments_collection_path,
-                  notice: "Comment deleted."
+                  notice: t("recording_studio.commentable.flashes.comment_deleted", default: "Comment deleted.")
     end
 
     private
@@ -151,20 +151,20 @@ module RecordingStudioCommentable
       @parent_recording = find_recording(params[:recording_id])
       return if @parent_recording
 
-      redirect_to(return_to_path || main_app.root_path, alert: "Recording not found.")
+      redirect_to(return_to_path || main_app.root_path, alert: recording_not_found_alert)
     end
 
     def load_comment_recording
       @comment_recording = find_recording(params[:id])
       unless @comment_recording
-        redirect_to(comments_collection_path, alert: "Comment not found.")
+        redirect_to(comments_collection_path, alert: comment_not_found_alert)
         return
       end
 
       requested_parent_recording = @parent_recording
       actual_parent_recording = comment_root_recording(@comment_recording)
       unless requested_parent_recording == actual_parent_recording
-        redirect_to(return_to_path || main_app.root_path, alert: "Comment not found.")
+        redirect_to(return_to_path || main_app.root_path, alert: comment_not_found_alert)
         return
       end
 
@@ -175,21 +175,24 @@ module RecordingStudioCommentable
       @reply_target_comment_recording = find_recording(params[:id])
       return if valid_reply_target_comment_recording?(@reply_target_comment_recording)
 
-      redirect_to(commentable_reply_fallback_path, alert: "Comment not found.")
+      redirect_to(commentable_reply_fallback_path, alert: comment_not_found_alert)
     end
 
     def load_reply_parent_recording
       @parent_recording = root_recording_for(@reply_target_comment_recording.parent_recording)
       return if @parent_recording
 
-      redirect_to(commentable_reply_fallback_path, alert: "Recording not found.")
+      redirect_to(commentable_reply_fallback_path, alert: recording_not_found_alert)
     end
 
     def prepare_page_context
       return unless @parent_recording
 
       @page_recordable = @parent_recording.try(:recordable)
-      @page_title = recordable_display_title(@page_recordable, missing: "Missing recordable")
+      @page_title = recordable_display_title(
+        @page_recordable,
+        missing: t("recording_studio.commentable.display.missing_recordable", default: "Missing recordable")
+      )
       @page_body = @page_recordable.try(:body).presence
       @safe_return_to_path = return_to_path
       @summary_path = summary_path
@@ -209,20 +212,37 @@ module RecordingStudioCommentable
       type = recordable&.class
       return if type && RecordingStudio.capability_enabled?(:commentable, for: type)
 
-      redirect_to(return_to_path || main_app.root_path, alert: "Comments are not enabled for this resource.")
+      redirect_to(
+        return_to_path || main_app.root_path,
+        alert: t(
+          "recording_studio.commentable.flashes.comments_not_enabled",
+          default: "Comments are not enabled for this resource."
+        )
+      )
     end
 
     def authorize_view!
       return if authorized?(:view)
 
-      redirect_to(return_to_path || main_app.root_path, alert: "You are not allowed to view comments here.")
+      redirect_to(
+        return_to_path || main_app.root_path,
+        alert: t(
+          "recording_studio.commentable.flashes.not_allowed_view",
+          default: "You are not allowed to view comments here."
+        )
+      )
     end
 
     def authorize_create!
       return if authorized?(:edit)
 
-      redirect_to(summary_path,
-                  alert: "You are not allowed to post comments here.")
+      redirect_to(
+        summary_path,
+        alert: t(
+          "recording_studio.commentable.flashes.not_allowed_post",
+          default: "You are not allowed to post comments here."
+        )
+      )
     end
 
     def authorize_edit!
@@ -234,8 +254,13 @@ module RecordingStudioCommentable
 
       return if authorized?(:manage)
 
-      redirect_to(comments_collection_path,
-                  alert: "You are not allowed to edit this comment.")
+      redirect_to(
+        comments_collection_path,
+        alert: t(
+          "recording_studio.commentable.flashes.not_allowed_edit",
+          default: "You are not allowed to edit this comment."
+        )
+      )
     end
 
     def authorized?(role)
@@ -452,6 +477,22 @@ module RecordingStudioCommentable
 
     def comment_params
       params.require(:comment).permit(:body)
+    end
+
+    def add_comment_heading
+      t("recording_studio.commentable.common.add_comment", default: "Add comment")
+    end
+
+    def reply_heading
+      t("recording_studio.commentable.common.reply", default: "Reply")
+    end
+
+    def recording_not_found_alert
+      t("recording_studio.commentable.flashes.recording_not_found", default: "Recording not found.")
+    end
+
+    def comment_not_found_alert
+      t("recording_studio.commentable.flashes.comment_not_found", default: "Comment not found.")
     end
   end
 end

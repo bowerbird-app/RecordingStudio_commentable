@@ -88,6 +88,34 @@ class RecordableDisplayHelperTest < Minitest::Test
     assert_equal "Missing recordable", @helper.recordable_display_title(nil, missing: "Missing recordable")
   end
 
+  def test_default_missing_label_resolves_through_i18n_with_english_default
+    assert_equal "Unknown item", @helper.recordable_display_title(nil)
+    assert_equal RecordingStudioCommentable::RecordableDisplayHelper::UNKNOWN_ITEM,
+                 @helper.recordable_display_title(nil)
+
+    previous = i18n_backend_translations_snapshot
+    previous_locales = I18n.available_locales
+    I18n.available_locales = (previous_locales + [:fr]).uniq
+    I18n.backend.store_translations(:fr, {
+      recording_studio: {
+        commentable: {
+          display: {
+            unknown_item: "Élément inconnu"
+          }
+        }
+      }
+    })
+
+    I18n.with_locale(:fr) do
+      assert_equal "Élément inconnu", @helper.recordable_display_title(nil)
+      assert_equal "Missing recordable",
+                   @helper.recordable_display_title(nil, missing: "Missing recordable")
+    end
+  ensure
+    I18n.available_locales = previous_locales if defined?(previous_locales) && previous_locales
+    restore_i18n_backend_translations(previous) if defined?(previous) && previous
+  end
+
   def test_tolerates_legacy_configuration_without_display_attribute_accessor
     legacy_config = Class.new do
       attr_accessor :timeout
