@@ -28,7 +28,7 @@ class CommentTest < Minitest::Test
     end
 
     def author_display_name
-      return anonymous_display_name unless author
+      return "Anonymous" unless author
 
       configured_name = RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
         author,
@@ -37,15 +37,6 @@ class CommentTest < Minitest::Test
       )
 
       configured_name || author.to_s
-    end
-
-    ANONYMOUS_DISPLAY_NAME = "Anonymous"
-
-    def anonymous_display_name
-      I18n.t(
-        "recording_studio.commentable.common.anonymous",
-        default: ANONYMOUS_DISPLAY_NAME
-      )
     end
 
     def author_avatar_url
@@ -90,30 +81,6 @@ class CommentTest < Minitest::Test
   def test_author_display_name_without_author
     comment = StubComment.new(body: "Hello", author: nil)
     assert_equal "Anonymous", comment.author_display_name
-    assert_equal StubComment::ANONYMOUS_DISPLAY_NAME, comment.author_display_name
-  end
-
-  def test_author_display_name_without_author_follows_non_english_locale
-    previous = i18n_backend_translations_snapshot
-    previous_locales = I18n.available_locales
-    I18n.available_locales = (previous_locales + [:fr]).uniq
-    I18n.backend.store_translations(:fr, {
-                                      recording_studio: {
-                                        commentable: {
-                                          common: {
-                                            anonymous: "Anonyme"
-                                          }
-                                        }
-                                      }
-                                    })
-
-    comment = StubComment.new(body: "Hello", author: nil)
-    I18n.with_locale(:fr) do
-      assert_equal "Anonyme", comment.author_display_name
-    end
-  ensure
-    I18n.available_locales = previous_locales if defined?(previous_locales) && previous_locales
-    restore_i18n_backend_translations(previous) if defined?(previous) && previous
   end
 
   def test_author_display_name_with_display_name_method
@@ -190,7 +157,7 @@ class CommentTest < Minitest::Test
     assert_includes content, "class Comment"
     assert_includes content, "validates :body, presence: true"
     assert_includes content, "def author_display_name"
-    assert_includes content, "ANONYMOUS_DISPLAY_NAME"
+    assert_includes content, 'return "Anonymous" unless author'
     assert_includes content, "def author_avatar_url"
   end
 end

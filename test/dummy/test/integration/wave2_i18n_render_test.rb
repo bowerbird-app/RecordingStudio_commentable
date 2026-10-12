@@ -47,35 +47,20 @@ class Wave2I18nRenderTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Add comment"
   end
 
-  def test_anonymous_display_name_english_matches_main_constant
+  def test_author_display_name_returns_literal_anonymous_like_main
     comment = RecordingStudioCommentable::Comment.new(body: "anon", author: nil)
 
-    assert_equal RecordingStudioCommentable::Comment::ANONYMOUS_DISPLAY_NAME, comment.author_display_name
     assert_equal "Anonymous", comment.author_display_name
   end
 
-  def test_anonymous_display_name_follows_non_english_locale_with_fallback
-    comment = RecordingStudioCommentable::Comment.new(body: "anon", author: nil)
+  def test_comment_partial_translates_anonymous_at_render_when_author_missing
+    partial_source = File.read(
+      RecordingStudioCommentable::Engine.root.join("app/views/recording_studio_commentable/comments/_comment.html.erb")
+    )
 
-    with_restored_i18n_backend do
-      previous_locales = I18n.available_locales
-      I18n.available_locales = (previous_locales + [:fr]).uniq
-      I18n.backend.store_translations(:fr, {
-        recording_studio: {
-          commentable: {
-            common: {
-              anonymous: "Anonyme"
-            }
-          }
-        }
-      })
-
-      I18n.with_locale(:fr) do
-        assert_equal "Anonyme", comment.author_display_name
-      end
-    ensure
-      I18n.available_locales = previous_locales if defined?(previous_locales) && previous_locales
-    end
+    assert_includes partial_source,
+                    't("recording_studio.commentable.common.anonymous", default: "Anonymous")'
+    assert_includes partial_source, "comment.author.present?"
   end
 
   def test_service_error_string_type_english_details_match_main

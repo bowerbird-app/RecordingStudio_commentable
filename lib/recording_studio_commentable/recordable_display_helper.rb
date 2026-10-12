@@ -6,15 +6,14 @@ module RecordingStudioCommentable
   module RecordableDisplayHelper
     UNKNOWN_ITEM = "Unknown item"
 
-    def recordable_display_title(recordable_or_recording, missing: UNKNOWN_ITEM)
+    def recordable_display_title(recordable_or_recording, missing: "Unknown item")
       recordable = extract_recordable(recordable_or_recording)
-      resolved_missing = resolve_missing_label(missing)
-      return resolved_missing unless recordable
+      return missing unless recordable
 
       configured_value = configured_display_value_for(recordable)
       return configured_value if configured_value.present?
 
-      fallback_display_value_for(recordable) || resolved_missing
+      fallback_display_value_for(recordable) || missing
     end
 
     private
@@ -56,15 +55,6 @@ module RecordingStudioCommentable
 
     def display_attribute_value(recordable, attribute_name)
       RecordingStudioCommentable::DisplayAttributeResolver.string_attribute_value(recordable, attribute_name)
-    end
-
-    def resolve_missing_label(missing)
-      return missing unless missing == UNKNOWN_ITEM
-
-      I18n.t(
-        "recording_studio.commentable.display.unknown_item",
-        default: UNKNOWN_ITEM
-      )
     end
   end
 end

@@ -57,7 +57,10 @@ module RecordingStudioCommentable
         {
           comment_recording: comment_recording,
           parent_recording: parent_recording,
-          parent_title: recordable_display_title(parent_recording),
+          parent_title: recordable_display_title(
+            parent_recording,
+            missing: t("recording_studio.commentable.display.unknown_item", default: "Unknown item")
+          ),
           accessible: accessible,
           replies: replies_by_parent.fetch(comment_recording.id, [])
         }

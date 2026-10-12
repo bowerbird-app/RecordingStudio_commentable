@@ -190,16 +190,16 @@ Leave `config.layout` unset to use Recording Studio's default layout (back and c
 
 ## Internationalization
 
-Static interface copy (views, flash notices/alerts, service errors, anonymous
-author label, and default missing-item labels) resolves through Rails I18n under
+Static interface copy (views, flash notices/alerts, service errors, and
+render-site display labels) resolves through Rails I18n under
 `recording_studio.commentable.*`. English is the only locale shipped by the gem.
 Hosts override by defining the same nested keys in their own `config/locales`.
 There is no dependency on `recording_studio_internationalization`.
 
-Public constants such as `Comment::ANONYMOUS_DISPLAY_NAME`,
-`RecordableDisplayHelper::UNKNOWN_ITEM`, and
-`CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stay for API
-compatibility; displayed copy uses those strings as `default:`.
+`Comment#author_display_name` and `recordable_display_title` keep main’s literal
+English return values; the comment partial and caller `missing:` args translate
+at render. `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stays for API
+compatibility.
 
 ### Upgrading to 0.5.0
 

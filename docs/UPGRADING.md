@@ -3,9 +3,9 @@
 ## Upgrading to 0.5.0
 
 Wave 2 finishes host-overridable copy outside views: controller flash
-notices/alerts, composer headings, service error strings, anonymous author
-label, and the default missing-recordable display label. Keys stay under
-`recording_studio.commentable.*`. English output is unchanged.
+notices/alerts, composer headings, service error strings, and display labels
+passed at render/call sites. Keys stay under `recording_studio.commentable.*`.
+English output is unchanged.
 
 ### Upgrade steps
 
@@ -13,11 +13,12 @@ label, and the default missing-recordable display label. Keys stay under
 2. Copy new `recording_studio.commentable.flashes.*`, `errors.*`, and
    `display.*` keys into host locale files when translating.
 3. Hosts override by defining the same nested keys in their own
-   `config/locales`. `Comment::ANONYMOUS_DISPLAY_NAME`,
-   `RecordableDisplayHelper::UNKNOWN_ITEM`, and
-   `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` remain for API
-   compatibility; displayed copy follows the locale with those values as
-   `default:`.
+   `config/locales`. `Comment#author_display_name` still returns the literal
+   `"Anonymous"`; the comment partial translates that case via
+   `t("recording_studio.commentable.common.anonymous", default: "Anonymous")`.
+   `recordable_display_title` still defaults to literal `"Unknown item"`;
+   callers pass `missing: t("recording_studio.commentable.display.*", default: ...)`.
+   `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` remains.
 4. There is no dependency on `recording_studio_internationalization`.
 
 When a service failure string is added via `errors.add(:base, result.error)`,
@@ -26,9 +27,10 @@ When a service failure string is added via `errors.add(:base, result.error)`,
 
 Intentionally left untranslated: comment bodies and other database content,
 `recording_studio_recordable label:` / `plural_label:` (class-load DSL),
-comment timestamp `strftime` output, generator CLI text, developer
-`ArgumentError` / trashable-integration messages, icon/style tokens, and
-dummy app views.
+`Comment#author_display_name` / `recordable_display_title` return values
+(translated at render), comment timestamp `strftime` output, generator CLI
+text, developer `ArgumentError` / trashable-integration messages, icon/style
+tokens, and dummy app views.
 
 ## Upgrading to 0.4.0
 

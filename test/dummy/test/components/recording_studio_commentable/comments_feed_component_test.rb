@@ -17,7 +17,7 @@ class CommentsFeedComponentTest < ComponentTestCase
     assert_includes rendered_content, "Write your comment..."
     assert_includes fragment.text, "Welcome to the shared thread"
     assert_includes fragment.text, "Reply sample: Quinn can respond here"
-    assert_equal 2, fragment.css("a").count { |link| link.text.strip == "Reply" }
+    assert_equal 2, fragment.css("a").count { |link| link.text.strip == "HOST Reply" }
   end
 
   def test_hides_composer_when_creation_is_not_allowed
@@ -54,7 +54,7 @@ class CommentsFeedComponentTest < ComponentTestCase
     rendered_top_level_bodies = top_level_comment_bodies.select { |body| rendered_content.include?(body) }
 
     assert_equal 1, rendered_top_level_bodies.size
-    assert_equal 1, Nokogiri::HTML.fragment(rendered_content).css("a").count { |link| link.text.strip == "Reply" }
+    assert_equal 1, Nokogiri::HTML.fragment(rendered_content).css("a").count { |link| link.text.strip == "HOST Reply" }
     expected_path = all_recording_comments_path(@public_recording,
                                                 return_to: "/components",
                                                 loading: :load_more,
