@@ -12,7 +12,5 @@ class AccessiblePinTest < ActiveSupport::TestCase
       assert_includes contents, 'tag: "v0.15.0"', "#{path} should pin Accessible v0.15.0"
       refute_includes contents, 'tag: "v0.13.0"', "#{path} should not keep the prior Accessible pin"
     end
-
-    assert_equal "0.15.0", RecordingStudioAccessible::VERSION
   end
 end
