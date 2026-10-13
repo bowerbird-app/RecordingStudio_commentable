@@ -9,7 +9,12 @@ gemspec
 # Because it is hosted on GitHub (not rubygems.org), it must also be listed
 # here so bundler can resolve it in the development/test environment.
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v4.5.0"
-gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.15.0"
+gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.17.0"
+# Accessible 0.17 loads trashable query-only; pin by tag with require: false.
+gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.10.0", require: false
+# Trashable gemspec deps are git-only; pin for Bundler resolution only.
+gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.2.0", require: false
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.208", require: false
 
 gem "puma"
 gem "sprockets-rails"
