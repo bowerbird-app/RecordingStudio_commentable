@@ -330,7 +330,7 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | v4.5.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudio | v4.6.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | RecordingStudioAccessible | v0.17.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | RecordingStudioTrashable | v0.10.0 (`require: false`; Accessible query-only companion) |
 | RecordingStudioMetrics | v0.2.0 (`require: false`; Trashable resolution companion) |
