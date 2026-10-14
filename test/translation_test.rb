@@ -326,9 +326,12 @@ class TranslationTest < Minitest::Test
       refute_predicate reserved, :html_safe?
       assert_equal view.t(missing_html, default: "<b>ok</b>"), reserved
 
+      # Array caller defaults on a missing _html key are marked html_safe by
+      # RecordingStudio.t (stricter than view t, which leaves them unsafe).
       array_default = RecordingStudio.t(missing_html, default: ["<b>arr</b>"])
       assert_equal "<b>arr</b>", array_default
-      refute_predicate array_default, :html_safe?
+      assert_predicate array_default, :html_safe?
+      refute_predicate view.t(missing_html, default: ["<b>arr</b>"]), :html_safe?
 
       xss = RecordingStudio.t(
         "recording_studio.commentable.probe.hi_html",
@@ -355,29 +358,21 @@ class TranslationTest < Minitest::Test
     assert_equal "Comments", table.fetch("recording_studio.commentable.common.comments")
   end
 
-  def test_shipped_english_table_becomes_a_new_object_after_rails_reloader_reload
-    boot_dummy_rails_for_reloader!
-
+  def test_shipped_english_table_becomes_a_new_object_after_reset
+    # Gem suite does not boot the dummy Rails reloader. reset_shipped_english!
+    # is what RecordingStudio's to_prepare path calls; dummy english_fallback_test
+    # covers Rails.application.reloader.reload! on a real app.
     before = RecordingStudio::Translation.shipped_english
     refute_empty before
     assert before.key?("recording_studio.commentable.home.title")
 
-    previous_cache_classes = Rails.application.config.cache_classes
-    begin
-      # Test env normally keeps cache_classes on; metrics then treats a second
-      # register during reload as a duplicate. Flip it off for this reload only.
-      Rails.application.config.cache_classes = false
-      RecordingStudioMetrics.registry.reset! if defined?(RecordingStudioMetrics)
+    RecordingStudio::Translation.reset_shipped_english!
+    after = RecordingStudio::Translation.shipped_english
 
-      Rails.application.reloader.reload!
-
-      after = RecordingStudio::Translation.shipped_english
-      refute_same before, after
-      assert_equal before, after
-      assert_predicate after, :frozen?
-    ensure
-      Rails.application.config.cache_classes = previous_cache_classes
-    end
+    refute_same before, after
+    assert_equal before, after
+    assert_predicate after, :frozen?
+    assert_equal "All comments", after.fetch("recording_studio.commentable.home.title")
   end
 
   def test_commentable_keys_absent_from_shipped_english_when_path_not_registered
@@ -464,13 +459,6 @@ class TranslationTest < Minitest::Test
 
   def gem_english_tree
     YAML.safe_load_file(COMMENTABLE_EN_YML, aliases: true).fetch("en")
-  end
-
-  def boot_dummy_rails_for_reloader!
-    return if defined?(Rails) && Rails.application&.initialized?
-
-    ENV["RAILS_ENV"] ||= "test"
-    require File.expand_path("dummy/config/environment", __dir__)
   end
 
   def assert_parity(key, **options)

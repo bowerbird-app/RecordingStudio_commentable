@@ -59,7 +59,7 @@ module RecordingStudioCommentable
 
       if result.success?
         redirect_to post_create_redirect_path,
-                    notice: t("recording_studio.commentable.flashes.comment_added", default: "Comment added.")
+                    notice: RecordingStudio.t("recording_studio.commentable.flashes.comment_added")
       else
         @comment = Comment.new(body: comment_params[:body])
         @comment.errors.add(:base, result.error) if result.error
@@ -89,7 +89,7 @@ module RecordingStudioCommentable
 
       if result.success?
         redirect_to post_reply_redirect_path,
-                    notice: t("recording_studio.commentable.flashes.comment_added", default: "Comment added.")
+                    notice: RecordingStudio.t("recording_studio.commentable.flashes.comment_added")
       else
         @comment = Comment.new(body: comment_params[:body])
         @comment.errors.add(:base, result.error) if result.error
@@ -117,7 +117,7 @@ module RecordingStudioCommentable
 
       if result.success?
         redirect_to comments_collection_path,
-                    notice: t("recording_studio.commentable.flashes.comment_updated", default: "Comment updated.")
+                    notice: RecordingStudio.t("recording_studio.commentable.flashes.comment_updated")
       else
         @comment = comment_from(@comment_recording)
         @comment.errors.add(:base, result.error) if result.error
@@ -134,7 +134,7 @@ module RecordingStudioCommentable
       )
 
       redirect_to commentable_home_referer_path || comments_collection_path,
-                  notice: t("recording_studio.commentable.flashes.comment_deleted", default: "Comment deleted.")
+                  notice: RecordingStudio.t("recording_studio.commentable.flashes.comment_deleted")
     end
 
     private
@@ -191,7 +191,7 @@ module RecordingStudioCommentable
       @page_recordable = @parent_recording.try(:recordable)
       @page_title = recordable_display_title(
         @page_recordable,
-        missing: t("recording_studio.commentable.display.missing_recordable", default: "Missing recordable")
+        missing: RecordingStudio.t("recording_studio.commentable.display.missing_recordable")
       )
       @page_body = @page_recordable.try(:body).presence
       @safe_return_to_path = return_to_path
@@ -214,10 +214,7 @@ module RecordingStudioCommentable
 
       redirect_to(
         return_to_path || main_app.root_path,
-        alert: t(
-          "recording_studio.commentable.flashes.comments_not_enabled",
-          default: "Comments are not enabled for this resource."
-        )
+        alert: RecordingStudio.t("recording_studio.commentable.flashes.comments_not_enabled")
       )
     end
 
@@ -226,10 +223,7 @@ module RecordingStudioCommentable
 
       redirect_to(
         return_to_path || main_app.root_path,
-        alert: t(
-          "recording_studio.commentable.flashes.not_allowed_view",
-          default: "You are not allowed to view comments here."
-        )
+        alert: RecordingStudio.t("recording_studio.commentable.flashes.not_allowed_view")
       )
     end
 
@@ -238,10 +232,7 @@ module RecordingStudioCommentable
 
       redirect_to(
         summary_path,
-        alert: t(
-          "recording_studio.commentable.flashes.not_allowed_post",
-          default: "You are not allowed to post comments here."
-        )
+        alert: RecordingStudio.t("recording_studio.commentable.flashes.not_allowed_post")
       )
     end
 
@@ -256,10 +247,7 @@ module RecordingStudioCommentable
 
       redirect_to(
         comments_collection_path,
-        alert: t(
-          "recording_studio.commentable.flashes.not_allowed_edit",
-          default: "You are not allowed to edit this comment."
-        )
+        alert: RecordingStudio.t("recording_studio.commentable.flashes.not_allowed_edit")
       )
     end
 
@@ -480,19 +468,19 @@ module RecordingStudioCommentable
     end
 
     def add_comment_heading
-      t("recording_studio.commentable.common.add_comment", default: "Add comment")
+      RecordingStudio.t("recording_studio.commentable.common.add_comment")
     end
 
     def reply_heading
-      t("recording_studio.commentable.common.reply", default: "Reply")
+      RecordingStudio.t("recording_studio.commentable.common.reply")
     end
 
     def recording_not_found_alert
-      t("recording_studio.commentable.flashes.recording_not_found", default: "Recording not found.")
+      RecordingStudio.t("recording_studio.commentable.flashes.recording_not_found")
     end
 
     def comment_not_found_alert
-      t("recording_studio.commentable.flashes.comment_not_found", default: "Comment not found.")
+      RecordingStudio.t("recording_studio.commentable.flashes.comment_not_found")
     end
   end
 end

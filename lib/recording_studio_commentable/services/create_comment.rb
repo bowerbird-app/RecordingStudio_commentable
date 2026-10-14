@@ -38,17 +38,11 @@ module RecordingStudioCommentable
       end
 
       def body_blank_error
-        I18n.t(
-          "recording_studio.commentable.errors.body_blank",
-          default: "Body cannot be blank"
-        )
+        RecordingStudio.t("recording_studio.commentable.errors.body_blank")
       end
 
       def comment_invalid_error
-        I18n.t(
-          "recording_studio.commentable.errors.comment_invalid",
-          default: "Comment is invalid"
-        )
+        RecordingStudio.t("recording_studio.commentable.errors.comment_invalid")
       end
 
       def build_comment

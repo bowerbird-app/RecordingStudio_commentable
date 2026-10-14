@@ -9,9 +9,13 @@ require_relative "../test_helper"
 # Existing boot override (recording_studio_commentable.host.en.yml) keeps
 # common.reply as "HOST Reply" — English assertions note that; never rewrite
 # other English tests to expect HOST.
+#
+# Devise flashes under :de/:fr can say "Translation missing" for their own
+# keys; assertions only forbid missing recording_studio.commentable.* text.
 class EnglishFallbackTest < ActionDispatch::IntegrationTest
   HOME_TITLE_KEY = "recording_studio.commentable.home.title"
   ADD_COMMENT_KEY = "recording_studio.commentable.common.add_comment"
+  COMMENTABLE_MISSING = /translation missing:.*recording_studio\.commentable/i
 
   setup do
     Rails.application.load_seed
@@ -25,6 +29,10 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
 
     # Force I18n to initialize before store_translations / backend mutations.
     I18n.t(HOME_TITLE_KEY)
+
+    # Sign in under the default locale so Devise flashes stay English and do
+    # not pollute commentable missing-key assertions.
+    sign_in_admin!
   end
 
   teardown do
@@ -38,45 +46,42 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
              ":de must not ship its own home.title (fallbacks may still resolve via :en)"
       refute locale_has_own_translation?(:de, "recording_studio.commentable.common.comments")
 
-      sign_in_admin!
-
       get "/commentable"
       assert_response :success
       assert_includes @response.body, "All comments"
-      refute_match(/translation missing/i, @response.body)
-      refute_includes @response.body, "Translation missing"
+      refute_match COMMENTABLE_MISSING, @response.body
 
-      get all_recording_comments_path(@public_recording)
+      # Use a host-absolute path: visiting /commentable mounts SCRIPT_NAME so
+      # all_recording_comments_path would incorrectly prefix /commentable.
+      get host_all_comments_path
       assert_response :success
       assert_includes @response.body, "Comments"
       assert_includes @response.body, "Post comment"
       assert_includes @response.body, "Write your comment..."
       # Boot-loaded host en override wins for reply via loaded :en fallback.
       assert_includes @response.body, "HOST Reply"
-      refute_match(/translation missing/i, @response.body)
+      refute_match COMMENTABLE_MISSING, @response.body
     end
   end
 
   test "english render matches gem english strings noting HOST Reply override" do
     I18n.with_locale(:en) do
-      sign_in_admin!
-
       get "/commentable"
       assert_response :success
       assert_includes @response.body, "All comments"
       assert_includes @response.body, "Every thread in this workspace, in one place."
-      refute_match(/translation missing/i, @response.body)
+      refute_match COMMENTABLE_MISSING, @response.body
 
-      get all_recording_comments_path(@public_recording)
+      get host_all_comments_path
       assert_response :success
       assert_includes @response.body, "Comments"
       assert_includes @response.body, "Post comment"
       assert_includes @response.body, "Write your comment..."
       assert_includes @response.body, "HOST Reply"
       refute_includes @response.body, ">Reply<"
-      refute_match(/translation missing/i, @response.body)
+      refute_match COMMENTABLE_MISSING, @response.body
 
-      get new_recording_comment_path(@public_recording)
+      get host_new_comment_path
       assert_response :success
       assert_includes @response.body, "Add comment"
       assert_includes @response.body, "Post comment"
@@ -97,12 +102,11 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
 
       %i[en fr].each do |locale|
         I18n.with_locale(locale) do
-          sign_in_admin!
           get "/commentable"
 
           assert_response :success
           assert_includes @response.body, "All comments"
-          refute_match(/translation missing/i, @response.body)
+          refute_match COMMENTABLE_MISSING, @response.body
         end
       end
     end
@@ -125,12 +129,11 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
 
       %i[en fr].each do |locale|
         I18n.with_locale(locale) do
-          sign_in_admin!
-          get new_recording_comment_path(@public_recording)
+          get host_new_comment_path
 
           assert_response :success
           assert_includes @response.body, "Add comment"
-          refute_match(/translation missing/i, @response.body)
+          refute_match COMMENTABLE_MISSING, @response.body
         end
       end
     end
@@ -189,6 +192,14 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
       }
     }
     assert_response :redirect
+  end
+
+  def host_all_comments_path
+    "/recordings/#{@public_recording.id}/comments/all"
+  end
+
+  def host_new_comment_path
+    "/recordings/#{@public_recording.id}/comments/new"
   end
 
   def i18n_config_snapshot

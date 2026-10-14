@@ -23,12 +23,15 @@ class EnglishDefaultDriftGuardTest < Minitest::Test
   ].freeze
   COMMENTABLE_KEY = /recording_studio\.commentable\./
 
+  # Longer names first so I18n.translate is not eaten by I18n.t.
+  # Bare t must be a call (t( / t " / t '), not the leading t in text:/title:.
   TRANSLATION_CALL = /
     (?:
       RecordingStudio::Translation\.t |
       RecordingStudio\.t |
-      I18n\.(?:t|translate) |
-      (?<![[:alnum:]_:@.])t
+      I18n\.translate |
+      I18n\.t |
+      (?<![[:alnum:]_:@.])t(?=\s*[("' ])
     )
   /x
 
@@ -236,6 +239,7 @@ class EnglishDefaultDriftGuardTest < Minitest::Test
     end
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def read_ruby_expression(source, start)
     i = start
     i += 1 while i < source.length && source[i].match?(/\s/)
@@ -267,6 +271,8 @@ class EnglishDefaultDriftGuardTest < Minitest::Test
       source[i...j]
     end
   end
+
+  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def allowed_dynamic_default?(default_src)
     normalized = default_src.gsub(/\s+/, "")

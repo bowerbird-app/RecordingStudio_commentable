@@ -5,7 +5,24 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require_relative "simplecov_helper"
 require "minitest/autorun"
 require "rails"
+require "yaml"
 require "recording_studio_commentable"
+
+# Gem suite does not boot the dummy Rails app, so engine initializers never
+# run. Register commentable English into RecordingStudio::Translation and seed
+# the I18n backend so RecordingStudio.t / service errors resolve without
+# hand-copied default: strings.
+COMMENTABLE_EN_YML = File.expand_path("../config/locales/en.yml", __dir__)
+if defined?(RecordingStudio::Translation) &&
+   RecordingStudio::Translation.respond_to?(:register_shipped_english)
+  RecordingStudio::Translation.register_shipped_english(COMMENTABLE_EN_YML)
+  RecordingStudio::Translation.shipped_english
+end
+begin
+  I18n.backend.store_translations(:en, YAML.safe_load_file(COMMENTABLE_EN_YML, aliases: true).fetch("en"))
+rescue StandardError
+  # Ignore when I18n is not ready yet; individual tests seed as needed.
+end
 
 # Minitest 6 dropped Object#stub. Keep a tiny replacement for generator/engine tests.
 module CommentableMinitestStub

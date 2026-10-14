@@ -1,5 +1,29 @@
 # Upgrade Guide
 
+## Upgrading to 0.6.0
+
+Missing `recording_studio.commentable.*` keys fall back through
+`RecordingStudio.t`: loaded `:en` (host English overrides included), then the
+caller's `default:`, then the merged gem-shipped English table. This gem
+registers `config/locales/en.yml` at boot via
+`RecordingStudio::Translation.register_shipped_english`. English output is
+unchanged. `en.yml` is byte-identical to 0.5.0.
+
+### Upgrade steps
+
+1. Install Commentable `0.6.0` and Recording Studio `>= 4.7.0`. No migration.
+2. Host apps need no change for English. Prefer `RecordingStudio.t` for new
+   gem-key call sites so missing locales keep the same fallback.
+3. Hosts that enable raise-on-missing translations no longer raise for
+   gem-shipped `recording_studio.commentable.*` keys looked up through
+   `RecordingStudio.t` when loaded `:en` or the gem-shipped table has the key.
+   Host overrides in the active locale still win; host `:en` overrides win on
+   the loaded-English fallback step.
+4. A missing `_html` key with a non-interpolating caller `default:` stays
+   unsafe like view `t`. An interpolating caller `default:` escapes args and
+   returns `html_safe` (stricter than view `t`).
+5. There is no dependency on `recording_studio_internationalization`.
+
 ## Upgrading to 0.5.0
 
 Wave 2 finishes host-overridable copy outside views: controller flash

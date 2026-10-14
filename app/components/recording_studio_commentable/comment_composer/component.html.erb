@@ -19,7 +19,7 @@
       <% composer.actions do %>
         <div class="flex w-full items-center justify-end gap-2">
           <%= render FlatPack::Button::Component.new(
-            text: t("recording_studio.commentable.common.cancel"),
+            text: RecordingStudio.t("recording_studio.commentable.common.cancel"),
             url: cancel_path,
             style: :ghost,
             size: :sm,

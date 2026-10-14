@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-14
+
+### Added
+- English fallback for shipped `recording_studio.commentable.*` keys when the
+  active locale has no translation: call sites use `RecordingStudio.t`, and the
+  engine registers `config/locales/en.yml` via
+  `RecordingStudio::Translation.register_shipped_english` so fallback comes
+  from the loaded English, host overrides included, then the merged gem-shipped
+  table
+- Behavioral coverage for parity vs `I18n.t`, fallback order, `_html` escaping,
+  boot registration, reloader reset, drift guard (no hand-copied English
+  `default:`), and real-page deleted-key / boot-override renders
+
+### Changed
+- Version `0.5.0` → `0.6.0`.
+- Requires Recording Studio `>= 4.7.0`.
+- Commentable views, controllers, components, and services look up copy through
+  `RecordingStudio.t` (hand-copied English `default:` removed; `en.yml`
+  unchanged).
+
+### Upgrade notes
+See [docs/UPGRADING.md](docs/UPGRADING.md).
+
 ## [0.5.0] - 2026-10-12
 
 ### Added
@@ -124,7 +147,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.2...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.1
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.0
