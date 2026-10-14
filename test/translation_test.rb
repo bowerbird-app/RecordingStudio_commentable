@@ -343,14 +343,10 @@ class TranslationTest < Minitest::Test
     # rubocop:enable Metrics/BlockLength
   end
 
-  def test_shipped_english_table_is_present_after_boot_registration
-    engine_source = File.read(
-      File.expand_path("../lib/recording_studio_commentable/engine.rb", __dir__)
-    )
-    assert_includes engine_source, "register_shipped_english",
-                    "engine must register_shipped_english before recording_studio.load_shipped_english"
-    assert_includes engine_source, "recording_studio.load_shipped_english"
-
+  def test_shipped_english_table_includes_commentable_keys_after_registration
+    # Path registration from real Rails boot is asserted in dummy
+    # english_fallback_test (without calling the initializer block). Gem suite
+    # registers via test_helper so RecordingStudio.t can resolve without a boot.
     table = RecordingStudio::Translation.shipped_english
     refute_nil table
     refute_empty table

@@ -22,13 +22,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Version `0.5.0` → `0.6.0`.
-- Requires Recording Studio `>= 4.7.0`.
-- Commentable views, controllers, components, and services look up copy through
-  `RecordingStudio.t` (hand-copied English `default:` removed; `en.yml`
-  unchanged).
+- Depends on `recording_studio ~> 4.7`.
+- Only this gem's `recording_studio.commentable.*` call sites look up copy
+  through `RecordingStudio.t` (hand-copied English `default:` removed;
+  `en.yml` unchanged). Host or other-namespace keys stay on their original
+  `I18n.t` / `t` with main's `default:` where they had one.
 
 ### Upgrade notes
-See [docs/UPGRADING.md](docs/UPGRADING.md).
+- Install Commentable `0.6.0` with Recording Studio `~> 4.7`. No migration.
+  English hosts need no change. See [docs/UPGRADING.md](docs/UPGRADING.md).
+- Prefer `RecordingStudio.t` only for `recording_studio.commentable.*` keys.
+  Host or other-namespace keys stay on `I18n.t` / `t` with main's `default:`
+  where they had one.
+- A missing `_html` key with a non-interpolating String caller `default:` stays
+  unsafe like view `t`. An interpolating String caller `default:` escapes args
+  and returns `html_safe` (stricter than view `t`). An Array caller `default:`
+  on a missing `_html` key is also marked `html_safe` by `RecordingStudio.t`
+  (stricter than view `t`, which leaves Array defaults unsafe).
 
 ## [0.5.0] - 2026-10-12
 

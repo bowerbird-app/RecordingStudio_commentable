@@ -210,6 +210,13 @@ class EngineTest < Minitest::Test
     assert_equal ["RecordingStudioCommentable::Comment"], registration[:child_recordables]
   end
 
+  def test_register_shipped_english_initializer_is_wired_before_recording_studio_load
+    initializer = find_initializer("recording_studio_commentable.register_shipped_english")
+    refute_nil initializer,
+               "engine must declare recording_studio_commentable.register_shipped_english"
+    assert_equal "recording_studio.load_shipped_english", initializer.before
+  end
+
   private
 
   def find_initializer(name)

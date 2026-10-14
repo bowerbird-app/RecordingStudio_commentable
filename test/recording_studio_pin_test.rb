@@ -16,4 +16,15 @@ class RecordingStudioPinTest < ActiveSupport::TestCase
       refute_includes contents, 'tag: "v4.6.0"', "#{path} should not keep the prior Recording Studio pin"
     end
   end
+
+  def test_gemspec_depends_on_recording_studio_tilde_4_7
+    gemspec = File.read(File.expand_path("../recording_studio_commentable.gemspec", __dir__))
+
+    assert_match(
+      /spec\.add_dependency ["']recording_studio["'], ["']~> 4\.7["']/,
+      gemspec,
+      "gemspec must depend on recording_studio ~> 4.7"
+    )
+    refute_includes gemspec, '">= 4.7.0"'
+  end
 end

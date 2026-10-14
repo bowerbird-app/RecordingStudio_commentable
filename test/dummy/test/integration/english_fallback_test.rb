@@ -182,6 +182,25 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
     assert_equal before.fetch(:exception_handler), i18n_config_snapshot.fetch(:exception_handler)
   end
 
+  # Fails on its own if the engine initializer is removed: asserts the path is
+  # already registered from Rails boot. Does not call the initializer block.
+  test "boot registers commentable en.yml path without invoking the initializer in the test" do
+    expected = File.expand_path(
+      RecordingStudioCommentable::Engine.root.join("config/locales/en.yml")
+    )
+    paths = RecordingStudio::Translation.send(:registered_shipped_english_paths)
+
+    assert_includes paths, expected,
+                    "engine boot must register commentable config/locales/en.yml " \
+                    "via RecordingStudio::Translation.register_shipped_english"
+
+    initializer = RecordingStudioCommentable::Engine.initializers.find do |entry|
+      entry.name == "recording_studio_commentable.register_shipped_english"
+    end
+    refute_nil initializer
+    assert_equal "recording_studio.load_shipped_english", initializer.before
+  end
+
   private
 
   def sign_in_admin!

@@ -9,8 +9,9 @@ require "test_helper"
 # Scanner covers RecordingStudio.t, I18n.t, I18n.translate, and view t(
 # (single-quoted, double-quoted, multi-line, paren-less, constant, Array).
 #
-# Companion rule: recording_studio.commentable.* lookups in app/ and lib/ must
-# use RecordingStudio.t (not plain I18n.t or bare t(). Admin DSL stays literal
+# Companion rule: only recording_studio.commentable.* lookups in app/ and lib/
+# must use RecordingStudio.t (not plain I18n.t or bare t(). Host or
+# other-namespace keys stay on their original helper. Admin DSL stays literal
 # (none in this gem).
 class EnglishDefaultDriftGuardTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
