@@ -191,21 +191,33 @@ Leave `config.layout` unset to use Recording Studio's default layout (back and c
 ## Internationalization
 
 Static interface copy (views, flash notices/alerts, service errors, and
-render-site display labels) resolves through Rails I18n under
-`recording_studio.commentable.*`. English is the only locale shipped by the gem.
-Hosts override by defining the same nested keys in their own `config/locales`.
-There is no dependency on `recording_studio_internationalization`.
+render-site display labels) resolves through `RecordingStudio.t` for this gem's
+`recording_studio.commentable.*` keys only. Host or other-namespace keys stay on
+their original `I18n.t` / `t` with main's `default:` where they had one. English
+is the only locale shipped by the gem. Hosts override by defining the same
+nested keys in their own `config/locales`. There is no dependency on
+`recording_studio_internationalization`.
+
+When a shipped commentable key is missing in the active locale, fallback comes
+from the loaded English, host overrides included, then the gem-shipped table
+registered at boot via `RecordingStudio::Translation.register_shipped_english`.
+Requires `recording_studio ~> 4.7`. A missing `_html` key with a non-interpolating
+String caller `default:` stays unsafe like view `t`: a plain default with no
+interpolation is returned as a plain (non-html_safe) String, so views will
+escape it. An interpolating String caller `default:` escapes args and returns
+`html_safe` (stricter than view `t`). An Array caller `default:` on a missing
+`_html` key is also marked `html_safe` by `RecordingStudio.t` (stricter than
+view `t`).
 
 `Comment#author_display_name` and `recordable_display_title` keep main’s literal
 English return values; the comment partial and caller `missing:` args translate
 at render. `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stays for API
 compatibility.
 
-### Upgrading to 0.5.0
+### Upgrading to 0.6.0
 
-1. Install Commentable `0.5.0`. No migration.
-2. Copy new `flashes.*`, `errors.*`, and `display.*` keys into host locale files
-   when translating.
+1. Install Commentable `0.6.0` and `recording_studio ~> 4.7`. No migration.
+2. Host apps need no change for English. See [docs/UPGRADING.md](docs/UPGRADING.md).
 3. `recording_studio_recordable label:` / `plural_label:` stay English
    (class-load DSL). Comment timestamp `strftime` output, generator CLI text,
    and developer `ArgumentError`s stay English.

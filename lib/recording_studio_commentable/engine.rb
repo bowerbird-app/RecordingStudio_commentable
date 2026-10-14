@@ -16,6 +16,16 @@ module RecordingStudioCommentable
       )
     end
 
+    initializer "recording_studio_commentable.register_shipped_english",
+                before: "recording_studio.load_shipped_english" do
+      next unless defined?(RecordingStudio::Translation)
+      next unless RecordingStudio::Translation.respond_to?(:register_shipped_english)
+
+      RecordingStudio::Translation.register_shipped_english(
+        root.join("config/locales/en.yml")
+      )
+    end
+
     class << self
       def apply_model_extensions(target)
         apply_extensions(target,

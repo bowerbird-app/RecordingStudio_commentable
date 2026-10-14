@@ -24,14 +24,14 @@ module RecordingStudioCommentable
       end
 
       def placeholder_text
-        I18n.t("recording_studio.commentable.composer.placeholder")
+        RecordingStudio.t("recording_studio.commentable.composer.placeholder")
       end
 
       def submit_label
         if comment.new_record?
-          I18n.t("recording_studio.commentable.composer.post")
+          RecordingStudio.t("recording_studio.commentable.composer.post")
         else
-          I18n.t("recording_studio.commentable.composer.save")
+          RecordingStudio.t("recording_studio.commentable.composer.save")
         end
       end
 
@@ -43,7 +43,7 @@ module RecordingStudioCommentable
       end
 
       def you_label
-        I18n.t("recording_studio.commentable.common.you")
+        RecordingStudio.t("recording_studio.commentable.common.you")
       end
     end
   end

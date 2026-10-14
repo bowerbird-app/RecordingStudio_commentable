@@ -33,7 +33,7 @@ module RecordingStudioCommentable
       end
 
       def button_text
-        text.presence || I18n.t(
+        text.presence || RecordingStudio.t(
           "recording_studio.commentable.button.comments",
           count: comments_count
         )
