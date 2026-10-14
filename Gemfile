@@ -10,7 +10,7 @@ gemspec
 # here so bundler can resolve it in the development/test environment.
 gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.208", require: false
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v4.6.0"
-gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.17.0"
+gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.18.0"
 # Trashable gemspec deps are git-only; pin for Bundler resolution only.
 gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.2.0", require: false
 # Accessible 0.17 loads trashable query-only; pin by tag with require: false.
