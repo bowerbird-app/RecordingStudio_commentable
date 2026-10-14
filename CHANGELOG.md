@@ -160,7 +160,7 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Basic test suite with Minitest
 
 [Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.0...HEAD
-[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.0...v0.6.0
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.3...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.1
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.0

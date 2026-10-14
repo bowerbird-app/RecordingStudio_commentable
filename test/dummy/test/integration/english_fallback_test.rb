@@ -132,7 +132,7 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
           get host_new_comment_path
 
           assert_response :success
-          assert_includes @response.body, "Add comment"
+          assert_select "h1", text: "Add comment"
           refute_match COMMENTABLE_MISSING, @response.body
         end
       end
