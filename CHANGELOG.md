@@ -29,16 +29,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `I18n.t` / `t` with main's `default:` where they had one.
 
 ### Upgrade notes
-- Install Commentable `0.6.0` with Recording Studio `~> 4.7`. No migration.
+- Install Commentable `0.6.0` with `recording_studio ~> 4.7`. No migration.
   English hosts need no change. See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Prefer `RecordingStudio.t` only for `recording_studio.commentable.*` keys.
   Host or other-namespace keys stay on `I18n.t` / `t` with main's `default:`
   where they had one.
 - A missing `_html` key with a non-interpolating String caller `default:` stays
-  unsafe like view `t`. An interpolating String caller `default:` escapes args
-  and returns `html_safe` (stricter than view `t`). An Array caller `default:`
-  on a missing `_html` key is also marked `html_safe` by `RecordingStudio.t`
-  (stricter than view `t`, which leaves Array defaults unsafe).
+  unsafe like view `t`: a plain default with no interpolation is returned as a
+  plain (non-html_safe) String, so views will escape it. An interpolating String
+  caller `default:` escapes args and returns `html_safe` (stricter than view
+  `t`). An Array caller `default:` on a missing `_html` key is also marked
+  `html_safe` by `RecordingStudio.t` (stricter than view `t`, which leaves
+  Array defaults unsafe).
 
 ## [0.5.0] - 2026-10-12
 
@@ -158,7 +160,7 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Basic test suite with Minitest
 
 [Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.0...HEAD
-[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.2...v0.6.0
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.1
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.0

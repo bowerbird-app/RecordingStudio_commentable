@@ -48,7 +48,7 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
 
       get "/commentable"
       assert_response :success
-      assert_includes @response.body, "All comments"
+      assert_select "h1", text: "All comments"
       refute_match COMMENTABLE_MISSING, @response.body
 
       # Use a host-absolute path: visiting /commentable mounts SCRIPT_NAME so
@@ -68,7 +68,7 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
     I18n.with_locale(:en) do
       get "/commentable"
       assert_response :success
-      assert_includes @response.body, "All comments"
+      assert_select "h1", text: "All comments"
       assert_includes @response.body, "Every thread in this workspace, in one place."
       refute_match COMMENTABLE_MISSING, @response.body
 
@@ -105,7 +105,7 @@ class EnglishFallbackTest < ActionDispatch::IntegrationTest
           get "/commentable"
 
           assert_response :success
-          assert_includes @response.body, "All comments"
+          assert_select "h1", text: "All comments"
           refute_match COMMENTABLE_MISSING, @response.body
         end
       end

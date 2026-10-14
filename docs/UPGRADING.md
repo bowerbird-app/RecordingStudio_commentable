@@ -11,7 +11,7 @@ unchanged. `en.yml` is byte-identical to 0.5.0.
 
 ### Upgrade steps
 
-1. Install Commentable `0.6.0` and Recording Studio `~> 4.7`. No migration.
+1. Install Commentable `0.6.0` and `recording_studio ~> 4.7`. No migration.
 2. Host apps need no change for English. Prefer `RecordingStudio.t` only for
    this gem's `recording_studio.commentable.*` keys so missing locales keep the
    same fallback. Host or other-namespace keys stay on `I18n.t` / `t` with
@@ -22,10 +22,12 @@ unchanged. `en.yml` is byte-identical to 0.5.0.
    Host overrides in the active locale still win; host `:en` overrides win on
    the loaded-English fallback step.
 4. A missing `_html` key with a non-interpolating String caller `default:`
-   stays unsafe like view `t`. An interpolating String caller `default:`
-   escapes args and returns `html_safe` (stricter than view `t`). An Array
-   caller `default:` on a missing `_html` key is also marked `html_safe` by
-   `RecordingStudio.t` (stricter than view `t`).
+   stays unsafe like view `t`: a plain default with no interpolation is
+   returned as a plain (non-html_safe) String, so views will escape it. An
+   interpolating String caller `default:` escapes args and returns `html_safe`
+   (stricter than view `t`). An Array caller `default:` on a missing `_html`
+   key is also marked `html_safe` by `RecordingStudio.t` (stricter than view
+   `t`).
 5. There is no dependency on `recording_studio_internationalization`.
 
 ## Upgrading to 0.5.0

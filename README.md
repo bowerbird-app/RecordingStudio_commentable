@@ -201,8 +201,13 @@ nested keys in their own `config/locales`. There is no dependency on
 When a shipped commentable key is missing in the active locale, fallback comes
 from the loaded English, host overrides included, then the gem-shipped table
 registered at boot via `RecordingStudio::Translation.register_shipped_english`.
-Requires Recording Studio `~> 4.7`. A missing `_html` key with an Array caller
-`default:` is marked `html_safe` by `RecordingStudio.t` (stricter than view `t`).
+Requires `recording_studio ~> 4.7`. A missing `_html` key with a non-interpolating
+String caller `default:` stays unsafe like view `t`: a plain default with no
+interpolation is returned as a plain (non-html_safe) String, so views will
+escape it. An interpolating String caller `default:` escapes args and returns
+`html_safe` (stricter than view `t`). An Array caller `default:` on a missing
+`_html` key is also marked `html_safe` by `RecordingStudio.t` (stricter than
+view `t`).
 
 `Comment#author_display_name` and `recordable_display_title` keep main’s literal
 English return values; the comment partial and caller `missing:` args translate
@@ -211,7 +216,7 @@ compatibility.
 
 ### Upgrading to 0.6.0
 
-1. Install Commentable `0.6.0` and Recording Studio `~> 4.7`. No migration.
+1. Install Commentable `0.6.0` and `recording_studio ~> 4.7`. No migration.
 2. Host apps need no change for English. See [docs/UPGRADING.md](docs/UPGRADING.md).
 3. `recording_studio_recordable label:` / `plural_label:` stay English
    (class-load DSL). Comment timestamp `strftime` output, generator CLI text,
