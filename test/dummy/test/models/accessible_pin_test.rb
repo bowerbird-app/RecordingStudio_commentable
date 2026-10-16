@@ -10,7 +10,7 @@ class AccessiblePinTest < ActiveSupport::TestCase
     assert_includes gemfile, 'gem "recording_studio_accessible"'
     assert_includes gemfile, 'tag: "v0.18.0"'
     assert_includes gemfile, 'gem "recording_studio_trashable"'
-    assert_includes gemfile, 'tag: "v0.10.0"'
+    assert_includes gemfile, 'tag: "v0.11.0"'
     assert_includes gemfile, 'gem "recording_studio_metrics"'
     assert_includes gemfile, 'tag: "v0.2.0"'
 
