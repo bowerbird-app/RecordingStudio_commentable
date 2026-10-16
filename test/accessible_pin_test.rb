@@ -12,7 +12,7 @@ class AccessiblePinTest < ActiveSupport::TestCase
       assert_includes contents, 'tag: "v0.18.0"', "#{path} should pin Accessible v0.18.0"
       refute_includes contents, 'tag: "v0.17.0"', "#{path} should not keep the prior Accessible pin"
       assert_includes contents, 'gem "recording_studio_trashable"'
-      assert_includes contents, 'tag: "v0.10.0"', "#{path} should pin Trashable v0.10.0"
+      assert_includes contents, 'tag: "v0.11.0"', "#{path} should pin Trashable v0.11.0"
       assert_includes contents, 'gem "recording_studio_metrics"'
       assert_includes contents, 'tag: "v0.2.0"', "#{path} should pin Metrics v0.2.0"
     end
