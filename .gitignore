@@ -33,6 +33,10 @@ tmp/
 .DS_Store
 Thumbs.db
 
+# Coverage (SimpleCov)
+coverage/
+test/dummy/coverage/
+
 # Rails
 test/dummy/log/
 test/dummy/tmp/
