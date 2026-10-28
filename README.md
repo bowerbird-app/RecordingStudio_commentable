@@ -17,7 +17,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Accessible `v0.18.0` (with Trashable `v0.10.0` and Metrics `v0.2.0` query-only companions), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Accessible `v0.18.0` (with Trashable `v0.11.0` and Metrics `v0.2.0` query-only companions), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -214,6 +214,12 @@ English return values; the comment partial and caller `missing:` args translate
 at render. `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stays for API
 compatibility.
 
+### Upgrading to 0.6.2
+
+1. Install Commentable `0.6.2`. No migration. Host apps need no code change.
+2. Git tag `v0.6.1` already existed for the Trashable `v0.11.0` companion pin
+   while `version.rb` still said `0.6.0`. See [docs/UPGRADING.md](docs/UPGRADING.md).
+
 ### Upgrading to 0.6.0
 
 1. Install Commentable `0.6.0` and `recording_studio ~> 4.7`. No migration.
@@ -342,9 +348,9 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | v4.6.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudio | v4.7.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | RecordingStudioAccessible | v0.18.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
-| RecordingStudioTrashable | v0.10.0 (`require: false`; Accessible query-only companion) |
+| RecordingStudioTrashable | v0.11.0 (`require: false`; Accessible query-only companion) |
 | RecordingStudioMetrics | v0.2.0 (`require: false`; Trashable resolution companion) |
 | FlatPack        | `main` in dummy; `v0.1.208` (`require: false`) at root for Trashable resolution |
 | Devise          | latest  |
