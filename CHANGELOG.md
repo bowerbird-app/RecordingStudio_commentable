@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-10-28
+
+### Changed
+- Version `0.6.0` → `0.6.2`. Git tag `v0.6.1` already existed (see below).
+- Stop tracking SimpleCov `coverage/` and `test/dummy/coverage/` output; ignore both directories.
+- CI Postgres database name is `recording_studio_commentable_test` instead of the leftover `gem_template_test`.
+- README pin table and dummy description match the Gemfile: Recording Studio `v4.7.0`, Trashable `v0.11.0`.
+- A few leftover `GemTemplate` / `/gem_template` labels in Copilot/agent/Codespaces setup copy now say Commentable.
+- Lockfiles only: `crass` `1.0.7` → `1.0.8` and dummy `net-ssh` `7.3.0` → `7.3.8` (`bundle update <gem> --conservative`). No Gemfile or gemspec pin change.
+
+### Added
+- Dummy request coverage for denied comment view, denied edit, and unauthorized destroy flash (existing controller behavior).
+
+### Upgrade notes
+- Install Commentable `0.6.2`. No migration. Host apps need no code change.
+
+## [0.6.1] - 2026-10-16
+
+Git tag `v0.6.1` was created on main for the Trashable companion pin to `v0.11.0` (#24). `lib/recording_studio_commentable/version.rb` was still `0.6.0` on that tag, so this changelog entry is retrospective.
+
+### Changed
+- Dummy and development Gemfiles pin `recording_studio_trashable` `v0.11.0` (`require: false`; Accessible query-only companion).
+
+### Upgrade notes
+- No Commentable API or migration change. Hosts that pin the same companion tag can move Trashable to `v0.11.0`.
+
 ## [0.6.0] - 2026-10-14
 
 ### Added
@@ -159,7 +185,9 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.3...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/releases/tag/v0.4.1
