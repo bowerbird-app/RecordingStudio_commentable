@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Version `0.6.0` → `0.6.2`. Git tag `v0.6.1` already existed (see below).
 - Stop tracking SimpleCov `coverage/` and `test/dummy/coverage/` output; ignore both directories.
-- CI Postgres database name is `recording_studio_commentable_test` instead of the leftover `gem_template_test`.
 - README pin table and dummy description match the Gemfile: Recording Studio `v4.7.0`, Trashable `v0.11.0`.
 - A few leftover `GemTemplate` / `/gem_template` labels in Copilot/agent/Codespaces setup copy now say Commentable.
 - Lockfiles only: `crass` `1.0.7` → `1.0.8` and dummy `net-ssh` `7.3.0` → `7.3.8` (`bundle update <gem> --conservative`). No Gemfile or gemspec pin change.

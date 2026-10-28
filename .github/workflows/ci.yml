@@ -17,7 +17,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: recording_studio_commentable_test
+          POSTGRES_DB: gem_template_test
         ports:
           - 5432:5432
         options: >-
@@ -47,55 +47,55 @@ jobs:
       working-directory: test/dummy
       env:
         BUNDLE_GITHUB__COM: x-access-token:${{ secrets.BOWERBIRD_ORG_CI_TOKEN }}
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
     
     - name: Run database migrations
       run: bundle exec rake db:migrate RAILS_ENV=test
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Build dummy Tailwind CSS
       run: bundle exec rails tailwindcss:build
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Run dummy app component tests
       run: bundle exec bin/rails test test/components
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Run dummy app smoke test
       run: bundle exec bin/rails test test/integration/recording_studio_commentable_smoke_test.rb
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Run dummy app host locale override tests
       run: bundle exec bin/rails test test/integration/host_locale_override_test.rb
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Run dummy app wave 2 render-level i18n tests
       run: bundle exec bin/rails test test/integration/wave2_i18n_render_test.rb
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Run dummy app English fallback tests
       run: bundle exec bin/rails test test/integration/english_fallback_test.rb test/integration/english_fallback_boot_override_test.rb
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Run dummy Cloud Agent boot files test
       run: bundle exec bin/rails test test/cursor_boot_files_test.rb
       working-directory: test/dummy
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
     - name: Run RuboCop
       run: bundle exec rubocop
@@ -103,4 +103,4 @@ jobs:
     - name: Run tests
       run: bundle exec rake app:test
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/recording_studio_commentable_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
