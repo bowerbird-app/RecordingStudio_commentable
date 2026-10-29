@@ -7,9 +7,9 @@ module RecordingStudioCommentable
     include RecordingStudioCommentable::RecordableDisplayHelper
 
     protect_from_forgery with: :exception unless defined?(::ApplicationController)
-    include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
-    helper RecordingStudio::LayoutHelper if defined?(RecordingStudio::LayoutHelper)
-    layout :commentable_layout
+    include RecordingStudio::ControllerLayout
+
+    recording_studio_layout { RecordingStudioCommentable.configuration.layout }
 
     helper_method :current_recording_studio_actor
     helper_method :commentable_recording_comments_path
@@ -42,10 +42,6 @@ module RecordingStudioCommentable
       else
         head :unauthorized
       end
-    end
-
-    def commentable_layout
-      RecordingStudioCommentable.configuration.layout.presence || "recording_studio/default_layout"
     end
 
     def commentable_recording_comments_path(recording, **options)

@@ -99,6 +99,27 @@ class ConfigurationTest < Minitest::Test
     assert_nil @configuration.layout
   end
 
+  def test_layout_accepts_false
+    @configuration.layout = false
+
+    assert_equal false, @configuration.layout
+  end
+
+  def test_layout_accepts_a_layout_name
+    @configuration.layout = "application"
+
+    assert_equal "application", @configuration.layout
+  end
+
+  def test_layout_accepts_a_callable
+    callable = ->(controller:) { controller && "application" }
+
+    @configuration.layout = callable
+
+    assert_same callable, @configuration.layout
+    assert_equal "application", callable.call(controller: Object.new)
+  end
+
   def test_defaults_recordable_display_attributes_to_empty_hash
     assert_equal({}, @configuration.recordable_display_attributes)
   end

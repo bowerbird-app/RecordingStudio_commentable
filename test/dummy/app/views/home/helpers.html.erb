@@ -1,21 +1,19 @@
-<% recording_studio_page_nav(
-  title: "View helpers",
-  page_nav_back_url: root_path,
-  page_nav_back_label: "Home",
-  page_nav_anchor_url: root_path,
-  page_nav_anchor_label: "Close"
+<% content_for :title, "View helpers" %>
+<% content_for :subtitle, "A dummy-app reference for the helper methods exposed by RecordingStudioCommentable and the host controller layer." %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: root_path,
+  back_tooltip: "Home",
+  anchor_href: root_path,
+  anchor_tooltip: "Close"
 ) %>
 
 <div class="flex w-full flex-col gap-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "View helpers",
-    subtitle: "A dummy-app reference for the helper methods exposed by RecordingStudioCommentable and the host controller layer.",
-    variant: :h1
-  ) %>
 
   <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
     <div class="flex flex-col gap-6">
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+      <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: "Exposed helper methods",
@@ -27,7 +25,7 @@
       <% end %>
 
       <% @helper_catalog.each do |helper_entry| %>
-        <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+        <%= render FlatPack::Card::Component.new do |card| %>
           <% card.header do %>
             <%= render FlatPack::PageTitle::Component.new(
               title: helper_entry[:title],
@@ -65,7 +63,7 @@
         <% end %>
       <% end %>
 
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+      <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: "Public services",
@@ -77,7 +75,7 @@
       <% end %>
 
       <% @service_catalog.each do |service_entry| %>
-        <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+        <%= render FlatPack::Card::Component.new do |card| %>
           <% card.header do %>
             <%= render FlatPack::PageTitle::Component.new(
               title: service_entry[:title],
@@ -117,7 +115,7 @@
     </div>
 
     <div class="flex flex-col gap-6">
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+      <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: "Shared notes",
@@ -136,7 +134,7 @@
         <% end %>
       <% end %>
 
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+      <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: "Host app API",
@@ -167,7 +165,7 @@
         <% end %>
       <% end %>
 
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+      <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: "Where they show up",

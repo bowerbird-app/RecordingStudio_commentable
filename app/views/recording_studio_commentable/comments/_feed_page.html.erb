@@ -23,7 +23,7 @@
         <div class="flex justify-center pt-4">
           <%= render FlatPack::Button::Component.new(
             text: RecordingStudio.t("recording_studio.commentable.feed.load_more"),
-            url: feed.page_path(next_page),
+            href: feed.page_path(next_page),
             style: :secondary,
             size: :sm,
             data: { turbo_frame: feed.page_frame_id(next_page) }

@@ -120,6 +120,64 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     assert RecordingStudio::Recording.unscoped.exists?(comment_recording.id)
   end
 
+  def test_nil_layout_follows_recording_studio_configuration
+    sign_in!(@admin)
+    with_commentable_layout(nil) do
+      RecordingStudio.configuration.layout = "flat_pack_pseudo_top_nav"
+
+      get all_recording_comments_path(@public_recording)
+
+      assert_response :success
+      assert_includes response.body, "Pseudo layout preview"
+      refute_includes response.body, 'data-recording-studio-default-layout="true"'
+    end
+  end
+
+  def test_false_layout_renders_without_a_host_shell
+    sign_in!(@admin)
+    with_commentable_layout(false) do
+      RecordingStudio.configuration.layout = "flat_pack_pseudo_top_nav"
+
+      get all_recording_comments_path(@public_recording)
+
+      assert_response :success
+      assert_includes response.body, "Comments"
+      refute_includes response.body, "Pseudo layout preview"
+      refute_includes response.body, 'data-recording-studio-default-layout="true"'
+      refute_includes response.body, "<html"
+    end
+  end
+
+  def test_named_layout_uses_that_shell
+    sign_in!(@admin)
+    with_commentable_layout("flat_pack_pseudo_top_nav") do
+      RecordingStudio.configuration.layout = "application"
+
+      get all_recording_comments_path(@public_recording)
+
+      assert_response :success
+      assert_includes response.body, "Pseudo layout preview"
+      refute_includes response.body, "container mx-auto mt-28"
+    end
+  end
+
+  def test_callable_layout_receives_the_controller_and_picks_the_shell
+    sign_in!(@admin)
+    seen = nil
+    with_commentable_layout(->(controller:) {
+      seen = controller
+      "flat_pack_pseudo_top_nav"
+    }) do
+      RecordingStudio.configuration.layout = "application"
+
+      get all_recording_comments_path(@public_recording)
+
+      assert_response :success
+      assert_includes response.body, "Pseudo layout preview"
+      assert_kind_of RecordingStudioCommentable::ApplicationController, seen
+    end
+  end
+
   def test_comment_recordable_is_registered_as_a_capability_owned_child_type
     assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioCommentable::Comment"
     assert RecordingStudio.configuration.capability_enabled?(:commentable, for_type: "Page")
@@ -150,5 +208,15 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
       }
     }
     assert_response :redirect
+  end
+
+  def with_commentable_layout(layout)
+    previous_commentable = RecordingStudioCommentable.configuration.layout
+    previous_core = RecordingStudio.configuration.layout
+    RecordingStudioCommentable.configuration.layout = layout
+    yield
+  ensure
+    RecordingStudioCommentable.configuration.layout = previous_commentable
+    RecordingStudio.configuration.layout = previous_core
   end
 end

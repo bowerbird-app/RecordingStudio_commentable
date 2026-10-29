@@ -17,7 +17,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Accessible `v0.18.0` (with Trashable `v0.11.0` and Metrics `v0.2.0` query-only companions), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.3.0`, FlatPack `v0.1.329`, Accessible `v0.22.2` (with Trashable `v0.12.0` and Metrics `v0.7.0` query-only companions), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -164,7 +164,7 @@ result = RecordingStudioCommentable::Services::DestroyComment.call(
 RecordingStudioCommentable.configure do |config|
   config.timeout = 5
   config.use_recording_studio_trashable_for_destroy = false
-  # config.layout = "recording_studio/default_layout"
+  # config.layout = "application"
   config.rich_text_comments = :toolbar
   config.recordable_display_attributes = {
     "Page" => :title,
@@ -186,7 +186,7 @@ RecordingStudioCommentable.configure do |config|
 end
 ```
 
-Leave `config.layout` unset to use Recording Studio's default layout (back and close). Set it to a host layout path when you want the comment pages and `/commentable` home feed to render inside your app shell.
+Leave `config.layout` unset (`nil`) to follow `RecordingStudio.configuration.layout`, then the shared default layout (back and close). Set a layout name, `false`, or a callable invoked as `call(controller:)` when comment pages and the `/commentable` home feed should use a different shell.
 
 ## Internationalization
 
@@ -201,7 +201,7 @@ nested keys in their own `config/locales`. There is no dependency on
 When a shipped commentable key is missing in the active locale, fallback comes
 from the loaded English, host overrides included, then the gem-shipped table
 registered at boot via `RecordingStudio::Translation.register_shipped_english`.
-Requires `recording_studio ~> 4.7`. A missing `_html` key with a non-interpolating
+Requires `recording_studio` `>= 6.1.0` (dummy pin `v6.3.0`). A missing `_html` key with a non-interpolating
 String caller `default:` stays unsafe like view `t`: a plain default with no
 interpolation is returned as a plain (non-html_safe) String, so views will
 escape it. An interpolating String caller `default:` escapes args and returns
@@ -348,11 +348,11 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | v4.7.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
-| RecordingStudioAccessible | v0.18.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
-| RecordingStudioTrashable | v0.11.0 (`require: false`; Accessible query-only companion) |
-| RecordingStudioMetrics | v0.2.0 (`require: false`; Trashable resolution companion) |
-| FlatPack        | `main` in dummy; `v0.1.208` (`require: false`) at root for Trashable resolution |
+| RecordingStudio | v6.3.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 6.1.0`) |
+| RecordingStudioAccessible | v0.22.2 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudioTrashable | v0.12.0 (`require: false`; Accessible query-only companion) |
+| RecordingStudioMetrics | v0.7.0 (`require: false`; Trashable resolution companion) |
+| FlatPack        | v0.1.329 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | Devise          | latest  |
 
 ## Documentation

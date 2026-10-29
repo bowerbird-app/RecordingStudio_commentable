@@ -1,9 +1,12 @@
-<% recording_studio_page_nav(
-  title: "Scenarios",
-  page_nav_back_url: root_path,
-  page_nav_back_label: "Home",
-  page_nav_anchor_url: root_path,
-  page_nav_anchor_label: "Close"
+<% content_for :title, "Comment scenarios" %>
+<% content_for :subtitle, "Include Commentable.to on a page to open a comment thread. Folders stay quiet." %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: root_path,
+  back_tooltip: "Home",
+  anchor_href: root_path,
+  anchor_tooltip: "Close"
 ) %>
 
 <div class="flex w-full flex-col gap-8"
@@ -12,11 +15,6 @@
   data-scroll-anchor-hash-value="comment-scenarios"
   data-scroll-anchor-offset-value="12"
   data-scroll-anchor-storage-key-value="comment-scenarios-scroll">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Comment scenarios",
-    subtitle: "Include Commentable.to on a page to open a comment thread. Folders stay quiet.",
-    variant: :h1
-  ) %>
 
   <div class="flex flex-wrap gap-2">
     <%= render FlatPack::Badge::Component.new(text: "Dummy scenarios", style: :success, size: :sm) %>
@@ -45,7 +43,7 @@
       else
         "Not accessible for #{actor_name}. Opening the feed or adding a comment will fail."
       end %>
-      <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <%= render FlatPack::Card::Component.new do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: title,

@@ -6,15 +6,15 @@ class ApplicationController < ActionController::Base
   include RecordingStudioCommentable::CommentBodyHelper
   include RecordingStudioCommentable::CommentRoutesHelper
   include RecordingStudioCommentable::RecordableDisplayHelper
-  include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
+  include RecordingStudio::ControllerLayout
+
+  recording_studio_layout { devise_controller? ? "devise" : nil }
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern unless Rails.env.test?
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
-
-  layout :application_layout
 
   before_action :authenticate_user!
   before_action :set_current_actor
@@ -28,10 +28,6 @@ class ApplicationController < ActionController::Base
                 :truncate_comment_body
 
   private
-
-  def application_layout
-    devise_controller? ? "devise" : "recording_studio/default_layout"
-  end
 
   def set_current_actor
     Current.actor = current_user

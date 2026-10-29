@@ -33,9 +33,9 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, 'controller_prefix: "recording_studio_commentable/"'
     assert_includes controller_source, "route_set.routes.filter_map do |route|"
     assert_includes controller_source, "route.path.spec.to_s.delete_suffix(\"(.:format)\")"
-    assert_includes view_source, 'title: "Gem routes"'
+    assert_includes view_source, 'content_for :title, "Gem routes"'
     assert_includes view_source,
-                    'subtitle: "A dummy-app reference for the RecordingStudioCommentable routes exposed by the mounted engine and the host app."'
+                    'content_for :subtitle, "A dummy-app reference for the RecordingStudioCommentable routes exposed by the mounted engine and the host app."'
     assert_includes view_source, "@gem_route_groups.each do |group|"
     assert_includes view_source, "title: group[:title]"
     assert_includes view_source, "group[:routes].each do |route|"
@@ -70,17 +70,17 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, ".where(parent_recording: recording)"
     assert_includes controller_source, ".pluck(:id)"
     assert_includes controller_source, "def recording_snapshot(recording)"
-    assert_includes index_view_source, 'title: "Recordings"'
+    assert_includes index_view_source, 'content_for :title, "Recordings"'
     assert_includes index_view_source, "@recording_entries.each do |entry|"
     assert_includes index_view_source, 'text: "Inspect structure"'
-    assert_includes index_view_source, "url: recording_browser_path(recording)"
-    assert_includes detail_view_source, "page_nav_back_url: recordings_browser_path"
-    assert_includes detail_view_source, "recording_studio_page_nav"
+    assert_includes index_view_source, "href: recording_browser_path(recording)"
+    assert_includes detail_view_source, "back_href: recordings_browser_path"
+    assert_includes detail_view_source, "flat_pack_page_nav"
     assert_includes detail_view_source, 'title: "Recording"'
     assert_includes detail_view_source, 'title: "Child recordings"'
     assert_includes detail_view_source, 'title: "Events"'
     assert_includes detail_view_source, 'title: "Recordable"'
-    assert_includes detail_view_source, "title: @recording_snapshot[:title]"
+    assert_includes detail_view_source, "content_for :title, @recording_snapshot[:title]"
     assert_includes detail_view_source, "@recording_children.each do |child|"
     assert_includes detail_view_source, "@recording_events.each do |entry|"
     assert_includes detail_view_source, "border-l border-(--surface-border-color)"
@@ -115,12 +115,12 @@ class CommentsPagesFlowTest < Minitest::Test
                     "RecordableDisplayHelper is included in both the dummy app controller and the engine controller."
     assert_includes controller_source,
                     "CommentRoutesHelper exposes the mounted reply route helper used by the gem-owned reply composer flow."
-    assert_includes view_source, 'title: "View helpers"'
+    assert_includes view_source, 'content_for :title, "View helpers"'
     assert_includes view_source, 'title: "Exposed helper methods"'
     assert_includes view_source, 'title: "Public services"'
     assert_includes view_source, 'title: "Host app API"'
     assert_includes view_source,
-                    'subtitle: "A dummy-app reference for the helper methods exposed by RecordingStudioCommentable and the host controller layer."'
+                    'content_for :subtitle, "A dummy-app reference for the helper methods exposed by RecordingStudioCommentable and the host controller layer."'
     assert_includes view_source, "@helper_catalog.each do |helper_entry|"
     assert_includes view_source, "@service_catalog.each do |service_entry|"
     assert_includes view_source, "@host_api_catalog.each do |api_entry|"
@@ -187,7 +187,7 @@ class CommentsPagesFlowTest < Minitest::Test
                     "Nested replies are rendered one level deep inside the shared comment partial, and nested reply rows do not expose a Reply action."
     assert_includes controller_source,
                     "Reply defaults to the mounted gem reply composer route using the shared inline FlatPack comments-link style."
-    assert_includes view_source, 'title: "Components"'
+    assert_includes view_source, 'content_for :title, "Components"'
     assert_includes view_source, "@component_catalog.each do |component_entry|"
     assert_includes view_source, "title: component_entry[:title]"
     assert_includes view_source, "Parameters"
@@ -227,8 +227,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source,
                     'render partial: "comments_page", locals: comments_page_locals, layout: false if turbo_frame_request?'
     assert_includes controller_source, "@external_back_path = main_app.root_path"
-    assert_includes view_source, "recording_studio_page_nav"
-    assert_includes view_source, "page_nav_back_url: @external_back_path"
+    assert_includes view_source, "flat_pack_page_nav"
+    assert_includes view_source, "back_href: @external_back_path"
     assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.home.title")'
     assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.home.subtitle")'
     assert_includes view_source, 'render "comments_page"'
@@ -265,11 +265,11 @@ class CommentsPagesFlowTest < Minitest::Test
     layout_source = read_workspace_file("app/views/layouts/recording_studio_commentable/application.html.erb")
 
     assert_includes application_controller_source, "include RecordingStudioCommentable::CommentBodyHelper"
-    assert_includes application_controller_source, "layout :commentable_layout"
+    assert_includes application_controller_source, "recording_studio_layout"
     assert_includes application_controller_source, "helper_method :truncate_comment_body"
     assert_includes application_controller_source,
-                    'RecordingStudioCommentable.configuration.layout.presence || "recording_studio/default_layout"'
-    assert_includes application_controller_source, "RecordingStudio::UsesDefaultLayout"
+                    "RecordingStudioCommentable.configuration.layout"
+    assert_includes application_controller_source, "RecordingStudio::ControllerLayout"
     assert_includes controller_source, "before_action :authorize_view!, only: %i[index all reply]"
     assert_includes controller_source, "def all"
     assert_includes controller_source, "@show_comments = summary_show_comments_request?"
@@ -307,7 +307,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source,
                     "referer_uri.query.present? ? \"\#{referer_uri.path}?\#{referer_uri.query}\" : referer_uri.path"
     refute_includes controller_source, "layout :comments_layout"
-    assert_includes application_controller_source, "RecordingStudio::LayoutHelper"
+    refute_includes application_controller_source, "RecordingStudio::UsesDefaultLayout"
     refute_includes layout_source, "FlatPack::SidebarLayout::Component"
   end
 
@@ -317,9 +317,9 @@ class CommentsPagesFlowTest < Minitest::Test
     count_source = read_workspace_file("lib/recording_studio_commentable/comment_count.rb")
     controller_source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
 
-    assert_includes view_source, "recording_studio_page_nav"
-    assert_includes view_source, "page_nav_back_url: @back_button_onclick.present? ? nil : @external_back_path"
-    assert_includes view_source, "page_nav_anchor_url: @external_back_path"
+    assert_includes view_source, "flat_pack_page_nav"
+    assert_includes view_source, "back_href: @back_button_onclick.present? ? nil : @external_back_path"
+    assert_includes view_source, "anchor_href: @external_back_path"
     assert_includes view_source, "unless @show_comments"
     assert_includes view_source,
                     "RecordingStudioCommentable::CommentsButton::Component.new("
@@ -357,13 +357,13 @@ class CommentsPagesFlowTest < Minitest::Test
     feed_page_partial_source = read_workspace_file("app/views/recording_studio_commentable/comments/_feed_page.html.erb")
     controller_source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
 
-    assert_includes view_source, "recording_studio_page_nav"
-    assert_includes view_source, "page_nav_back_url: @summary_path"
+    assert_includes view_source, "flat_pack_page_nav"
+    assert_includes view_source, "back_href: @summary_path"
     assert_includes view_source, "show_new_comment_button = ActiveModel::Type::Boolean.new.cast(params[:new_comment_button])"
     assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.common.add_comment")'
-    assert_includes view_source, "url: @new_comment_path"
-    assert_includes view_source, "style: :secondary"
-    assert_includes view_source, 'class: "justify-start"'
+    assert_includes view_source, "@new_comment_path"
+    assert_includes view_source, "register_page_nav"
+    assert_includes view_source, "role: :secondary"
     assert_includes view_source, "RecordingStudioCommentable::CommentsFeed::Component.new("
     assert_includes view_source, "recording: @parent_recording"
     assert_includes view_source, "mode: params[:loading]"
@@ -431,11 +431,11 @@ class CommentsPagesFlowTest < Minitest::Test
     dummy_home_controller_source = read_workspace_file("test/dummy/app/controllers/home_controller.rb")
     dummy_home_index_source = read_workspace_file("test/dummy/app/views/home/index.html.erb")
 
-    assert_includes new_view_source, "recording_studio_page_nav"
+    assert_includes new_view_source, "flat_pack_page_nav"
     assert_includes new_view_source,
                     "back_path = @safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "FlatPack::Comments::Thread::Component.new("
-    assert_includes new_view_source, "thread.header do"
+    refute_includes new_view_source, "thread.header do"
     assert_includes new_view_source, "thread.comment do"
     assert_includes new_view_source, "composer_title = @composer_title.presence"
     assert_includes new_view_source,
@@ -496,6 +496,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes seeds_source, 'email: "view@admin.com"'
     assert_includes seeds_source, 'avatar_url: "https://i.pravatar.cc/160?u=view@admin.com"'
     assert_includes seeds_source, "RecordingStudioAccessible.bootstrap_owner_access!"
+    assert_includes seeds_source, "Access already exists"
     assert_includes seeds_source, "RecordingStudioAccessible.grant_access("
     refute_includes seeds_source, "AccessCreationContext"
     refute_includes seeds_source, "record(RecordingStudio::Access"

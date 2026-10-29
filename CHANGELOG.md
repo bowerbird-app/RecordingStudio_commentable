@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-29
+
+### Changed
+- Version `0.6.2` → `0.7.0`.
+- Runtime dependency is now `recording_studio` `>= 6.1.0`. Dummy and development apps pin core tag `v6.3.0` and FlatPack tag `v0.1.329`. Companion dummy pins are Accessible `v0.22.2`, Trashable `v0.12.0`, and Metrics `v0.7.0` so Bundler can resolve core 6.3.
+- Comment screens call `recording_studio_layout` with `configuration.layout`. `UsesDefaultLayout` and a hard-coded default layout path are gone. Layout values go through `RecordingStudio::Layout.accept`.
+- Engine and dummy pages set `content_for :title` and `:subtitle`. Back and close use `flat_pack_page_nav`. The all-comments add action uses `register_page_nav`. Dummy sign-out stays in `recording_studio_page_nav_right`.
+- FlatPack `Button` `url:` is `href:`. Card `style:` is `border:` / `shadow:`.
+
+### Upgrade notes
+- Install Commentable `0.7.0` with Recording Studio `>= 6.1.0` (`tag: "v6.3.0"` in this dummy) and FlatPack `v0.1.329` or newer. Stay on `0.6.2` if you are still on Recording Studio 4.
+- Leave `config.layout` unset (`nil`) to follow the host Recording Studio layout, then the shared default. Set a layout name, `false`, or a callable invoked as `call(controller:)`. Blank strings still store as `nil`.
+- Replace `recording_studio_page_nav` with `content_for :title` / `:subtitle` and `flat_pack_page_nav`. Put page actions on `register_page_nav`. `recording_studio_page_nav_right` remains for custom right-side HTML.
+- Replace FlatPack `Button` `url:` with `href:`. Remove Card `style:`; use `border:` and `shadow:`.
+
 ## [0.6.2] - 2026-10-28
 
 ### Changed
@@ -184,7 +199,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.5.3...v0.6.0

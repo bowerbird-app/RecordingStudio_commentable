@@ -8,7 +8,7 @@ class RecordingStudioCommentableTest < Minitest::Test
   end
 
   def test_version
-    assert_equal "0.6.2", ::RecordingStudioCommentable::VERSION
+    assert_equal "0.7.0", ::RecordingStudioCommentable::VERSION
   end
 
   def test_engine_exists
@@ -19,8 +19,8 @@ class RecordingStudioCommentableTest < Minitest::Test
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
 
-    assert_includes controller_source, "RecordingStudio::UsesDefaultLayout"
-    assert_includes controller_source, '"recording_studio/default_layout"'
+    assert_includes controller_source, "RecordingStudio::ControllerLayout"
+    assert_includes controller_source, "recording_studio_layout"
     assert_includes controller_source, "devise_controller? ? \"devise\""
   end
 
@@ -50,8 +50,9 @@ class RecordingStudioCommentableTest < Minitest::Test
     )
     controller_source = File.read(application_controller_path)
 
-    assert_includes controller_source, "RecordingStudio::UsesDefaultLayout"
-    assert_includes controller_source, '"recording_studio/default_layout"'
+    assert_includes controller_source, "RecordingStudio::ControllerLayout"
+    assert_includes controller_source, "recording_studio_layout"
+    assert_includes controller_source, "RecordingStudioCommentable.configuration.layout"
     refute_includes controller_source, '"recording_studio_commentable/application"'
 
     head_path = File.expand_path("../app/views/recording_studio/_default_layout_head.html.erb", __dir__)
@@ -83,7 +84,7 @@ class RecordingStudioCommentableTest < Minitest::Test
     assert_includes view_source, "Scenario matrix"
     assert_includes view_source, "Workspace state"
     assert_includes view_source, "/scenarios"
-    assert_includes view_source, "recording_studio_page_nav"
+    assert_includes view_source, "flat_pack_page_nav"
   end
 
   def test_dummy_scenarios_page_uses_flatpack_components
@@ -93,7 +94,7 @@ class RecordingStudioCommentableTest < Minitest::Test
     assert_includes view_source, "FlatPack::PageTitle::Component"
     assert_includes view_source, "FlatPack::Card::Component"
     assert_includes view_source, "FlatPack::Badge::Component"
-    assert_includes view_source, "recording_studio_page_nav"
+    assert_includes view_source, "flat_pack_page_nav"
   end
 
   def test_engine_home_page_lists_comments_without_dummy_sidebar_shell
@@ -101,7 +102,7 @@ class RecordingStudioCommentableTest < Minitest::Test
     view_source = File.read(view_path)
 
     assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.home.title")'
-    assert_includes view_source, "recording_studio_page_nav"
+    assert_includes view_source, "flat_pack_page_nav"
     assert_includes view_source, 'render "comments_page"'
     refute_includes view_source, "FlatPack::SidebarLayout::Component"
   end
@@ -118,9 +119,9 @@ class RecordingStudioCommentableTest < Minitest::Test
     view_source = File.read(view_path)
 
     assert_includes view_source, 'text: "Scenarios"'
-    assert_includes view_source, "url: scenarios_path"
+    assert_includes view_source, "href: scenarios_path"
     assert_includes view_source, 'text: "All comments"'
-    assert_includes view_source, 'url: "/commentable"'
+    assert_includes view_source, 'href: "/commentable"'
   end
 
   def test_commentable_module_exists

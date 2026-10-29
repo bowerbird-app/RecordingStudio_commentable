@@ -28,7 +28,7 @@ module RecordingStudioCommentable
           size: size,
           disabled: disabled?
         )
-        args[:url] = destination_path unless disabled?
+        args[:href] = destination_path unless disabled?
         args
       end
 

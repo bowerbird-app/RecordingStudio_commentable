@@ -1,5 +1,26 @@
 # Upgrade Guide
 
+## Upgrading to 0.7.0
+
+Commentable works with Recording Studio 6.1 and newer. Dummy and CI pin core
+`v6.3.0` and FlatPack `v0.1.329`.
+
+### Upgrade steps
+
+1. Install Commentable `0.7.0` with `recording_studio` `>= 6.1.0`. Run the
+   dummy on Recording Studio `v6.3.0` and FlatPack `v0.1.329`. No migration.
+2. Leave `config.layout` unset unless this gem's screens should use a
+   different layout than `RecordingStudio.configuration.layout`. Accepted
+   values are `nil`, `false`, a layout name, or a callable invoked as
+   `call(controller:)`.
+3. Replace `recording_studio_page_nav` with `content_for :title`,
+   `content_for :subtitle`, and `flat_pack_page_nav`. Put page actions on
+   `register_page_nav`. `recording_studio_page_nav_right` is available again
+   on core 6.1+.
+4. Replace FlatPack `Button` `url:` with `href:`. Remove Card `style:`.
+
+Stay on Commentable `0.6.2` if the host is still on Recording Studio 4.
+
 ## Upgrading to 0.6.2
 
 No host or schema changes. Comment enablement, services, and screens stay on
