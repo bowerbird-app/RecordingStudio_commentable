@@ -85,6 +85,41 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     refute_includes response.body, updated_body
   end
 
+  def test_denied_view_redirects_with_not_allowed_flash
+    quinn = User.find_by!(email: "quinn@admin.com")
+    admin_page = Page.find_by!(title: "Admin User owns this document")
+    admin_recording = RecordingStudio::Recording.unscoped.find_by!(recordable: admin_page)
+
+    sign_in!(quinn)
+    get all_recording_comments_path(admin_recording)
+
+    assert_redirected_to root_path
+    assert_equal "You are not allowed to view comments here.", flash[:alert]
+  end
+
+  def test_denied_edit_redirects_with_not_allowed_flash
+    viewer = User.find_by!(email: "view@admin.com")
+    comment_recording = seeded_welcome_comment_recording!
+
+    sign_in!(viewer)
+    get edit_recording_comment_path(@public_recording, comment_recording)
+
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
+    assert_equal "You are not allowed to edit this comment.", flash[:alert]
+  end
+
+  def test_unauthorized_destroy_keeps_comment_and_flashes_not_allowed
+    viewer = User.find_by!(email: "view@admin.com")
+    comment_recording = seeded_welcome_comment_recording!
+
+    sign_in!(viewer)
+    delete recording_comment_path(@public_recording, comment_recording)
+
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
+    assert_equal "You are not allowed to edit this comment.", flash[:alert]
+    assert RecordingStudio::Recording.unscoped.exists?(comment_recording.id)
+  end
+
   def test_comment_recordable_is_registered_as_a_capability_owned_child_type
     assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioCommentable::Comment"
     assert RecordingStudio.configuration.capability_enabled?(:commentable, for_type: "Page")
@@ -99,5 +134,21 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
   def comment_recording_for_body!(body)
     comment = RecordingStudioCommentable::Comment.find_by!(body: body)
     RecordingStudio::Recording.unscoped.find_by!(recordable: comment)
+  end
+
+  def seeded_welcome_comment_recording!
+    comment_recording_for_body!(
+      "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."
+    )
+  end
+
+  def sign_in!(user)
+    post user_session_path, params: {
+      user: {
+        email: user.email,
+        password: "Password"
+      }
+    }
+    assert_response :redirect
   end
 end

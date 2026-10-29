@@ -7,6 +7,10 @@ class RecordingStudioCommentableTest < Minitest::Test
     refute_nil ::RecordingStudioCommentable::VERSION
   end
 
+  def test_version
+    assert_equal "0.6.2", ::RecordingStudioCommentable::VERSION
+  end
+
   def test_engine_exists
     assert_kind_of Class, ::RecordingStudioCommentable::Engine
   end

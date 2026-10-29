@@ -1,5 +1,31 @@
 # Upgrade Guide
 
+## Upgrading to 0.6.2
+
+No host or schema changes. Comment enablement, services, and screens stay on
+the 0.6.0 contract.
+
+Git tag `v0.6.1` already existed for the Trashable `v0.11.0` companion pin
+while `version.rb` still said `0.6.0`, so this release is `0.6.2`.
+
+### Upgrade steps
+
+1. Install Commentable `0.6.2`. No migration.
+2. Host apps need no code change.
+3. Dummy / development companion pins already use Trashable `v0.11.0` from the
+   `v0.6.1` tag. Hosts that pin that companion can stay on `v0.11.0`.
+
+## Upgrading to 0.6.1
+
+No Commentable API or schema change. The git tag `v0.6.1` recorded the
+Trashable companion pin to `v0.11.0` (#24) without bumping `version.rb`.
+
+### Upgrade steps
+
+1. No Commentable install step was published from `version.rb` for this tag.
+2. Hosts that pin `recording_studio_trashable` as an Accessible query-only
+   companion can use tag `v0.11.0`.
+
 ## Upgrading to 0.6.0
 
 Missing `recording_studio.commentable.*` keys fall back through
