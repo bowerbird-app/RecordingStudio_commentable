@@ -7,8 +7,10 @@ RecordingStudioCommentable.configure do |config|
   # Timeout for service operations (seconds)
   # config.timeout = 5
 
-  # Optional host-app layout. Leave blank to use Recording Studio's default layout.
-  # config.layout = "recording_studio/default_layout"
+  # Optional host-app layout. Leave unset (nil) to follow Recording Studio's
+  # layout, then the shared default layout. Set a layout name, false, or a
+  # callable invoked as call(controller:).
+  # config.layout = "application"
 
   # Use recording_studio_trashable's namespaced trash API for comment deletion.
   # Leave false unless the host app installs recording_studio_trashable.

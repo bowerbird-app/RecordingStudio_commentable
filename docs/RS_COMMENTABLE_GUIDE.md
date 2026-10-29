@@ -39,7 +39,7 @@ RecordingStudioCommentable.configure do |config|
 end
 ```
 
-Leave `config.layout` unset to keep Recording Studio's default layout. Set it to a host layout path when comment pages should render inside your app shell.
+Leave `config.layout` unset to follow Recording Studio's layout, then the shared default. Set a layout name, `false`, or a callable invoked as `call(controller:)` when comment pages should use a different shell.
 
 Set `config.use_recording_studio_trashable_for_destroy` to `true` only when your host app also installs `recording_studio_trashable` and wants comment deletion to use that gem's namespaced trash lifecycle method on the comment recording. Leave it `false` to keep the default destroy behavior in this addon.
 

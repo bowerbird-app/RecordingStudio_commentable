@@ -1,19 +1,17 @@
-<% recording_studio_page_nav(
-  title: "Recordings",
-  page_nav_back_url: root_path,
-  page_nav_back_label: "Home",
-  page_nav_anchor_url: root_path,
-  page_nav_anchor_label: "Close"
+<% content_for :title, "Recordings" %>
+<% content_for :subtitle, "Browse dummy RecordingStudio recordings and inspect how pages, folders, comments, and workspace nodes are structured." %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: root_path,
+  back_tooltip: "Home",
+  anchor_href: root_path,
+  anchor_tooltip: "Close"
 ) %>
 
 <div class="flex w-full flex-col gap-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Recordings",
-    subtitle: "Browse dummy RecordingStudio recordings and inspect how pages, folders, comments, and workspace nodes are structured.",
-    variant: :h1
-  ) %>
 
-  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+  <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
     <% card.body do %>
       <div class="flex flex-wrap gap-3 text-sm leading-6 text-(--surface-content-color)">
         <p><strong>Total recordings:</strong> <%= @recordings.size %></p>
@@ -26,7 +24,7 @@
     <% @recording_entries.each do |entry| %>
       <% recording = entry[:recording] %>
       <% title = entry[:title] %>
-      <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <%= render FlatPack::Card::Component.new do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: title,
@@ -66,7 +64,7 @@
                   text: "Inspect structure",
                   style: :secondary,
                   size: :sm,
-                  url: recording_browser_path(recording)
+                  href: recording_browser_path(recording)
                 ) %>
           </div>
         <% end %>

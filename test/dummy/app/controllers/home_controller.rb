@@ -497,13 +497,13 @@ class HomeController < ApplicationController
           },
           {
             label: "Custom reply action",
-            input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, reply_action: ->(comment_recording:, default_options:, **) { default_options.merge(url: recording_comments_path(recording, show_comments: true), text: \"Reply inline\") })",
+            input: "render RecordingStudioCommentable::CommentsFeed::Component.new(recording: recording, reply_action: ->(comment_recording:, default_options:, **) { default_options.merge(href: recording_comments_path(recording, show_comments: true), text: \"Reply inline\") })",
             preview: lambda {
               RecordingStudioCommentable::CommentsFeed::Component.new(
                 recording: paginated_feed_recording,
                 reply_action: lambda do |default_options:, **|
                   default_options.merge(
-                    url: recording_comments_path(paginated_feed_recording, show_comments: true),
+                    href: recording_comments_path(paginated_feed_recording, show_comments: true),
                     text: "Reply inline"
                   )
                 end

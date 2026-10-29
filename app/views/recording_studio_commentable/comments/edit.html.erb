@@ -1,19 +1,16 @@
-<% recording_studio_page_nav(
-  title: RecordingStudio.t("recording_studio.commentable.common.edit_comment"),
-  page_nav_back_url: @comments_collection_path,
-  page_nav_back_label: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
-  page_nav_anchor_url: @comments_collection_path,
-  page_nav_anchor_label: RecordingStudio.t("recording_studio.commentable.navigation.close")
+<% content_for :title, RecordingStudio.t("recording_studio.commentable.common.edit_comment") %>
+<% content_for :subtitle, @page_title %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: @comments_collection_path,
+  back_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
+  anchor_href: @comments_collection_path,
+  anchor_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.close")
 ) %>
 
 <div class="flex w-full max-w-3xl flex-col gap-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: RecordingStudio.t("recording_studio.commentable.common.edit_comment"),
-    subtitle: @page_title,
-    variant: :h1
-  ) %>
-
-  <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+  <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
     <% card.body do %>
       <%= render RecordingStudioCommentable::CommentComposer::Component.new(
             comment: @comment,

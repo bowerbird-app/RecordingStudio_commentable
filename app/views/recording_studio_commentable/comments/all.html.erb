@@ -1,24 +1,22 @@
-<% recording_studio_page_nav(
-  title: RecordingStudio.t("recording_studio.commentable.common.comments"),
-  page_nav_back_url: @summary_path,
-  page_nav_back_label: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
-  page_nav_anchor_url: @summary_path,
-  page_nav_anchor_label: RecordingStudio.t("recording_studio.commentable.navigation.close")
+<% content_for :title, RecordingStudio.t("recording_studio.commentable.common.comments") %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: @summary_path,
+  back_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
+  anchor_href: @summary_path,
+  anchor_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.close")
 ) %>
 
 <div class="flex w-full max-w-3xl flex-col gap-8">
   <% show_new_comment_button = ActiveModel::Type::Boolean.new.cast(params[:new_comment_button]) %>
 
   <% if show_new_comment_button && @can_create_comment %>
-    <div class="flex justify-start">
-      <%= render FlatPack::Button::Component.new(
-            text: RecordingStudio.t("recording_studio.commentable.common.add_comment"),
-            url: @new_comment_path,
-            style: :secondary,
-            size: :sm,
-            class: "justify-start"
-          ) %>
-    </div>
+    <% register_page_nav(
+      RecordingStudio.t("recording_studio.commentable.common.add_comment"),
+      @new_comment_path,
+      role: :secondary
+    ) %>
   <% end %>
 
   <%= render RecordingStudioCommentable::CommentsFeed::Component.new(

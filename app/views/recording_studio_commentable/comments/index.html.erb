@@ -1,21 +1,15 @@
-<% recording_studio_page_nav(
-  title: @page_title,
-  page_nav_back_url: @back_button_onclick.present? ? nil : @external_back_path,
-  page_nav_back_label: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
-  page_nav_anchor_url: @external_back_path,
-  page_nav_anchor_label: RecordingStudio.t("recording_studio.commentable.navigation.close")
+<% content_for :title, @page_title %>
+<% content_for :subtitle, RecordingStudio.t("recording_studio.commentable.index.subtitle") %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: @back_button_onclick.present? ? nil : @external_back_path,
+  back_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
+  anchor_href: @external_back_path,
+  anchor_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.close")
 ) %>
 
 <article class="flex w-full max-w-3xl flex-col gap-8">
-  <header class="space-y-2">
-    <%= render FlatPack::PageTitle::Component.new(
-      title: @page_title,
-      subtitle: RecordingStudio.t("recording_studio.commentable.index.subtitle"),
-      variant: :h1,
-      class: "mb-0 pb-0"
-    ) %>
-  </header>
-
   <% if @page_body.present? %>
     <section>
       <div class="max-w-none space-y-4 text-lg leading-8 whitespace-pre-wrap text-(--surface-content-color)">

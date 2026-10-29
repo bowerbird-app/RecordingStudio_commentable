@@ -1,21 +1,19 @@
-<% recording_studio_page_nav(
-  title: "Gem routes",
-  page_nav_back_url: root_path,
-  page_nav_back_label: "Home",
-  page_nav_anchor_url: root_path,
-  page_nav_anchor_label: "Close"
+<% content_for :title, "Gem routes" %>
+<% content_for :subtitle, "A dummy-app reference for the RecordingStudioCommentable routes exposed by the mounted engine and the host app." %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: root_path,
+  back_tooltip: "Home",
+  anchor_href: root_path,
+  anchor_tooltip: "Close"
 ) %>
 
 <div class="flex w-full flex-col gap-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Gem routes",
-    subtitle: "A dummy-app reference for the RecordingStudioCommentable routes exposed by the mounted engine and the host app.",
-    variant: :h1
-  ) %>
 
   <div class="grid gap-4 md:grid-cols-2">
     <% @gem_route_groups.each do |group| %>
-      <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+      <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |card| %>
         <% card.body do %>
           <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
             <p class="text-(--surface-muted-content-color)"><%= group[:title] %></p>
@@ -28,7 +26,7 @@
 
   <div class="flex flex-col gap-6">
     <% @gem_route_groups.each do |group| %>
-      <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <%= render FlatPack::Card::Component.new do |card| %>
         <% card.header do %>
           <%= render FlatPack::PageTitle::Component.new(
             title: group[:title],
@@ -41,7 +39,7 @@
         <% card.body do %>
           <div class="flex flex-col gap-4">
             <% group[:routes].each do |route| %>
-              <%= render FlatPack::Card::Component.new(style: :outlined) do |route_card| %>
+              <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |route_card| %>
                 <% route_card.body do %>
                   <div class="grid gap-4 lg:grid-cols-[minmax(0,160px)_minmax(0,1fr)]">
                     <div class="flex items-start gap-2">

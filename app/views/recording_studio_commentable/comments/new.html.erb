@@ -2,12 +2,15 @@
 <% composer_url = @composer_url || commentable_recording_comments_path(@parent_recording, **(@safe_return_to_path.present? ? { return_to: @safe_return_to_path } : {})) %>
 <% back_path = @safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path) %>
 
-<% recording_studio_page_nav(
-  title: composer_title,
-  page_nav_back_url: back_path,
-  page_nav_back_label: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
-  page_nav_anchor_url: back_path,
-  page_nav_anchor_label: RecordingStudio.t("recording_studio.commentable.navigation.close")
+<% content_for :title, composer_title %>
+<% content_for :subtitle, @composer_subtitle.presence || @page_title %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: back_path,
+  back_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
+  anchor_href: back_path,
+  anchor_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.close")
 ) %>
 
 <div class="flex w-full max-w-3xl flex-col gap-8">
@@ -18,12 +21,6 @@
     empty_body: ""
   ) do |thread| %>
     <% thread.header do %>
-      <%= render FlatPack::PageTitle::Component.new(
-        title: composer_title,
-        subtitle: @composer_subtitle.presence || @page_title,
-        variant: :h1,
-        class: "mb-0 pb-0"
-      ) %>
     <% end %>
 
     <% thread.comment do %>

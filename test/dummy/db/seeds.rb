@@ -23,9 +23,13 @@ def ensure_bootstrap_owner!(actor:, recording:)
     recording: recording,
     actor: actor
   )
-  raise result.error if result.failure?
+  return result.value if result.success?
+  if result.error.to_s.include?("Access already exists") &&
+     RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :admin)
+    return
+  end
 
-  result.value
+  raise result.error
 end
 
 def ensure_access_grant!(recording:, actor:, role:, manager_actor:)

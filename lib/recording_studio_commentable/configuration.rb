@@ -32,7 +32,8 @@ module RecordingStudioCommentable
     end
 
     def layout=(value)
-      @layout = value.to_s.strip.presence
+      normalized = value.is_a?(String) ? value.strip.presence : value
+      @layout = RecordingStudio::Layout.accept(normalized)
     end
 
     def rich_text_comments=(value)

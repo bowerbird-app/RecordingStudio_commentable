@@ -218,7 +218,7 @@ module RecordingStudioCommentable
       def default_reply_button_options_for(comment_recording, _parent_recording)
         DEFAULT_REPLY_BUTTON_STYLE.merge(
           text: RecordingStudio.t("recording_studio.commentable.common.reply"),
-          url: helpers.commentable_reply_comment_path(comment_recording, **reply_return_to_options)
+          href: helpers.commentable_reply_comment_path(comment_recording, **reply_return_to_options)
         )
       end
 

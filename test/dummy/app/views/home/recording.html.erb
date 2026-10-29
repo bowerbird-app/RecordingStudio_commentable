@@ -1,20 +1,18 @@
-<% recording_studio_page_nav(
-  title: @recording_snapshot[:title],
-  page_nav_back_url: recordings_browser_path,
-  page_nav_back_label: "Recordings",
-  page_nav_anchor_url: recordings_browser_path,
-  page_nav_anchor_label: "Close"
+<% content_for :title, @recording_snapshot[:title] %>
+<% content_for :subtitle, "Recording #{@recording.id}" %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: recordings_browser_path,
+  back_tooltip: "Recordings",
+  anchor_href: recordings_browser_path,
+  anchor_tooltip: "Close"
 ) %>
 
 <div class="flex w-full flex-col gap-8">
 
-  <%= render FlatPack::PageTitle::Component.new(
-    title: @recording_snapshot[:title],
-    subtitle: "Recording #{@recording.id}",
-    variant: :h1
-  ) %>
 
-  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+  <%= render FlatPack::Card::Component.new do |card| %>
     <% card.header do %>
       <%= render FlatPack::PageTitle::Component.new(
         title: "Recording",
@@ -36,7 +34,7 @@
         </dl>
 
         <div class="pl-4 md:pl-8 border-l border-(--surface-border-color)">
-          <%= render FlatPack::Card::Component.new(style: :outlined) do |nested_card| %>
+          <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |nested_card| %>
             <% nested_card.header do %>
               <%= render FlatPack::PageTitle::Component.new(
                 title: "Recordable",
@@ -70,7 +68,7 @@
           <% if @recording_children.any? %>
             <div class="flex flex-col gap-4 pl-4 md:pl-8 border-l border-(--surface-border-color)">
               <% @recording_children.each do |child| %>
-                <%= render FlatPack::Card::Component.new(style: :outlined) do |child_card| %>
+                <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |child_card| %>
                   <% child_card.header do %>
                     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                       <%= render FlatPack::PageTitle::Component.new(
@@ -84,7 +82,7 @@
                             text: "Open child",
                             style: :ghost,
                             size: :sm,
-                            url: recording_browser_path(child[:recording])
+                            href: recording_browser_path(child[:recording])
                           ) %>
                     </div>
                   <% end %>
@@ -101,7 +99,7 @@
                       </dl>
 
                       <div class="pl-4 md:pl-6 border-l border-(--surface-border-color)">
-                        <%= render FlatPack::Card::Component.new(style: :default) do |recordable_card| %>
+                        <%= render FlatPack::Card::Component.new do |recordable_card| %>
                           <% recordable_card.header do %>
                             <%= render FlatPack::PageTitle::Component.new(
                                   title: "Recordable",
@@ -136,7 +134,7 @@
     <% end %>
   <% end %>
 
-  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+  <%= render FlatPack::Card::Component.new do |card| %>
     <% card.header do %>
       <%= render FlatPack::PageTitle::Component.new(
         title: "Events",
@@ -148,7 +146,7 @@
 
     <% card.body do %>
       <div class="mb-4 grid gap-4 md:grid-cols-4">
-        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+        <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |summary_card| %>
           <% summary_card.body do %>
             <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
               <p class="text-(--surface-muted-content-color)">Child recordings</p>
@@ -157,7 +155,7 @@
           <% end %>
         <% end %>
 
-        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+        <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |summary_card| %>
           <% summary_card.body do %>
             <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
               <p class="text-(--surface-muted-content-color)">Events in scope</p>
@@ -166,7 +164,7 @@
           <% end %>
         <% end %>
 
-        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+        <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |summary_card| %>
           <% summary_card.body do %>
             <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
               <p class="text-(--surface-muted-content-color)">Parent recording</p>
@@ -175,7 +173,7 @@
           <% end %>
         <% end %>
 
-        <%= render FlatPack::Card::Component.new(style: :outlined) do |summary_card| %>
+        <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |summary_card| %>
           <% summary_card.body do %>
             <div class="space-y-1 text-sm leading-6 text-(--surface-content-color)">
               <p class="text-(--surface-muted-content-color)">Root recording</p>
@@ -188,7 +186,7 @@
       <% if @recording_events.any? %>
         <div class="flex flex-col gap-4">
           <% @recording_events.each do |entry| %>
-            <%= render FlatPack::Card::Component.new(style: :outlined) do |event_card| %>
+            <%= render FlatPack::Card::Component.new(border: :default, shadow: :none) do |event_card| %>
               <% event_card.header do %>
                 <%= render FlatPack::PageTitle::Component.new(
                       title: entry[:title],

@@ -104,7 +104,7 @@ class CommentsFeedComponentTest < ComponentTestCase
       RecordingStudioCommentable::CommentsFeed::Component.new(
         recording: @public_recording,
         reply_action: lambda do |default_options:, **|
-          default_options.merge(url: custom_url, text: "Reply inline")
+          default_options.merge(href: custom_url, text: "Reply inline")
         end
       )
     )

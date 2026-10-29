@@ -1,18 +1,15 @@
-<% recording_studio_page_nav(
-  title: RecordingStudio.t("recording_studio.commentable.home.title"),
-  page_nav_back_url: @external_back_path,
-  page_nav_back_label: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
-  page_nav_anchor_url: @external_back_path,
-  page_nav_anchor_label: RecordingStudio.t("recording_studio.commentable.navigation.close")
+<% content_for :title, RecordingStudio.t("recording_studio.commentable.home.title") %>
+<% content_for :subtitle, RecordingStudio.t("recording_studio.commentable.home.subtitle") %>
+<% flat_pack_page_nav(
+  round: true,
+  style: :default,
+  back_href: @external_back_path,
+  back_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.go_back"),
+  anchor_href: @external_back_path,
+  anchor_tooltip: RecordingStudio.t("recording_studio.commentable.navigation.close")
 ) %>
 
 <div class="flex w-full max-w-4xl flex-col gap-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: RecordingStudio.t("recording_studio.commentable.home.title"),
-    subtitle: RecordingStudio.t("recording_studio.commentable.home.subtitle"),
-    variant: :h1
-  ) %>
-
   <% if @comment_entries.any? %>
     <div class="flex flex-col gap-4" id="comments">
       <%= render "comments_page",
