@@ -1,13 +1,13 @@
 # Upgrade Guide
 
-## Upgrading to 0.6.3
+## Upgrading to 0.7.0
 
 Commentable works with Recording Studio 6.1 and newer. Dummy and CI pin core
 `v6.3.0` and FlatPack `v0.1.329`.
 
 ### Upgrade steps
 
-1. Install Commentable `0.6.3` with `recording_studio` `>= 4.2, < 7`. Run the
+1. Install Commentable `0.7.0` with `recording_studio` `>= 6.1.0`. Run the
    dummy on Recording Studio `v6.3.0` and FlatPack `v0.1.329`. No migration.
 2. Leave `config.layout` unset unless this gem's screens should use a
    different layout than `RecordingStudio.configuration.layout`. Accepted

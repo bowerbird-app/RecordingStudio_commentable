@@ -8,7 +8,7 @@ class RecordingStudioCommentableTest < Minitest::Test
   end
 
   def test_version
-    assert_equal "0.6.3", ::RecordingStudioCommentable::VERSION
+    assert_equal "0.7.0", ::RecordingStudioCommentable::VERSION
   end
 
   def test_engine_exists

@@ -20,9 +20,6 @@
     empty_title: "",
     empty_body: ""
   ) do |thread| %>
-    <% thread.header do %>
-    <% end %>
-
     <% thread.comment do %>
       <%= render RecordingStudioCommentable::CommentComposer::Component.new(
             comment: @comment,

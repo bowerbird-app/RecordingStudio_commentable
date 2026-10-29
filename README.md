@@ -201,7 +201,7 @@ nested keys in their own `config/locales`. There is no dependency on
 When a shipped commentable key is missing in the active locale, fallback comes
 from the loaded English, host overrides included, then the gem-shipped table
 registered at boot via `RecordingStudio::Translation.register_shipped_english`.
-Requires `recording_studio` `>= 4.2, < 7` (dummy pin `v6.3.0`). A missing `_html` key with a non-interpolating
+Requires `recording_studio` `>= 6.1.0` (dummy pin `v6.3.0`). A missing `_html` key with a non-interpolating
 String caller `default:` stays unsafe like view `t`: a plain default with no
 interpolation is returned as a plain (non-html_safe) String, so views will
 escape it. An interpolating String caller `default:` escapes args and returns
@@ -348,7 +348,7 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | v6.3.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 4.2, < 7`) |
+| RecordingStudio | v6.3.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 6.1.0`) |
 | RecordingStudioAccessible | v0.22.2 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | RecordingStudioTrashable | v0.12.0 (`require: false`; Accessible query-only companion) |
 | RecordingStudioMetrics | v0.7.0 (`require: false`; Trashable resolution companion) |

@@ -435,7 +435,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes new_view_source,
                     "back_path = @safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "FlatPack::Comments::Thread::Component.new("
-    assert_includes new_view_source, "thread.header do"
+    refute_includes new_view_source, "thread.header do"
     assert_includes new_view_source, "thread.comment do"
     assert_includes new_view_source, "composer_title = @composer_title.presence"
     assert_includes new_view_source,

@@ -17,15 +17,17 @@ class RecordingStudioPinTest < ActiveSupport::TestCase
     end
   end
 
-  def test_gemspec_depends_on_recording_studio_4_2_through_6
+  def test_gemspec_depends_on_recording_studio_6_1_0
     gemspec = File.read(File.expand_path("../recording_studio_commentable.gemspec", __dir__))
 
     assert_match(
-      /spec\.add_dependency ["']recording_studio["'], ["']>= 4\.2["'], ["']< 7["']/,
+      /spec\.add_dependency ["']recording_studio["'], ["']>= 6\.1\.0["']/,
       gemspec,
-      "gemspec must depend on recording_studio >= 4.2, < 7"
+      "gemspec must depend on recording_studio >= 6.1.0"
     )
     refute_includes gemspec, '"~> 4.7"'
+    refute_includes gemspec, '">= 4.2"'
+    refute_includes gemspec, '"< 7"'
   end
 
   def test_root_and_dummy_gemfiles_pin_flat_pack_v0_1_329
