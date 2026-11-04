@@ -40,6 +40,7 @@ en:
         comment_added: "Comment added."
         comment_updated: "Comment updated."
         comment_deleted: "Comment deleted."
+        comment_not_deleted: "Couldn't delete that comment."
         recording_not_found: "Recording not found."
         comment_not_found: "Comment not found."
         comments_not_enabled: "Comments are not enabled for this resource."

@@ -42,10 +42,11 @@ class CommentTest < Minitest::Test
     def author_avatar_url
       return unless author
 
-      RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
+      raw_url = RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
         author,
         mappings: RecordingStudioCommentable::DisplayAttributeResolver.mapping_for_configuration(:author_avatar_attributes)
       )
+      RecordingStudioCommentable::PathSafety.safe_avatar_url(raw_url)
     end
 
     def persisted?
@@ -136,6 +137,22 @@ class CommentTest < Minitest::Test
     assert_equal "https://example.com/avatar.png", comment.author_avatar_url
   ensure
     Object.send(:remove_const, :AvatarAuthor) if Object.const_defined?(:AvatarAuthor)
+  end
+
+  def test_author_avatar_url_rejects_javascript_urls
+    author_class = Class.new do
+      def profile_image
+        "javascript:alert(1)"
+      end
+    end
+    Object.const_set("UnsafeAvatarAuthor", author_class)
+    RecordingStudioCommentable.configuration.author_avatar_attributes = { "UnsafeAvatarAuthor" => :profile_image }
+
+    comment = StubComment.new(body: "Hello", author: UnsafeAvatarAuthor.new)
+
+    assert_nil comment.author_avatar_url
+  ensure
+    Object.send(:remove_const, :UnsafeAvatarAuthor) if Object.const_defined?(:UnsafeAvatarAuthor)
   end
 
   def test_author_avatar_url_returns_nil_without_configuration

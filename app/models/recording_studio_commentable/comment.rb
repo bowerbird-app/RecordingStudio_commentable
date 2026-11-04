@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "recording_studio_commentable/display_attribute_resolver"
+require "recording_studio_commentable/path_safety"
 
 module RecordingStudioCommentable
   # Stores the body text and authorship of a single comment.
@@ -47,10 +48,11 @@ module RecordingStudioCommentable
     def author_avatar_url
       return unless author
 
-      RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
+      raw_url = RecordingStudioCommentable::DisplayAttributeResolver.string_value_for(
         author,
         mappings: RecordingStudioCommentable::DisplayAttributeResolver.mapping_for_configuration(:author_avatar_attributes)
       )
+      RecordingStudioCommentable::PathSafety.safe_avatar_url(raw_url)
     end
   end
 end

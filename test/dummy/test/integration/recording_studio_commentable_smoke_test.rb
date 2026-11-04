@@ -108,6 +108,81 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     assert_equal "You are not allowed to edit this comment.", flash[:alert]
   end
 
+  def test_hidden_comment_partial_omits_author_time_and_avatar
+    comment_recording = seeded_welcome_comment_recording!
+    comment = comment_recording.recordable
+    html = ApplicationController.render(
+      partial: "recording_studio_commentable/comments/comment",
+      locals: {
+        comment_recording: comment_recording,
+        parent_recording: @public_recording,
+        accessible: false,
+        replies: [],
+        allow_reply: false
+      }
+    )
+
+    refute_includes html, comment.author_display_name
+    refute_includes html, "Admin User"
+    refute_includes html, comment.author_avatar_url.to_s if comment.author_avatar_url.present?
+    refute_includes html, comment_recording.created_at.strftime("%b %-d, %Y")
+    refute_includes html, comment_recording.created_at.iso8601
+    assert_includes html, "Comment hidden"
+  end
+
+  def test_home_inbox_omits_unauthorized_comment_author_time_and_avatar
+    secret_author = User.create!(
+      email: "secret-author@admin.com",
+      password: "Password",
+      password_confirmation: "Password",
+      name: "Secret Author Unique",
+      avatar_url: "https://i.pravatar.cc/160?u=secret-author-unique"
+    )
+    admin_page = Page.find_by!(title: "Admin User owns this document")
+    admin_recording = RecordingStudio::Recording.unscoped.find_by!(recordable: admin_page)
+    Current.actor = secret_author
+    result = RecordingStudioCommentable::Services::CreateComment.call(
+      parent_recording: admin_recording,
+      body: "Secret inbox comment that Quinn must not see",
+      author: secret_author
+    )
+    assert result.success?
+
+    quinn = User.find_by!(email: "quinn@admin.com")
+    sign_in!(quinn)
+    get recording_studio_commentable.root_path
+
+    assert_response :success
+    refute_includes response.body, "Secret Author Unique"
+    refute_includes response.body, "secret-author-unique"
+    refute_includes response.body, "Secret inbox comment that Quinn must not see"
+    refute_includes response.body, "Admin-owned page sample comment"
+  end
+
+  def test_failed_destroy_flashes_error_not_success
+    comment_recording = seeded_welcome_comment_recording!
+    failure = RecordingStudioCommentable::Services::BaseService::Result.new(
+      success: false,
+      error: "boom"
+    )
+
+    sign_in!(@admin)
+    destroy_class = RecordingStudioCommentable::Services::DestroyComment
+    singleton = destroy_class.singleton_class
+    original = singleton.instance_method(:call)
+    singleton.define_method(:call) { |**| failure }
+    begin
+      delete recording_comment_path(@public_recording, comment_recording)
+    ensure
+      singleton.define_method(:call, original)
+    end
+
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
+    assert_equal "Couldn't delete that comment.", flash[:alert]
+    refute_equal "Comment deleted.", flash[:notice]
+    assert RecordingStudio::Recording.unscoped.exists?(comment_recording.id)
+  end
+
   def test_unauthorized_destroy_keeps_comment_and_flashes_not_allowed
     viewer = User.find_by!(email: "view@admin.com")
     comment_recording = seeded_welcome_comment_recording!

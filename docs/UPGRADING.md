@@ -1,5 +1,18 @@
 # Upgrade Guide
 
+## Upgrading to 0.7.1
+
+No schema change. Comment screens still use Recording Studio default layout.
+
+### Upgrade steps
+
+1. Install Commentable `0.7.1`. No migration.
+2. `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stays for API
+   compatibility.
+3. Dummy / development companion pins: FlatPack `v0.1.341`, Accessible
+   `v0.24.0`, Trashable `v0.12.2`, Metrics `v0.7.2`. Recording Studio stays
+   `v6.3.0`.
+
 ## Upgrading to 0.7.0
 
 Commentable works with Recording Studio 6.1 and newer. Dummy and CI pin core

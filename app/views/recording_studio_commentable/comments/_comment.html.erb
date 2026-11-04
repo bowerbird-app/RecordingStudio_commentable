@@ -21,9 +21,15 @@ elsif allow_reply
 else
   nil
 end %>
-<% author_name = comment.respond_to?(:author_display_name) ? (name = comment.author_display_name; name == "Anonymous" ? RecordingStudio.t("recording_studio.commentable.common.anonymous") : name) : RecordingStudio.t("recording_studio.commentable.common.anonymous") %>
-<% author_avatar_url = comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil %>
-<% created_at = comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
+<% author_name = if accessible
+  comment.respond_to?(:author_display_name) ? (name = comment.author_display_name; name == "Anonymous" ? RecordingStudio.t("recording_studio.commentable.common.anonymous") : name) : RecordingStudio.t("recording_studio.commentable.common.anonymous")
+else
+  RecordingStudio.t("recording_studio.commentable.comment.hidden")
+end %>
+<% author_avatar_url = if accessible && comment.respond_to?(:author_avatar_url)
+  comment.author_avatar_url
+end %>
+<% created_at = accessible && comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
 <% body_html = accessible && rich_text_comments_enabled ? FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe : nil %>
 <% body_text = if accessible
   rich_text_comments_enabled ? nil : comment.body.to_s
@@ -38,7 +44,7 @@ end %>
     timestamp_iso: created_at&.iso8601,
     body: body_text,
     body_html: body_html,
-    avatar: { name: author_name, src: author_avatar_url }
+    avatar: accessible ? { name: author_name, src: author_avatar_url } : nil
   ) do |item| %>
     <% if accessible %>
       <% item.actions do %>

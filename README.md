@@ -17,7 +17,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.3.0`, FlatPack `v0.1.329`, Accessible `v0.22.2` (with Trashable `v0.12.0` and Metrics `v0.7.0` query-only companions), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.3.0`, FlatPack `v0.1.341`, Accessible `v0.24.0` (with Trashable `v0.12.2` and Metrics `v0.7.2` query-only companions), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -349,14 +349,14 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
 | RecordingStudio | v6.3.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 6.1.0`) |
-| RecordingStudioAccessible | v0.22.2 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
-| RecordingStudioTrashable | v0.12.0 (`require: false`; Accessible query-only companion) |
-| RecordingStudioMetrics | v0.7.0 (`require: false`; Trashable resolution companion) |
-| FlatPack        | v0.1.329 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudioAccessible | v0.24.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudioTrashable | v0.12.2 (`require: false`; Accessible query-only companion) |
+| RecordingStudioMetrics | v0.7.2 (`require: false`; Trashable resolution companion) |
+| FlatPack        | v0.1.341 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | Devise          | latest  |
 
 ## Documentation
 
 For a host-app focused walkthrough of installation, request flow, service methods, and hooks, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md). Upgrade notes live in [docs/UPGRADING.md](docs/UPGRADING.md). Cloud Agent boot and the fetched skill pack are in [docs/cursor-skills.md](docs/cursor-skills.md).
 
-The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material. Use it as background on the engine conventions; the README and dummy app are the source of truth for the Recording Studio addon workflow.
+The README, [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md), and the dummy app are the source of truth for the Recording Studio addon workflow.

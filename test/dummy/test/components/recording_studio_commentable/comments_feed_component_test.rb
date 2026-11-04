@@ -144,6 +144,13 @@ class CommentsFeedComponentTest < ComponentTestCase
     )
   end
 
+  def test_default_reply_button_style_is_ghost_small
+    options = RecordingStudioCommentable::CommentsFeed::Component::DEFAULT_REPLY_BUTTON_STYLE
+
+    assert options.frozen?
+    assert_equal({ style: :ghost, size: :sm, data: { turbo_frame: "_top" } }, options)
+  end
+
   private
 
   def reply_comment_path_fragment

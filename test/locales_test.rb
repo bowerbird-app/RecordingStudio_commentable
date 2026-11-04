@@ -34,6 +34,7 @@ class LocalesTest < Minitest::Test
     "recording_studio.commentable.flashes.comment_added" => "Comment added.",
     "recording_studio.commentable.flashes.comment_updated" => "Comment updated.",
     "recording_studio.commentable.flashes.comment_deleted" => "Comment deleted.",
+    "recording_studio.commentable.flashes.comment_not_deleted" => "Couldn't delete that comment.",
     "recording_studio.commentable.flashes.recording_not_found" => "Recording not found.",
     "recording_studio.commentable.flashes.comment_not_found" => "Comment not found.",
     "recording_studio.commentable.flashes.comments_not_enabled" => "Comments are not enabled for this resource.",
