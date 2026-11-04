@@ -221,6 +221,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "comment_recording?(comment_recording.parent_recording)"
     assert_includes controller_source, "replies: replies_by_parent.fetch(comment_recording.id, [])"
     assert_includes controller_source, "next if workspace_recording?(parent_recording)"
+    assert_includes controller_source, "next unless authorized_to_view?(parent_recording)"
+    assert_includes controller_source, "accessible: true"
     assert_includes controller_source, "group_by(&:parent_recording_id)"
     assert_includes controller_source, 'recording.recordable_type == "Workspace"'
     assert_includes controller_source, 'recording.recordable_type == "RecordingStudioCommentable::Comment"'
@@ -262,7 +264,7 @@ class CommentsPagesFlowTest < Minitest::Test
   def test_comments_controller_uses_plain_layout_and_internal_flow
     application_controller_source = read_workspace_file("app/controllers/recording_studio_commentable/application_controller.rb")
     controller_source = read_workspace_file("app/controllers/recording_studio_commentable/comments_controller.rb")
-    layout_source = read_workspace_file("app/views/layouts/recording_studio_commentable/application.html.erb")
+    layout_path = File.expand_path("../app/views/layouts/recording_studio_commentable/application.html.erb", __dir__)
 
     assert_includes application_controller_source, "include RecordingStudioCommentable::CommentBodyHelper"
     assert_includes application_controller_source, "recording_studio_layout"
@@ -276,7 +278,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "@comment = Comment.new"
     assert_includes controller_source, "redirect_to comments_collection_path,"
     assert_includes controller_source, "redirect_to post_create_redirect_path,"
-    assert_includes controller_source, "redirect_to commentable_home_referer_path || comments_collection_path,"
+    assert_includes controller_source, "redirect_target = commentable_home_referer_path || comments_collection_path"
     assert_includes controller_source, "if inline_composer_request? && summary_show_comments_request?"
     assert_includes controller_source, "render :index, status: :unprocessable_entity"
     assert_includes controller_source, "if inline_composer_request?"
@@ -308,7 +310,9 @@ class CommentsPagesFlowTest < Minitest::Test
                     "referer_uri.query.present? ? \"\#{referer_uri.path}?\#{referer_uri.query}\" : referer_uri.path"
     refute_includes controller_source, "layout :comments_layout"
     refute_includes application_controller_source, "RecordingStudio::UsesDefaultLayout"
-    refute_includes layout_source, "FlatPack::SidebarLayout::Component"
+    refute File.exist?(layout_path), "unused commentable application layout should be gone"
+    assert_includes controller_source, "if result.success?"
+    assert_includes controller_source, 'RecordingStudio.t("recording_studio.commentable.flashes.comment_not_deleted")'
   end
 
   def test_summary_page_template_shows_text_block_and_dynamic_bottom_button
@@ -380,10 +384,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_source, "loading_mode != :all"
     assert_includes component_source, "reply_action: nil"
     assert_includes component_source, "DEFAULT_REPLY_BUTTON_STYLE = {"
-    assert_includes component_source, "DEFAULT_REPLY_BUTTON_OPTIONS ="
-    assert_includes component_source,
-                    'DEFAULT_REPLY_BUTTON_OPTIONS = DEFAULT_REPLY_BUTTON_STYLE.merge(text: "Reply").freeze'
-    assert_includes component_source, 'text: "Reply"'
+    refute_includes component_source, "DEFAULT_REPLY_BUTTON_OPTIONS"
+    refute_includes component_source, 'text: "Reply"'
     assert_includes component_source, 'data: { turbo_frame: "_top" }'
     assert_includes component_source,
                     'RecordingStudio.t("recording_studio.commentable.common.reply")'
@@ -474,8 +476,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source,
                     "link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]"
     assert_includes comment_partial_source, "FlatPack::Button::Component.new(**reply_action_options)"
-    assert_includes comment_partial_source, "comment.respond_to?(:author_avatar_url) ? comment.author_avatar_url : nil"
-    assert_includes comment_partial_source, "avatar: { name: author_name, src: author_avatar_url }"
+    assert_includes comment_partial_source, "RecordingStudioCommentable::PathSafety.safe_avatar_url(comment.author_avatar_url)"
+    assert_includes comment_partial_source, "avatar: accessible ? { name: author_name, src: author_avatar_url } : nil"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
     assert_includes comment_partial_source, 'RecordingStudio.t("recording_studio.commentable.common.reply")'
     assert_includes comment_partial_source, "commentable_reply_comment_path"

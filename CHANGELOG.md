@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-04
+
+### Changed
+- Version `0.7.0` → `0.7.1`.
+- Dummy and development apps pin FlatPack `v0.1.341`, Accessible `v0.24.0`, Trashable `v0.12.2`, and Metrics `v0.7.2`. Recording Studio stays on `v6.3.0`.
+- The home inbox only lists comments you are allowed to view. Hidden rows no longer show an author, time, or avatar.
+- Deleting a comment only flashes success when the delete actually worked.
+- `return_to` paths reject backslashes, control characters, and encoded line breaks. Avatar images only use http(s) or relative image URLs.
+- Removed the unused commentable layout template, stale template docs, and the unused `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` alias.
+
+### Upgrade notes
+- Install Commentable `0.7.1`. No migration.
+- Hosts that read `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` should use `DEFAULT_REPLY_BUTTON_STYLE` plus their own reply label.
+- Dummy pins: FlatPack `v0.1.341`, Accessible `v0.24.0`, Trashable `v0.12.2`, Metrics `v0.7.2`.
+
 ## [0.7.0] - 2026-10-29
 
 ### Changed
@@ -199,7 +214,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.0...v0.6.1

@@ -127,14 +127,20 @@ module RecordingStudioCommentable
 
     def destroy
       root = root_recording_for(@parent_recording)
-      Services::DestroyComment.call(
+      result = Services::DestroyComment.call(
         comment_recording: @comment_recording,
         root_recording: root,
         actor: current_recording_studio_actor
       )
 
-      redirect_to commentable_home_referer_path || comments_collection_path,
-                  notice: RecordingStudio.t("recording_studio.commentable.flashes.comment_deleted")
+      redirect_target = commentable_home_referer_path || comments_collection_path
+      if result.success?
+        redirect_to redirect_target,
+                    notice: RecordingStudio.t("recording_studio.commentable.flashes.comment_deleted")
+      else
+        redirect_to redirect_target,
+                    alert: RecordingStudio.t("recording_studio.commentable.flashes.comment_not_deleted")
+      end
     end
 
     private

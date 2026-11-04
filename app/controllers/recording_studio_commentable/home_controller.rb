@@ -51,8 +51,7 @@ module RecordingStudioCommentable
       top_level_comments.filter_map do |comment_recording|
         parent_recording = root_recording_for(comment_recording.parent_recording)
         next if workspace_recording?(parent_recording)
-
-        accessible = authorized_to_view?(parent_recording)
+        next unless authorized_to_view?(parent_recording)
 
         {
           comment_recording: comment_recording,
@@ -61,7 +60,7 @@ module RecordingStudioCommentable
             parent_recording,
             missing: RecordingStudio.t("recording_studio.commentable.display.unknown_item")
           ),
-          accessible: accessible,
+          accessible: true,
           replies: replies_by_parent.fetch(comment_recording.id, [])
         }
       end
