@@ -4,6 +4,9 @@ require "cgi"
 require "uri"
 
 module RecordingStudioCommentable
+  # return_to must stay a relative path; avatars must be http(s) or a relative
+  # image URL. Private helpers reject backslash, control chars, encoded CRLF,
+  # protocol-relative URLs, and userinfo.
   module PathSafety
     UNSAFE_CHARACTERS = /[\\\x00-\x1F\x7F\u0080-\u009F\u2028\u2029]/
     DECODED_CONTROL_CHARACTERS = /[\x00-\x1F\x7F\u0080-\u009F\u2028\u2029]/

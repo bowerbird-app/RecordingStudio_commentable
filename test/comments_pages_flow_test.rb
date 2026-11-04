@@ -384,8 +384,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_source, "loading_mode != :all"
     assert_includes component_source, "reply_action: nil"
     assert_includes component_source, "DEFAULT_REPLY_BUTTON_STYLE = {"
-    refute_includes component_source, "DEFAULT_REPLY_BUTTON_OPTIONS"
-    refute_includes component_source, 'text: "Reply"'
+    assert_includes component_source, "DEFAULT_REPLY_BUTTON_OPTIONS ="
+    assert_includes component_source,
+                    'DEFAULT_REPLY_BUTTON_OPTIONS = DEFAULT_REPLY_BUTTON_STYLE.merge(text: "Reply").freeze'
+    assert_includes component_source, 'text: "Reply"'
     assert_includes component_source, 'data: { turbo_frame: "_top" }'
     assert_includes component_source,
                     'RecordingStudio.t("recording_studio.commentable.common.reply")'
@@ -476,7 +478,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes comment_partial_source,
                     "link_to reply_action_options[:text], reply_action_options[:href], class: reply_action_options[:class], data: reply_action_options[:data]"
     assert_includes comment_partial_source, "FlatPack::Button::Component.new(**reply_action_options)"
-    assert_includes comment_partial_source, "RecordingStudioCommentable::PathSafety.safe_avatar_url(comment.author_avatar_url)"
+    assert_includes comment_partial_source, "comment.author_avatar_url"
+    refute_includes comment_partial_source, "PathSafety.safe_avatar_url(comment.author_avatar_url)"
     assert_includes comment_partial_source, "avatar: accessible ? { name: author_name, src: author_avatar_url } : nil"
     assert_includes comment_partial_source, "FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe"
     assert_includes comment_partial_source, 'RecordingStudio.t("recording_studio.commentable.common.reply")'

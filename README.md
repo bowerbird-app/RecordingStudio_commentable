@@ -211,8 +211,8 @@ view `t`).
 
 `Comment#author_display_name` and `recordable_display_title` keep main’s literal
 English return values; the comment partial and caller `missing:` args translate
-at render. Reply buttons use `DEFAULT_REPLY_BUTTON_STYLE` plus translated reply
-copy; the old `DEFAULT_REPLY_BUTTON_OPTIONS` alias is gone.
+at render. `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stays for API
+compatibility.
 
 ### Upgrading to 0.6.2
 

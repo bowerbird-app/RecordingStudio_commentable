@@ -129,12 +129,26 @@ class CommentsFeedComponentTest < ComponentTestCase
     refute_includes rendered_content, "example.com/escape"
   end
 
+  def test_default_reply_button_options_alias_still_exposes_reply_text
+    options = RecordingStudioCommentable::CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS
+
+    assert options.frozen?
+    assert_equal(
+      {
+        text: "Reply",
+        style: :ghost,
+        size: :sm,
+        data: { turbo_frame: "_top" }
+      },
+      options
+    )
+  end
+
   def test_default_reply_button_style_is_ghost_small
     options = RecordingStudioCommentable::CommentsFeed::Component::DEFAULT_REPLY_BUTTON_STYLE
 
     assert options.frozen?
     assert_equal({ style: :ghost, size: :sm, data: { turbo_frame: "_top" } }, options)
-    refute RecordingStudioCommentable::CommentsFeed::Component.const_defined?(:DEFAULT_REPLY_BUTTON_OPTIONS)
   end
 
   private

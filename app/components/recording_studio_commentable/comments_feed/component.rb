@@ -11,6 +11,7 @@ module RecordingStudioCommentable
         size: :sm,
         data: { turbo_frame: "_top" }
       }.freeze
+      DEFAULT_REPLY_BUTTON_OPTIONS = DEFAULT_REPLY_BUTTON_STYLE.merge(text: "Reply").freeze
 
       def initialize(recording:, mode: :all, page_size: DEFAULT_PAGE_SIZE, include_composer: false, return_to: nil,
                      comment: nil, can_create_comment: nil, reply_action: nil)

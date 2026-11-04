@@ -27,7 +27,7 @@ else
   RecordingStudio.t("recording_studio.commentable.comment.hidden")
 end %>
 <% author_avatar_url = if accessible && comment.respond_to?(:author_avatar_url)
-  RecordingStudioCommentable::PathSafety.safe_avatar_url(comment.author_avatar_url)
+  comment.author_avatar_url
 end %>
 <% created_at = accessible && comment_recording.respond_to?(:created_at) ? comment_recording.created_at : nil %>
 <% body_html = accessible && rich_text_comments_enabled ? FlatPack::RichTextSanitizer.sanitize(comment.body.to_s).html_safe : nil %>

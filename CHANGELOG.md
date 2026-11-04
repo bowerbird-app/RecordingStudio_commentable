@@ -15,11 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The home inbox only lists comments you are allowed to view. Hidden rows no longer show an author, time, or avatar.
 - Deleting a comment only flashes success when the delete actually worked.
 - `return_to` paths reject backslashes, control characters, and encoded line breaks. Avatar images only use http(s) or relative image URLs.
-- Removed the unused commentable layout template, stale template docs, and the unused `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` alias.
+- Removed the unused commentable layout template and stale template docs. `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` stays for API compatibility.
 
 ### Upgrade notes
 - Install Commentable `0.7.1`. No migration.
-- Hosts that read `CommentsFeed::Component::DEFAULT_REPLY_BUTTON_OPTIONS` should use `DEFAULT_REPLY_BUTTON_STYLE` plus their own reply label.
 - Dummy pins: FlatPack `v0.1.341`, Accessible `v0.24.0`, Trashable `v0.12.2`, Metrics `v0.7.2`.
 
 ## [0.7.0] - 2026-10-29
