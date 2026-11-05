@@ -1,5 +1,15 @@
 # Upgrade Guide
 
+## Upgrading to 0.7.2
+
+No schema change. Development and dummy lockfiles use Rails `8.1.4.1` and the
+matching rack, nokogiri, loofah, and rails-html-sanitizer versions.
+
+### Upgrade steps
+
+1. Install Commentable `0.7.2`. No migration.
+2. Match the dummy lockfile Rails `8.1.4.1` stack if you pin those gems.
+
 ## Upgrading to 0.7.1
 
 No schema change. Comment screens still use Recording Studio default layout.

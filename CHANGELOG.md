@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-11-05
+
+### Changed
+- Version `0.7.1` → `0.7.2`.
+- Development and dummy lockfiles move to Rails `8.1.4.1`, rack `3.2.8`, nokogiri `1.19.7`, loofah `2.25.3`, and rails-html-sanitizer `1.7.2`.
+
+### Upgrade notes
+- Install Commentable `0.7.2`. No migration. Hosts should match those Rails and sanitizer versions.
+
 ## [0.7.1] - 2026-11-04
 
 ### Changed
@@ -213,7 +222,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.1...v0.6.2
