@@ -17,7 +17,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.341`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), sets `config.authorize_write` through Accessible `:edit` (owner grants are seeded; no empty-tree allow), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.341`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), sets `config.authorize_write` through Accessible `:edit` (AccessCreationContext only for Access rows; owner grants are seeded; no empty-tree allow), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 

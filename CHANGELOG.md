@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Dummy `authorize_write` allows `AccessCreationContext` only for Access rows, so other writes still need Accessible `:edit` during bootstrap.
+
 ## [0.8.0] - 2026-11-06
 
 ### Changed

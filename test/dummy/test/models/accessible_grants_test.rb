@@ -45,4 +45,32 @@ class AccessibleGrantsTest < ActiveSupport::TestCase
     assert_equal "edit", access.role
     assert RecordingStudioAccessible.authorized?(actor: extra, recording: @public_recording, role: :edit)
   end
+
+  test "authorize_write allows AccessCreationContext only for Access rows" do
+    authorizer = RecordingStudio.configuration.authorize_write
+    page = Page.new(title: "Bootstrap hole")
+    access = RecordingStudio::Access.new
+
+    RecordingStudioAccessible::AccessCreationContext.allow do
+      refute authorizer.call(
+        actor: @viewer,
+        root_recording: @public_recording,
+        recording: @public_recording,
+        recordable: page
+      )
+      assert authorizer.call(
+        actor: @viewer,
+        root_recording: @public_recording,
+        recording: @public_recording,
+        recordable: access
+      )
+    end
+
+    refute authorizer.call(
+      actor: @viewer,
+      root_recording: @public_recording,
+      recording: @public_recording,
+      recordable: access
+    )
+  end
 end
