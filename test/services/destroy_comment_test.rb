@@ -88,11 +88,11 @@ class DestroyCommentTest < Minitest::Test
     # RecordingStudio is not loaded in unit tests, so trash_available? returns
     # false regardless of root responding to :trash.
     # We verify the service completes without error.
-    result = RecordingStudioCommentable::Services::DestroyComment.call(
+    result = destroy_comment(
       comment_recording: comment_recording,
       root_recording: root,
       actor: actor
-    )
+    ) { |service| allow_accessible_admin(service) }
 
     assert_respond_to result, :success?
   end
@@ -104,11 +104,11 @@ class DestroyCommentTest < Minitest::Test
     comment_recording = FakeTrashableCommentRecording.new
     actor = Object.new
 
-    result = RecordingStudioCommentable::Services::DestroyComment.call(
+    result = destroy_comment(
       comment_recording: comment_recording,
       root_recording: root,
       actor: actor
-    )
+    ) { |service| allow_accessible_admin(service) }
 
     assert_equal true, result.success?
     assert_same comment_recording, result.value
@@ -122,11 +122,11 @@ class DestroyCommentTest < Minitest::Test
     root = FakeRootRecording.new
     comment_recording = FakeCommentRecording.new
 
-    result = RecordingStudioCommentable::Services::DestroyComment.call(
+    result = destroy_comment(
       comment_recording: comment_recording,
       root_recording: root,
       actor: nil
-    )
+    ) { |service| allow_accessible_admin(service) }
 
     assert_equal true, result.failure?
     assert_includes result.error, "recording_studio_trashable destroy integration is enabled"
@@ -137,14 +137,40 @@ class DestroyCommentTest < Minitest::Test
     root = FakeRootRecording.new
     comment_recording = FakeCommentRecording.new
 
-    result = RecordingStudioCommentable::Services::DestroyComment.call(
+    result = destroy_comment(
       comment_recording: comment_recording,
       root_recording: root,
       actor: nil
-    )
+    ) { |service| allow_accessible_admin(service) }
 
     # destroy_directly calls comment_recording.recordable.destroy!
     # FakeComment#destroy! returns true, so this should succeed
     assert_respond_to result, :success?
+  end
+
+  def test_denies_when_accessible_admin_is_missing
+    root = FakeRootRecording.new
+    comment_recording = FakeCommentRecording.new
+
+    result = RecordingStudioCommentable::Services::DestroyComment.call(
+      comment_recording: comment_recording,
+      root_recording: root,
+      actor: Object.new
+    )
+
+    assert result.failure?
+    assert_equal "You are not allowed to edit this comment.", result.error
+  end
+
+  private
+
+  def destroy_comment(**)
+    service = RecordingStudioCommentable::Services::DestroyComment.new(**)
+    yield service if block_given?
+    service.call
+  end
+
+  def allow_accessible_admin(service)
+    service.define_singleton_method(:accessible_admin?) { true }
   end
 end

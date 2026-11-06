@@ -16,6 +16,8 @@ module RecordingStudioCommentable
     #   )
     #
     class UpdateComment < BaseService
+      include AccessibleAdminGuard
+
       def initialize(comment_recording:, root_recording:, body:, actor: nil)
         @comment_recording = comment_recording
         @root_recording = root_recording
@@ -26,6 +28,7 @@ module RecordingStudioCommentable
       private
 
       def perform
+        return failure(not_allowed_edit_error) unless accessible_admin?
         return failure(body_blank_error) if @body.blank?
 
         if revise_available?
@@ -39,7 +42,7 @@ module RecordingStudioCommentable
 
       def revise_via_recording_studio
         updated_comment = nil
-        @root_recording.revise(@comment_recording) do |new_comment|
+        @root_recording.revise(@comment_recording, actor: @actor) do |new_comment|
           new_comment.body = @body
           updated_comment = new_comment
         end

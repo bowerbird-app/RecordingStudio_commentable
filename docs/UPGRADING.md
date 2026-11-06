@@ -15,8 +15,9 @@ view, post, edit, and delete. Accessible has no `:manage` role.
    denied.
 4. Dummy / development companion pins: Recording Studio `v6.5.0`, Accessible
    `v0.24.2`, Trashable `v0.12.3`, Metrics `v0.7.3`. FlatPack stays `v0.1.341`.
-   Dummy sets `config.authorize_write` through Accessible (`:edit`, with an
-   empty-tree bootstrap). Hosts on core 6.5 need their own write gate.
+   Dummy sets `config.authorize_write` through Accessible `:edit`. Seed owner
+   grants with `bootstrap_owner_access!` / `grant_access`. Hosts on core 6.5
+   need their own write gate.
 
 ## Upgrading to 0.7.2
 

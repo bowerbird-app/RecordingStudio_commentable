@@ -44,6 +44,7 @@ class LocalesTest < Minitest::Test
     "recording_studio.commentable.flashes.must_sign_in" => "You must be signed in.",
     "recording_studio.commentable.errors.body_blank" => "Body cannot be blank",
     "recording_studio.commentable.errors.comment_invalid" => "Comment is invalid",
+    "recording_studio.commentable.errors.not_allowed_edit" => "You are not allowed to edit this comment.",
     "recording_studio.commentable.display.missing_recordable" => "Missing recordable",
     "recording_studio.commentable.display.unknown_item" => "Unknown item"
   }.freeze

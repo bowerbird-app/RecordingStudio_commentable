@@ -201,7 +201,7 @@ The flow looks like this:
 4. it passes the body and actor into `CreateComment`
 5. the service validates the body
 6. the service builds a `RecordingStudioCommentable::Comment`
-7. the service asks `RecordingStudio` to record that comment as a child of the parent recording
+7. the service asks `RecordingStudio` to record that comment as a child of the parent recording, passing the same actor
 8. the controller redirects back to the feed
 
 In plain terms: a new comment is created as a comment record, then wrapped by RecordingStudio as a child recording under the item you commented on.
@@ -219,7 +219,7 @@ The flow is:
 2. it checks Accessible `:admin` on the parent recording
 3. it finds the root recording
 4. it passes the comment recording, root recording, new body, and actor into `UpdateComment`
-5. the service uses RecordingStudio's `revise` flow
+5. the service checks Accessible `:admin` again, then uses RecordingStudio's `revise` flow with the passed actor
 6. RecordingStudio keeps the same recording in place but updates the recordable snapshot
 
 The practical result is: the comment looks edited in the feed, but RecordingStudio still keeps the history.
@@ -237,7 +237,7 @@ The flow is:
 2. it checks Accessible `:admin` on the parent recording
 3. it finds the root recording
 4. it passes the comment recording and actor into `DestroyComment`
-5. the service calls RecordingStudio's `trash`
+5. the service checks Accessible `:admin` again, then calls RecordingStudio's `trash`
 6. the feed stops showing that comment because trashed recordings are excluded
 
 This is a soft delete at the recording layer, not a hard wipe of history.
@@ -262,7 +262,7 @@ What it does:
 
 - rejects blank bodies
 - builds a `RecordingStudioCommentable::Comment`
-- records it under the parent recording when `RecordingStudio` is available
+- records it under the parent recording when `RecordingStudio` is available, using the passed author as the actor
 
 ### UpdateComment
 
@@ -279,8 +279,9 @@ Use this when you want to revise an existing comment through RecordingStudio.
 
 What it does:
 
+- requires Accessible `:admin` on the parent recording (same as HTTP)
 - rejects blank bodies
-- uses `revise` when RecordingStudio is available
+- uses `revise` with the passed actor when RecordingStudio is available
 - preserves the recording-based history model
 
 ### DestroyComment
@@ -297,6 +298,7 @@ Use this when you want to trash a comment recording.
 
 What it does:
 
+- requires Accessible `:admin` on the parent recording (same as HTTP)
 - uses RecordingStudio's `trash`
 - removes the comment from the active feed
 - leaves history available in RecordingStudio terms

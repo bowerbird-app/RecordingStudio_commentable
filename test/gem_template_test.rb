@@ -69,6 +69,9 @@ class RecordingStudioCommentableTest < Minitest::Test
     assert_includes initializer_source, "config.authorize_write ="
     assert_includes initializer_source,
                     "RecordingStudioAccessible.authorized?(actor: actor, recording: target, role: :edit)"
+    refute_includes initializer_source, "access_recordings_for(scope).none?"
+    refute_match(/authorize_write\s*=\s*->\(actor:, \*\*\) \{ actor\.present\? \}/, initializer_source)
+    refute_includes initializer_source, "next false unless actor"
     refute_includes initializer_source, "config.features."
   end
 

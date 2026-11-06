@@ -107,7 +107,7 @@ class CreateCommentTest < Minitest::Test
 
     assert result.success?
     assert_equal FakeComment, fake_recording.last_record_class
-    assert_equal({ parent_recording: fake_recording }, fake_recording.last_record_kwargs)
+    assert_equal({ parent_recording: fake_recording, actor: fake_author }, fake_recording.last_record_kwargs)
     assert_equal 1, fake_recording.children.size
   end
 

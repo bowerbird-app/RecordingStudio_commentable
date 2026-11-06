@@ -316,6 +316,15 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "if result.success?"
     assert_includes controller_source, 'RecordingStudio.t("recording_studio.commentable.flashes.comment_not_deleted")'
     assert_includes controller_source, "return if authorized?(:admin)"
+    update_source = read_workspace_file("lib/recording_studio_commentable/services/update_comment.rb")
+    destroy_source = read_workspace_file("lib/recording_studio_commentable/services/destroy_comment.rb")
+    create_source = read_workspace_file("lib/recording_studio_commentable/services/create_comment.rb")
+    assert_includes update_source, "include AccessibleAdminGuard"
+    assert_includes destroy_source, "include AccessibleAdminGuard"
+    assert_includes update_source, "return failure(not_allowed_edit_error) unless accessible_admin?"
+    assert_includes destroy_source, "return failure(not_allowed_edit_error) unless accessible_admin?"
+    assert_includes update_source, "@root_recording.revise(@comment_recording, actor: @actor)"
+    assert_includes create_source, "actor: @author"
     refute_includes controller_source, "comment_recordable.author == actor"
     refute_includes controller_source, "Allow comment authors"
     assert_includes controller_source, "return false unless defined?(RecordingStudioAccessible)"
