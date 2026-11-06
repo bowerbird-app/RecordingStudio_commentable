@@ -140,13 +140,13 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     )
     admin_page = Page.find_by!(title: "Admin User owns this document")
     admin_recording = RecordingStudio::Recording.unscoped.find_by!(recordable: admin_page)
-    Current.actor = secret_author
+    Current.actor = @admin
     result = RecordingStudioCommentable::Services::CreateComment.call(
       parent_recording: admin_recording,
       body: "Secret inbox comment that Quinn must not see",
       author: secret_author
     )
-    assert result.success?
+    assert result.success?, result.error.to_s
 
     quinn = User.find_by!(email: "quinn@admin.com")
     sign_in!(quinn)
@@ -193,6 +193,42 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
     assert_equal "You are not allowed to edit this comment.", flash[:alert]
     assert RecordingStudio::Recording.unscoped.exists?(comment_recording.id)
+  end
+
+  def test_author_without_admin_cannot_edit_or_delete_own_comment
+    quinn = User.find_by!(email: "quinn@admin.com")
+    comment_recording = seeded_quinn_top_level_comment_recording!
+    original_body = comment_recording.recordable.body
+
+    sign_in!(quinn)
+    get edit_recording_comment_path(@public_recording, comment_recording)
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
+    assert_equal "You are not allowed to edit this comment.", flash[:alert]
+
+    patch recording_comment_path(@public_recording, comment_recording), params: {
+      comment: { body: "Quinn should not be able to rewrite this" }
+    }
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
+    assert_equal "You are not allowed to edit this comment.", flash[:alert]
+    assert_equal original_body, comment_recording.recordable.reload.body
+
+    delete recording_comment_path(@public_recording, comment_recording)
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
+    assert_equal "You are not allowed to edit this comment.", flash[:alert]
+    assert RecordingStudio::Recording.unscoped.exists?(comment_recording.id)
+  end
+
+  def test_admin_can_edit_someone_elses_comment
+    comment_recording = seeded_quinn_top_level_comment_recording!
+    updated_body = "Admin rewrote Quinn's note"
+
+    sign_in!(@admin)
+    patch recording_comment_path(@public_recording, comment_recording), params: {
+      comment: { body: updated_body }
+    }
+
+    assert_redirected_to all_recording_comments_path(@public_recording, anchor: "root")
+    assert_equal updated_body, comment_recording.reload.recordable.body
   end
 
   def test_nil_layout_follows_recording_studio_configuration
@@ -272,6 +308,12 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
   def seeded_welcome_comment_recording!
     comment_recording_for_body!(
       "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."
+    )
+  end
+
+  def seeded_quinn_top_level_comment_recording!
+    comment_recording_for_body!(
+      "A second top-level comment gives the paginated feed examples enough items to demonstrate the different loading modes."
     )
   end
 

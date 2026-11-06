@@ -20,6 +20,9 @@ class AccessibleGrantsTest < ActiveSupport::TestCase
     assert_equal "admin", RecordingStudioAccessible.role_for(actor: @admin, recording: @public_recording).to_s
     assert_equal "edit", RecordingStudioAccessible.role_for(actor: @quinn, recording: @public_recording).to_s
     assert_equal "view", RecordingStudioAccessible.role_for(actor: @viewer, recording: @public_recording).to_s
+    assert RecordingStudioAccessible.authorized?(actor: @admin, recording: @public_recording, role: :admin)
+    refute RecordingStudioAccessible.authorized?(actor: @admin, recording: @public_recording, role: :manage)
+    refute RecordingStudioAccessible.authorized?(actor: @quinn, recording: @public_recording, role: :admin)
   end
 
   test "grant_access upserts a string role without writing Access rows directly" do

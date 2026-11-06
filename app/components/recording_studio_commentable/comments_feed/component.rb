@@ -182,7 +182,7 @@ module RecordingStudioCommentable
       end
 
       def authorized_to_edit?
-        return true unless defined?(RecordingStudioAccessible)
+        return false unless defined?(RecordingStudioAccessible)
 
         actor = current_actor
         return false unless actor

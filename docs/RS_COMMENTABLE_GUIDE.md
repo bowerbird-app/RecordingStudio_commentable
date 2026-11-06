@@ -216,7 +216,7 @@ Editing goes to:
 The flow is:
 
 1. the controller loads the comment recording
-2. it lets the author edit their own comment, or checks for `manage` permission
+2. it checks Accessible `:admin` on the parent recording
 3. it finds the root recording
 4. it passes the comment recording, root recording, new body, and actor into `UpdateComment`
 5. the service uses RecordingStudio's `revise` flow
@@ -234,7 +234,7 @@ Deleting goes to:
 The flow is:
 
 1. the controller loads the comment recording
-2. it checks author-or-manage permission
+2. it checks Accessible `:admin` on the parent recording
 3. it finds the root recording
 4. it passes the comment recording and actor into `DestroyComment`
 5. the service calls RecordingStudio's `trash`
@@ -472,16 +472,15 @@ end
 
 ## Authorization flow
 
-If `RecordingStudioAccessible` is present, this gem uses it against the parent recording.
+This gem uses `RecordingStudioAccessible` against the parent recording.
 
 The default role mapping is:
 
 - view feed: `view`
 - create comment: `edit`
-- edit or delete any comment: `manage`
-- edit your own comment: allowed even without `manage`
+- edit or delete a comment: `admin`
 
-If `RecordingStudioAccessible` is not installed, those role checks are skipped.
+Authors cannot edit or delete their own comments without `:admin` on the parent. If `RecordingStudioAccessible` is not installed, those checks deny. Accessible has no `:manage` role.
 
 ## Mental model to keep in mind
 

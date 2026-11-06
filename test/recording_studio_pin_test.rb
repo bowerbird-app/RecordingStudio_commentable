@@ -3,16 +3,17 @@
 require "test_helper"
 
 class RecordingStudioPinTest < ActiveSupport::TestCase
-  def test_root_and_dummy_gemfiles_pin_recording_studio_v6_3_0
+  def test_root_and_dummy_gemfiles_pin_recording_studio_v6_5_0
     root = File.expand_path("..", __dir__)
 
     [File.join(root, "Gemfile"), File.join(root, "test/dummy/Gemfile")].each do |path|
       contents = File.read(path)
       assert_match(
-        %r{gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6\.3\.0"},
+        %r{gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6\.5\.0"},
         contents,
-        "#{path} should pin Recording Studio v6.3.0"
+        "#{path} should pin Recording Studio v6.5.0"
       )
+      refute_includes contents, 'tag: "v6.3.0"', "#{path} should not keep the prior Recording Studio pin"
       refute_includes contents, 'tag: "v4.7.0"', "#{path} should not keep the prior Recording Studio pin"
     end
   end

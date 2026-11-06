@@ -1,5 +1,23 @@
 # Upgrade Guide
 
+## Upgrading to 0.8.0
+
+No schema change. Comment edit and delete now require Accessible `:admin` on
+the parent recording. Authors do not get a bypass. Missing Accessible denies
+view, post, edit, and delete. Accessible has no `:manage` role.
+
+### Upgrade steps
+
+1. Install Commentable `0.8.0`. No migration.
+2. Grant Accessible `:admin` on the parent recording to anyone who should
+   edit or delete comments, including people who wrote them.
+3. Keep `recording_studio_accessible` loaded. Without it, comment actions are
+   denied.
+4. Dummy / development companion pins: Recording Studio `v6.5.0`, Accessible
+   `v0.24.2`, Trashable `v0.12.3`, Metrics `v0.7.3`. FlatPack stays `v0.1.341`.
+   Dummy sets `config.authorize_write` through Accessible (`:edit`, with an
+   empty-tree bootstrap). Hosts on core 6.5 need their own write gate.
+
 ## Upgrading to 0.7.2
 
 No schema change. Development and dummy lockfiles use Rails `8.1.4.1` and the
