@@ -51,6 +51,7 @@ en:
       errors:
         body_blank: "Body cannot be blank"
         comment_invalid: "Comment is invalid"
+        not_allowed_edit: "You are not allowed to edit this comment."
       display:
         missing_recordable: "Missing recordable"
         unknown_item: "Unknown item"

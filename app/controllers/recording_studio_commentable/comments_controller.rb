@@ -243,13 +243,7 @@ module RecordingStudioCommentable
     end
 
     def authorize_edit!
-      actor = current_recording_studio_actor
-      comment_recordable = @comment_recording.try(:recordable)
-
-      # Allow comment authors to edit their own comments
-      return if comment_recordable.respond_to?(:author) && comment_recordable.author == actor
-
-      return if authorized?(:manage)
+      return if authorized?(:admin)
 
       redirect_to(
         comments_collection_path,
@@ -258,7 +252,7 @@ module RecordingStudioCommentable
     end
 
     def authorized?(role)
-      return true unless defined?(RecordingStudioAccessible)
+      return false unless defined?(RecordingStudioAccessible)
 
       RecordingStudioAccessible.authorized?(
         actor: current_recording_studio_actor,

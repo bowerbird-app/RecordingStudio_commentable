@@ -101,7 +101,7 @@ module RecordingStudioCommentable
 
     def authorized_to_view?(recording)
       return false unless recording
-      return true unless defined?(RecordingStudioAccessible)
+      return false unless defined?(RecordingStudioAccessible)
 
       RecordingStudioAccessible.authorized?(
         actor: current_recording_studio_actor,

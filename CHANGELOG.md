@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Dummy `authorize_write` allows `AccessCreationContext` only for Access rows, so other writes still need Accessible `:edit` during bootstrap.
+
+## [0.8.0] - 2026-11-06
+
+### Changed
+- Version `0.7.2` → `0.8.0`.
+- Comment edit and delete go through Accessible `:admin` on the parent recording only. Authors can no longer edit or delete their own comments without that grant. The previous `authorized?(:manage)` check was kept in spirit, but Accessible has no `:manage` role, so that check always denied.
+- View, create, edit, and inbox checks deny when `RecordingStudioAccessible` is not loaded (fail closed). The comments button and feed composer follow the same rule.
+- Dummy and development apps pin Recording Studio `v6.5.0`, Accessible `v0.24.2`, Trashable `v0.12.3`, and Metrics `v0.7.3`. FlatPack stays `v0.1.341`. This gem does not ship Admin. Dummy `config.authorize_write` delegates to Accessible `:edit`. Seeds bootstrap owner grants; there is no empty-tree allow.
+- `UpdateComment` and `DestroyComment` require Accessible `:admin` on the parent recording at the service boundary. Direct service calls deny when HTTP would deny. `CreateComment` and `UpdateComment` pass the given actor into `record` / `revise`.
+
+### Upgrade notes
+- Install Commentable `0.8.0`. No migration.
+- Grant Accessible `:admin` on the parent recording to anyone who should edit or delete comments, including authors of those comments.
+- Load `recording_studio_accessible`. Without it, comment view, post, edit, and delete are denied, including direct `UpdateComment` / `DestroyComment` calls.
+- Dummy / development pins: Recording Studio `v6.5.0`, Accessible `v0.24.2`, Trashable `v0.12.3`, Metrics `v0.7.3`.
+
 ## [0.7.2] - 2026-11-05
 
 ### Changed
@@ -222,7 +240,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.6.2...v0.7.0

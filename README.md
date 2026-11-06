@@ -6,7 +6,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 
 - **Opt-in per recordable** — include `RecordingStudio::Capabilities::Commentable.to` on the types that should have comment feeds. Installing the gem does not turn comments on.
 - **RecordingStudio-native** — comments are child recordings; create/update/delete go through the `record`/`revise`/`trash` API
-- **Access-control aware** — integrates with `RecordingStudioAccessible` roles (view, edit, manage) when available
+- **Access-control aware** — uses `RecordingStudioAccessible` roles (`view`, `edit`, `admin`) on the parent recording; missing Accessible denies
 - **FlatPack UI** — all views built with FlatPack components; no raw HTML needed
 - **Service objects** — `CreateComment`, `UpdateComment`, `DestroyComment` encapsulate business logic
 - **Hook system** — lifecycle hooks (`before_initialize`, `after_initialize`, `on_configuration`, `before_service`, `after_service`, `around_service`) for host-app customisation
@@ -17,7 +17,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.3.0`, FlatPack `v0.1.341`, Accessible `v0.24.0` (with Trashable `v0.12.2` and Metrics `v0.7.2` query-only companions), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.341`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), sets `config.authorize_write` through Accessible `:edit` (AccessCreationContext only for Access rows; owner grants are seeded; no empty-tree allow), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -109,16 +109,15 @@ The widget routes to the full comments page, disables itself when the current ac
 
 ## Access Control
 
-When `RecordingStudioAccessible` is loaded, the following role checks apply:
+Role checks go through `RecordingStudioAccessible` on the parent recording:
 
 | Action | Required role |
 |--------|---------------|
 | View comment feed | `view` |
 | Post a comment | `edit` |
-| Edit/delete any comment | `manage` |
-| Edit own comment | always allowed (author) |
+| Edit/delete a comment | `admin` |
 
-If `RecordingStudioAccessible` is not loaded, access checks are skipped and all authenticated users can perform all actions.
+Authors cannot edit or delete their own comments without Accessible `:admin` on the parent. If `RecordingStudioAccessible` is not loaded, those actions are denied. Accessible has no `:manage` role (`view` / `edit` / `admin` only).
 
 ## Comment Model
 
@@ -201,7 +200,7 @@ nested keys in their own `config/locales`. There is no dependency on
 When a shipped commentable key is missing in the active locale, fallback comes
 from the loaded English, host overrides included, then the gem-shipped table
 registered at boot via `RecordingStudio::Translation.register_shipped_english`.
-Requires `recording_studio` `>= 6.1.0` (dummy pin `v6.3.0`). A missing `_html` key with a non-interpolating
+Requires `recording_studio` `>= 6.1.0` (dummy pin `v6.5.0`). A missing `_html` key with a non-interpolating
 String caller `default:` stays unsafe like view `t`: a plain default with no
 interpolation is returned as a plain (non-html_safe) String, so views will
 escape it. An interpolating String caller `default:` escapes args and returns
@@ -348,10 +347,10 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | v6.3.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 6.1.0`) |
-| RecordingStudioAccessible | v0.24.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
-| RecordingStudioTrashable | v0.12.2 (`require: false`; Accessible query-only companion) |
-| RecordingStudioMetrics | v0.7.2 (`require: false`; Trashable resolution companion) |
+| RecordingStudio | v6.5.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 6.1.0`) |
+| RecordingStudioAccessible | v0.24.2 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudioTrashable | v0.12.3 (`require: false`; Accessible query-only companion) |
+| RecordingStudioMetrics | v0.7.3 (`require: false`; Trashable resolution companion) |
 | FlatPack        | v0.1.341 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | Devise          | latest  |
 

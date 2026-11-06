@@ -15,6 +15,8 @@ module RecordingStudioCommentable
     #   )
     #
     class DestroyComment < BaseService
+      include AccessibleAdminGuard
+
       def initialize(comment_recording:, root_recording:, actor: nil)
         @comment_recording = comment_recording
         @root_recording = root_recording
@@ -24,6 +26,8 @@ module RecordingStudioCommentable
       private
 
       def perform
+        return failure(not_allowed_edit_error) unless accessible_admin?
+
         if recording_studio_trashable_requested?
           return failure(recording_studio_trashable_missing_error) unless recording_studio_trashable_available?
 

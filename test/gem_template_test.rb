@@ -8,7 +8,7 @@ class RecordingStudioCommentableTest < Minitest::Test
   end
 
   def test_version
-    assert_equal "0.7.2", ::RecordingStudioCommentable::VERSION
+    assert_equal "0.8.0", ::RecordingStudioCommentable::VERSION
   end
 
   def test_engine_exists
@@ -66,6 +66,15 @@ class RecordingStudioCommentableTest < Minitest::Test
 
     assert_includes initializer_source, "Built-in capabilities remain disabled"
     assert_includes initializer_source, "RecordingStudio::Capabilities::Commentable.to"
+    assert_includes initializer_source, "config.authorize_write ="
+    assert_includes initializer_source, "recordable.is_a?(RecordingStudio::Access)"
+    assert_includes initializer_source, "RecordingStudioAccessible::AccessCreationContext.allowed?"
+    assert_includes initializer_source,
+                    "RecordingStudioAccessible.authorized?(actor: actor, recording: target, role: :edit)"
+    refute_includes initializer_source, "next true if RecordingStudioAccessible::AccessCreationContext.allowed?"
+    refute_includes initializer_source, "access_recordings_for(scope).none?"
+    refute_match(/authorize_write\s*=\s*->\(actor:, \*\*\) \{ actor\.present\? \}/, initializer_source)
+    refute_includes initializer_source, "next false unless actor"
     refute_includes initializer_source, "config.features."
   end
 

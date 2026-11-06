@@ -52,7 +52,11 @@ module RecordingStudioCommentable
       def record_comment(comment)
         if recording_studio_available?
           created_comment = nil
-          @parent_recording.record(comment.class, parent_recording: @parent_recording) do |c|
+          @parent_recording.record(
+            comment.class,
+            parent_recording: @parent_recording,
+            actor: @author
+          ) do |c|
             c.body = @body
             c.author = @author
             created_comment = c

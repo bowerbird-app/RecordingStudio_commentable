@@ -222,6 +222,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, "replies: replies_by_parent.fetch(comment_recording.id, [])"
     assert_includes controller_source, "next if workspace_recording?(parent_recording)"
     assert_includes controller_source, "next unless authorized_to_view?(parent_recording)"
+    assert_includes controller_source, "return false unless defined?(RecordingStudioAccessible)"
+    refute_includes controller_source, "return true unless defined?(RecordingStudioAccessible)"
     assert_includes controller_source, "accessible: true"
     assert_includes controller_source, "group_by(&:parent_recording_id)"
     assert_includes controller_source, 'recording.recordable_type == "Workspace"'
@@ -313,6 +315,20 @@ class CommentsPagesFlowTest < Minitest::Test
     refute File.exist?(layout_path), "unused commentable application layout should be gone"
     assert_includes controller_source, "if result.success?"
     assert_includes controller_source, 'RecordingStudio.t("recording_studio.commentable.flashes.comment_not_deleted")'
+    assert_includes controller_source, "return if authorized?(:admin)"
+    update_source = read_workspace_file("lib/recording_studio_commentable/services/update_comment.rb")
+    destroy_source = read_workspace_file("lib/recording_studio_commentable/services/destroy_comment.rb")
+    create_source = read_workspace_file("lib/recording_studio_commentable/services/create_comment.rb")
+    assert_includes update_source, "include AccessibleAdminGuard"
+    assert_includes destroy_source, "include AccessibleAdminGuard"
+    assert_includes update_source, "return failure(not_allowed_edit_error) unless accessible_admin?"
+    assert_includes destroy_source, "return failure(not_allowed_edit_error) unless accessible_admin?"
+    assert_includes update_source, "@root_recording.revise(@comment_recording, actor: @actor)"
+    assert_includes create_source, "actor: @author"
+    refute_includes controller_source, "comment_recordable.author == actor"
+    refute_includes controller_source, "Allow comment authors"
+    assert_includes controller_source, "return false unless defined?(RecordingStudioAccessible)"
+    refute_includes controller_source, "return true unless defined?(RecordingStudioAccessible)"
   end
 
   def test_summary_page_template_shows_text_block_and_dynamic_bottom_button
@@ -344,6 +360,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes widget_source, "RecordingStudioCommentable::CommentCount.for_recording(recording)"
     assert_includes widget_source,
                     "RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)"
+    assert_includes widget_source, "return false unless defined?(RecordingStudioAccessible)"
+    refute_includes widget_source, "return true unless defined?(RecordingStudioAccessible)"
     assert_includes count_source, 'COMMENT_RECORDABLE_TYPE = "RecordingStudioCommentable::Comment"'
     assert_includes count_source, "where(parent_recording_id: frontier_ids)"
     assert_includes count_source, "where(recordable_type: COMMENT_RECORDABLE_TYPE)"
@@ -396,6 +414,10 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_source, "def reply_button_options_for(comment_recording, parent_recording = recording)"
     assert_includes component_source, "default_reply_button_options_for(comment_recording, parent_recording)"
     assert_includes component_source, "resolve_reply_action(comment_recording, parent_recording, default_options)"
+    assert_includes component_source, "return false unless defined?(RecordingStudioAccessible)"
+    refute_includes component_source, "return true unless defined?(RecordingStudioAccessible)"
+    assert_includes component_source,
+                    "RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :edit)"
     assert_includes component_source, "RecordingStudioCommentable::PathSafety.normalize_relative_path("
     assert_includes component_source, "helpers.commentable_recording_comments_path(recording, **args)"
     assert_includes component_source, "helpers.commentable_all_recording_comments_path("
