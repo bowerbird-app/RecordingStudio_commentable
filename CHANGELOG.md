@@ -10,6 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Dummy `authorize_write` allows `AccessCreationContext` only for Access rows, so other writes still need Accessible `:edit` during bootstrap.
 
+## [0.9.0] - 2026-11-12
+
+### Added
+- Comments are a Recording Studio API recordable type. Create and reply wrap `CreateComment`, update wraps `UpdateComment` (`:admin`), and destroy wraps `DestroyComment` (`:admin`, trash). List and show include `comment_count` from `CommentCount.for_recording` and a `replies` children relationship. MCP uses the generic recordable path.
+- `CreateComment` checks Accessible `:edit` and `:commentable` through the same gate as `CommentsController`. Direct service calls deny when HTTP would deny.
+
+### Changed
+- Version `0.8.0` → `0.9.0`.
+- Dummy and development apps pin Recording Studio API `v0.21.3`, with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0` so Bundler can resolve and boot the API gem.
+- Dummy `authorize_write` still requires Accessible `:edit` for comments. API client and credential recordings may be written only inside `AccessCreationContext`, so tests can provision tokens without opening a comment write hole.
+
+### Upgrade notes
+- Install Commentable `0.9.0`. No migration in this gem. Hosts that expose comments over the API should add `recording_studio_api` and run that gem's install and migrations.
+- Grant Accessible `:edit` to post comments and `:admin` to edit or delete them, same as the UI. Authors still have no edit/delete bypass.
+- Load `recording_studio_accessible`. Without it, comment create, edit, and delete are denied, including direct `CreateComment` / `UpdateComment` / `DestroyComment` calls.
+
 ## [0.8.0] - 2026-11-06
 
 ### Changed
@@ -240,7 +256,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.0...v0.7.1

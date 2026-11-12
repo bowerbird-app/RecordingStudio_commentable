@@ -214,9 +214,7 @@ module RecordingStudioCommentable
     # ------------------------------------------------------------------ #
 
     def require_commentable!
-      recordable = @parent_recording.try(:recordable)
-      type = recordable&.class
-      return if type && RecordingStudio.capability_enabled?(:commentable, for: type)
+      return if Services::AccessibleCreateGuard.commentable?(@parent_recording)
 
       redirect_to(
         return_to_path || main_app.root_path,
@@ -234,7 +232,10 @@ module RecordingStudioCommentable
     end
 
     def authorize_create!
-      return if authorized?(:edit)
+      return if Services::AccessibleCreateGuard.authorized?(
+        actor: current_recording_studio_actor,
+        recording: @parent_recording
+      )
 
       redirect_to(
         summary_path,

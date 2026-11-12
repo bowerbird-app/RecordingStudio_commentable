@@ -21,6 +21,9 @@ RecordingStudio.configure do |config|
                  recordable.is_a?(RecordingStudio::Access) &&
                  RecordingStudioAccessible::AccessCreationContext.allowed?
 
+    api_engine_recordable = defined?(RecordingStudioApi) && recordable.class.name.to_s.start_with?("RecordingStudioApi::")
+    next true if api_engine_recordable && RecordingStudioAccessible::AccessCreationContext.allowed?
+
     RecordingStudioAccessible.authorized?(actor: actor, recording: target, role: :edit)
   }
 

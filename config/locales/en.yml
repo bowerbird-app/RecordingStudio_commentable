@@ -52,6 +52,8 @@ en:
         body_blank: "Body cannot be blank"
         comment_invalid: "Comment is invalid"
         not_allowed_edit: "You are not allowed to edit this comment."
+        not_allowed_post: "You are not allowed to post comments here."
+        comments_not_enabled: "Comments are not enabled for this resource."
       display:
         missing_recordable: "Missing recordable"
         unknown_item: "Unknown item"

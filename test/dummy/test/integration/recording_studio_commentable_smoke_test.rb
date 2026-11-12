@@ -224,6 +224,19 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     assert RecordingStudio::Recording.unscoped.exists?(comment_recording.id)
   end
 
+  def test_direct_create_denies_without_accessible_edit
+    viewer = User.find_by!(email: "view@admin.com")
+
+    result = RecordingStudioCommentable::Services::CreateComment.call(
+      parent_recording: @public_recording,
+      body: "Viewer must not post through the service",
+      author: viewer
+    )
+
+    assert result.failure?
+    assert_equal "You are not allowed to post comments here.", result.error
+  end
+
   def test_direct_update_and_destroy_deny_without_accessible_admin
     quinn = User.find_by!(email: "quinn@admin.com")
     comment_recording = seeded_quinn_top_level_comment_recording!

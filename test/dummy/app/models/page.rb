@@ -12,6 +12,7 @@ class Page < ApplicationRecord
   include RecordingStudio::Capabilities::Commentable.to
 
   RecordingStudio.enable_capability(:accessible, on: self) if defined?(RecordingStudioAccessible)
+  RecordingStudio.enable_capability(:api_access_point, on: self) if defined?(RecordingStudioApi)
 
   validates :title, presence: true
 end
