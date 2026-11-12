@@ -66,6 +66,7 @@ class RecordingStudioCommentableTest < Minitest::Test
 
     assert_includes initializer_source, "Built-in capabilities remain disabled"
     assert_includes initializer_source, "RecordingStudio::Capabilities::Commentable.to"
+    assert_includes initializer_source, "RecordingStudioApi::AdminApi"
     assert_includes initializer_source, "config.authorize_write ="
     assert_includes initializer_source, "recordable.is_a?(RecordingStudio::Access)"
     assert_includes initializer_source, "RecordingStudioAccessible::AccessCreationContext.allowed?"

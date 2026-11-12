@@ -13,7 +13,10 @@ Authors still have no edit/delete bypass.
 1. Install Commentable `0.9.0`. No Commentable migration.
 2. Add `recording_studio_api` when hosts should expose comments over the API,
    then run that gem's install and migrations. MCP picks comments up from the
-   generic recordable path.
+   generic recordable path. Hosts without an admin root should set
+   `admin_root_recordable_type_names` to `[]` and still list
+   `RecordingStudioApi::AdminApi` in `config.recordable_types` so CI eager-load
+   declaration checks match the loaded model.
 3. Keep Accessible roles aligned with the UI: `:view` to list/show, `:edit` to
    post or reply, `:admin` to update or destroy.
 4. Dummy / development companion pins add Recording Studio API `v0.21.3`, Admin

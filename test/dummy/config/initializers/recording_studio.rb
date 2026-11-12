@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 RecordingStudio.configure do |config|
-  # Registered delegated_type recordables (strings or classes)
-  config.recordable_types = [ "Workspace", "Folder", "Page", "RecordingStudioCommentable::Comment" ]
+  # Registered delegated_type recordables (strings or classes).
+  # AdminApi declares on eager load; register it so CI declaration checks pass.
+  host_types = [ "Workspace", "Folder", "Page", "RecordingStudioCommentable::Comment" ]
+  host_types << "RecordingStudioApi::AdminApi" if defined?(RecordingStudioApi)
+  config.recordable_types = host_types
   config.app_name = "Comments" if config.respond_to?(:app_name=)
 
   # Actor resolver for events when no actor is explicitly supplied
