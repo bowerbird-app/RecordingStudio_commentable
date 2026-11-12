@@ -6,7 +6,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 
 - **Opt-in per recordable** — include `RecordingStudio::Capabilities::Commentable.to` on the types that should have comment feeds. Installing the gem does not turn comments on.
 - **RecordingStudio-native** — comments are child recordings; create/update/delete go through the `record`/`revise`/`trash` API
-- **Access-control aware** — uses `RecordingStudioAccessible` roles (`view`, `edit`, `admin`) on the parent recording; missing Accessible denies. `CreateComment`, `UpdateComment`, and `DestroyComment` use the same gates as the UI.
+- **Access-control aware** — uses `RecordingStudioAccessible` roles (`view`, `edit`, `admin`) on the parent recording; missing Accessible denies. `UpdateComment` and `DestroyComment` use the same Accessible `:admin` gate as the UI.
 - **Recording Studio API** — registers `RecordingStudioCommentable::Comment` so JSON clients and MCP can list, show, create, reply, update, and trash comments through the generic recordable path
 - **FlatPack UI** — all views built with FlatPack components; no raw HTML needed
 - **Service objects** — `CreateComment`, `UpdateComment`, `DestroyComment` encapsulate business logic
@@ -18,7 +18,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.341`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), Recording Studio API `v0.21.3` (with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0`), sets `config.authorize_write` through Accessible `:edit` (AccessCreationContext only for Access rows; owner grants are seeded; no empty-tree allow), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.341`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), Recording Studio API `v0.21.3` (with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0`), sets `config.authorize_write` through Accessible `:edit` (AccessCreationContext for Access rows and `RecordingStudioApi::*` recordables; owner grants are seeded; no empty-tree allow; dummy-only `api_management_authorization_required = false`), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -118,9 +118,9 @@ Role checks go through `RecordingStudioAccessible` on the parent recording:
 | Post a comment | `edit` |
 | Edit/delete a comment | `admin` |
 
-Authors cannot edit or delete their own comments without Accessible `:admin` on the parent. If `RecordingStudioAccessible` is not loaded, those actions are denied. Accessible has no `:manage` role (`view` / `edit` / `admin` only). Direct `CreateComment` calls also require `:commentable` on the parent recordable and Accessible `:edit`.
+Authors cannot edit or delete their own comments without Accessible `:admin` on the parent. If `RecordingStudioAccessible` is not loaded, those actions are denied. Accessible has no `:manage` role (`view` / `edit` / `admin` only).
 
-When `recording_studio_api` is loaded, this gem registers the Comment recordable type (`index`/`show` `:view`, `create` `:edit`, `update`/`destroy` `:admin`). Create, reply, update, and destroy wrap the same services as the screens. List and show include `comment_count` and child `replies`.
+When `recording_studio_api` is loaded, this gem registers the Comment recordable type (`index`/`show` `:view`, `create` `:edit` plus `:commentable` on the parent, `update`/`destroy` `:admin` on the comment's parent). Create, reply, update, and destroy wrap the same services as the screens. List and show include `comment_count` and child `replies`.
 
 ## Comment Model
 

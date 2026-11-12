@@ -13,19 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.0] - 2026-11-12
 
 ### Added
-- Comments are a Recording Studio API recordable type. Create and reply wrap `CreateComment`, update wraps `UpdateComment` (`:admin`), and destroy wraps `DestroyComment` (`:admin`, trash). List and show include `comment_count` from `CommentCount.for_recording` and a `replies` children relationship. MCP uses the generic recordable path.
-- `CreateComment` checks Accessible `:edit` and `:commentable` through the same gate as `CommentsController`. Direct service calls deny when HTTP would deny.
+- Comments are a Recording Studio API recordable type. Create and reply wrap `CreateComment` after Accessible `:edit` and a `:commentable` check on the parent. Update wraps `UpdateComment` (`:admin` on the comment's parent). Destroy wraps `DestroyComment` (`:admin` on the comment's parent, trash). List and show include `comment_count` from `CommentCount.for_recording` and a `replies` children relationship. MCP uses the generic recordable path.
 
 ### Changed
 - Version `0.8.0` → `0.9.0`.
 - Dummy and development apps pin Recording Studio API `v0.21.3`, with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0` so Bundler can resolve and boot the API gem.
-- Dummy `authorize_write` still requires Accessible `:edit` for comments. API client and credential recordings may be written only inside `AccessCreationContext`, so tests can provision tokens without opening a comment write hole.
+- Dummy `authorize_write` still requires Accessible `:edit` for comments. Inside `AccessCreationContext` it also lets `RecordingStudioApi::*` recordables through so tests can provision tokens. Dummy sets `api_management_authorization_required = false`. Both are dummy-only.
 - Dummy registers `RecordingStudioApi::AdminApi` and clears API `admin_root_recordable_type_names` so CI eager-load declaration checks match a comments host with no admin root.
 
 ### Upgrade notes
 - Install Commentable `0.9.0`. No migration in this gem. Hosts that expose comments over the API should add `recording_studio_api` and run that gem's install and migrations.
-- Grant Accessible `:edit` to post comments and `:admin` to edit or delete them, same as the UI. Authors still have no edit/delete bypass.
-- Load `recording_studio_accessible`. Without it, comment create, edit, and delete are denied, including direct `CreateComment` / `UpdateComment` / `DestroyComment` calls.
+- Grant Accessible `:edit` to post comments and `:admin` on the comment's parent to edit or delete them, same as the UI. Authors still have no edit/delete bypass.
+- Load `recording_studio_accessible`. Without it, HTML create/edit/delete and API write handlers are denied. Direct `UpdateComment` / `DestroyComment` calls still deny without `:admin`. Direct `CreateComment` is unchanged from `0.8.0`.
 
 ## [0.8.0] - 2026-11-06
 

@@ -18,8 +18,6 @@ module RecordingStudioCommentable
     #   result.value    # => the Comment instance
     #
     class CreateComment < BaseService
-      include AccessibleCreateGuard
-
       def initialize(parent_recording:, body:, author: nil)
         @parent_recording = parent_recording
         @body = body
@@ -29,8 +27,6 @@ module RecordingStudioCommentable
       private
 
       def perform
-        return failure(comments_not_enabled_error) unless commentable_enabled?
-        return failure(not_allowed_post_error) unless accessible_create?
         return failure(body_blank_error) if @body.blank?
 
         comment = build_comment

@@ -50,10 +50,16 @@ class ApiTest < Minitest::Test
 
     assert_includes create_source, "RecordingStudioCommentable::Services::CreateComment.call"
     assert_includes create_source, "authorize_access!(parent_recording, role: :edit)"
+    assert_includes create_source, "assert_commentable!(parent_recording)"
+    assert_includes create_source, "RecordingStudio.capability_enabled?(:commentable, for: type)"
     assert_includes update_source, "RecordingStudioCommentable::Services::UpdateComment.call"
-    assert_includes update_source, "role: :admin"
+    assert_includes update_source, "resource_attributes[:body]"
+    assert_includes update_source, "access_grant.authorize!(recording: parent_recording, role: :admin)"
+    refute_includes update_source, "request_payload"
+    refute_includes update_source, "params[:body]"
     assert_includes destroy_source, "RecordingStudioCommentable::Services::DestroyComment.call"
-    assert_includes destroy_source, "role: :admin"
+    assert_includes destroy_source, "access_grant.authorize!(recording: parent_recording, role: :admin,"
+    assert_includes destroy_source, "include_trashed: true)"
     assert_includes destroy_source, 'deleted_via: "trashed"'
   end
 

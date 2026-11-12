@@ -83,8 +83,6 @@ class NestedRepliesTest < Minitest::Test
       author: nil
     )
     service.define_singleton_method(:recording_studio_available?) { true }
-    service.define_singleton_method(:commentable_enabled?) { true }
-    service.define_singleton_method(:accessible_create?) { true }
     service.define_singleton_method(:build_comment) do
       FakeComment.new.tap { |c| c.body = "This is a reply" }
     end
@@ -103,14 +101,11 @@ class NestedRepliesTest < Minitest::Test
       recordable_type: "RecordingStudioCommentable::Comment"
     )
 
-    service = RecordingStudioCommentable::Services::CreateComment.new(
+    result = RecordingStudioCommentable::Services::CreateComment.call(
       parent_recording: comment_recording,
       body: "",
       author: nil
     )
-    service.define_singleton_method(:commentable_enabled?) { true }
-    service.define_singleton_method(:accessible_create?) { true }
-    result = service.call
 
     assert result.failure?
     assert_equal "Body cannot be blank", result.error

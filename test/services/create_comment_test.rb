@@ -63,11 +63,11 @@ class CreateCommentTest < Minitest::Test
     fake_recording = FakeRecording.new
 
     # Call service with blank body — should fail fast without touching DB
-    result = create_comment(
+    result = RecordingStudioCommentable::Services::CreateComment.call(
       parent_recording: fake_recording,
       body: "",
       author: nil
-    ) { |service| allow_accessible_create(service) }
+    )
 
     assert result.failure?
     assert_equal "Body cannot be blank", result.error
@@ -76,11 +76,11 @@ class CreateCommentTest < Minitest::Test
   def test_failure_when_body_is_nil
     fake_recording = FakeRecording.new
 
-    result = create_comment(
+    result = RecordingStudioCommentable::Services::CreateComment.call(
       parent_recording: fake_recording,
       body: nil,
       author: nil
-    ) { |service| allow_accessible_create(service) }
+    )
 
     assert result.failure?
     assert_equal "Body cannot be blank", result.error
@@ -96,7 +96,6 @@ class CreateCommentTest < Minitest::Test
       author: fake_author
     )
     service.define_singleton_method(:recording_studio_available?) { true }
-    allow_accessible_create(service)
     service.define_singleton_method(:build_comment) do
       FakeComment.new.tap do |comment|
         comment.body = "Test comment"
@@ -115,59 +114,15 @@ class CreateCommentTest < Minitest::Test
   def test_result_responds_to_success_and_failure
     fake_recording = FakeRecording.new
 
-    result = create_comment(
+    result = RecordingStudioCommentable::Services::CreateComment.call(
       parent_recording: fake_recording,
       body: "",
       author: nil
-    ) { |service| allow_accessible_create(service) }
+    )
 
     assert_respond_to result, :success?
     assert_respond_to result, :failure?
     assert_respond_to result, :error
     assert_respond_to result, :value
-  end
-
-  def test_denies_when_accessible_create_is_missing
-    fake_recording = FakeRecording.new
-
-    result = RecordingStudioCommentable::Services::CreateComment.call(
-      parent_recording: fake_recording,
-      body: "Test comment",
-      author: Object.new
-    )
-
-    assert result.failure?
-    assert_equal "Comments are not enabled for this resource.", result.error
-    assert_empty fake_recording.children
-  end
-
-  def test_denies_when_actor_lacks_edit
-    fake_recording = FakeRecording.new
-
-    result = create_comment(
-      parent_recording: fake_recording,
-      body: "Test comment",
-      author: Object.new
-    ) do |service|
-      service.define_singleton_method(:commentable_enabled?) { true }
-      service.define_singleton_method(:accessible_create?) { false }
-    end
-
-    assert result.failure?
-    assert_equal "You are not allowed to post comments here.", result.error
-    assert_empty fake_recording.children
-  end
-
-  private
-
-  def create_comment(**)
-    service = RecordingStudioCommentable::Services::CreateComment.new(**)
-    yield service if block_given?
-    service.call
-  end
-
-  def allow_accessible_create(service)
-    service.define_singleton_method(:commentable_enabled?) { true }
-    service.define_singleton_method(:accessible_create?) { true }
   end
 end

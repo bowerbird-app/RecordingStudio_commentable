@@ -5,22 +5,6 @@ module RecordingStudioCommentable
     # Shared Accessible :admin check for comment edit and delete.
     # HTTP and direct service calls use the same gate.
     module AccessibleAdminGuard
-      def self.authorized?(actor:, recording:)
-        return false unless defined?(RecordingStudioAccessible)
-        return false unless recording
-
-        RecordingStudioAccessible.authorized?(
-          actor: actor,
-          recording: recording,
-          role: :admin
-        )
-      end
-
-      def self.recording_for(comment_recording:, root_recording: nil)
-        parent = comment_recording.respond_to?(:parent_recording) ? comment_recording.parent_recording : nil
-        parent || root_recording
-      end
-
       private
 
       def accessible_admin?
@@ -29,14 +13,19 @@ module RecordingStudioCommentable
         recording = accessible_admin_recording
         return false unless recording
 
-        AccessibleAdminGuard.authorized?(actor: @actor, recording: recording)
+        RecordingStudioAccessible.authorized?(
+          actor: @actor,
+          recording: recording,
+          role: :admin
+        )
       end
 
       def accessible_admin_recording
-        AccessibleAdminGuard.recording_for(
-          comment_recording: @comment_recording,
-          root_recording: @root_recording
-        )
+        parent = @comment_recording.respond_to?(:parent_recording) ? @comment_recording.parent_recording : nil
+        parent ||= @root_recording
+        return parent unless parent.respond_to?(:root_recording)
+
+        parent.root_recording || parent
       end
 
       def not_allowed_edit_error

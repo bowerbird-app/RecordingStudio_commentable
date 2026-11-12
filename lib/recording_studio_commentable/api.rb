@@ -61,13 +61,6 @@ module RecordingStudioCommentable
         found
       end
 
-      def admin_access_recording(comment_recording)
-        RecordingStudioCommentable::Services::AccessibleAdminGuard.recording_for(
-          comment_recording: comment_recording,
-          root_recording: comment_recording
-        )
-      end
-
       private
 
       def register_type!

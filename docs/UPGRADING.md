@@ -4,9 +4,11 @@
 
 No schema change in this gem. Comments are registered on Recording Studio API
 as the Comment recordable type. Create and reply go through `CreateComment`
-(Accessible `:edit` plus `:commentable`). Update and destroy stay Accessible
-`:admin`. List and show use `CommentCount.for_recording` and child replies.
-Authors still have no edit/delete bypass.
+after the API authorizes Accessible `:edit` and `:commentable` on the parent.
+Update and destroy stay Accessible `:admin` on the comment's parent. List and
+show use `CommentCount.for_recording` and child replies. Authors still have no
+edit/delete bypass. Direct `CreateComment` calls keep the previous service
+behaviour; the HTML controller still gates create.
 
 ### Upgrade steps
 

@@ -5,11 +5,10 @@ module RecordingStudioCommentable
     class Destroy < RecordingStudioApi::Services::ResourceOperations::Destroy
       def call
         comment_recording = RecordingStudioCommentable::Api.member_recording(context, include_trashed: true)
-        authorize_access!(
-          RecordingStudioCommentable::Api.admin_access_recording(comment_recording),
-          role: :admin,
-          include_trashed: true
-        )
+        parent_recording = comment_recording.parent_recording
+        raise RecordingStudioApi::NotFoundError, "Resource was not found in this API scope" if parent_recording.nil?
+
+        access_grant.authorize!(recording: parent_recording, role: :admin, include_trashed: true)
 
         serialized_recording = serialize_recording(comment_recording)
         result = RecordingStudioCommentable::Services::DestroyComment.call(
