@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reply lists render `FlatPack::Comments::Replies` one level deep. Replies still cannot start another reply.
 - The edit composer no longer forces `rounded-xl` on its Flatpack cancel and submit buttons. Those buttons go through `composer.slot`; Flatpack deprecates `composer.actions` for the same slot.
 - Dummy Tailwind uses Flatpack's `tailwind_config.css.tt` radii and drops the copied `--color-fp-*` tokens. Dummy and development apps pin FlatPack `v0.1.359`. That pull also moves lockfile `tailwind_merge` to `1.5.6`, `view_component` to `4.24.0`, `minitest` to `6.1.0`, and `irb` to `1.19.0`.
+- Dummy Tailwind `@source` paths for the local bundle now start at `test/dummy/vendor`. The previous `../../vendor/bundle` path pointed at `app/vendor`, so Flatpack size utilities (including the empty-state icon's `w-8 h-8`) were never emitted. That path was already wrong on `main`.
 
 ### Upgrade notes
 - Install Commentable `0.9.0`. No migration.

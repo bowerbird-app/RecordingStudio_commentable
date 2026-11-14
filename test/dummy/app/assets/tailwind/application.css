@@ -3,9 +3,11 @@
 /* Include dummy app views for Tailwind CSS */
 @source "../../views/**/*.erb";
 
-/* Include RecordingStudio engine views for Tailwind CSS */
-@source "../../vendor/bundle/**/recording_studio*/app/views/**/*.erb";
-@source "../../vendor/bundle/**/RecordingStudio*/app/views/**/*.erb";
+/* Include RecordingStudio engine views for Tailwind CSS.
+ * application.css lives in app/assets/tailwind, so the dummy bundle is three
+ * levels up (test/dummy/vendor), not two (app/vendor). */
+@source "../../../vendor/bundle/**/recording_studio*/app/views/**/*.erb";
+@source "../../../vendor/bundle/**/RecordingStudio*/app/views/**/*.erb";
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio-*/app/views/**/*.erb";
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
 @source "../../../../../../home/**/.local/share/mise/installs/ruby/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
@@ -18,7 +20,7 @@
 /* Tailwind CSS - Scan FlatPack components for classes.
  * This is the generator template's @source, with the host bundle paths this
  * dummy actually installs into. */
-@source "../../vendor/bundle/**/flatpack*/app/components/**/*.{rb,erb}";
+@source "../../../vendor/bundle/**/flatpack*/app/components/**/*.{rb,erb}";
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 @source "../../../../../../home/**/.local/share/mise/installs/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 

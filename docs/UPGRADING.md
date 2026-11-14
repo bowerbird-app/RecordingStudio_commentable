@@ -21,7 +21,9 @@ color tokens.
 5. Dummy / development pin FlatPack `v0.1.359` and rebuild Tailwind. Use
    Flatpack's `tailwind_config.css.tt` (`:root` radii only). Do not redefine
    `--color-fp-*` or point `--color-primary` at those copies. Load
-   `flat_pack/variables`.
+   `flat_pack/variables`. From `app/assets/tailwind/application.css`, a
+   `vendor/bundle` `@source` is `../../../vendor/bundle` (the dummy root),
+   not `../../vendor/bundle` (`app/vendor`).
 6. The gemspec still does not depend on Flatpack. The view APIs used here
    exist from Flatpack `v0.1.341`. This repo locks `v0.1.359`.
 
