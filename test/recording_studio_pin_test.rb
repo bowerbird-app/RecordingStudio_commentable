@@ -31,13 +31,15 @@ class RecordingStudioPinTest < ActiveSupport::TestCase
     refute_includes gemspec, '"< 7"'
   end
 
-  def test_root_and_dummy_gemfiles_pin_flat_pack_v0_1_341
+  def test_root_and_dummy_gemfiles_pin_flat_pack_v0_1_359
     root = File.expand_path("..", __dir__)
     dummy = File.read(File.join(root, "test/dummy/Gemfile"))
     gemfile = File.read(File.join(root, "Gemfile"))
 
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
-    assert_includes dummy, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.359"'
+    assert_includes dummy, 'github: "bowerbird-app/flatpack", tag: "v0.1.359"'
+    refute_includes gemfile, 'tag: "v0.1.341"'
+    refute_includes dummy, 'tag: "v0.1.341"'
     refute_includes dummy, 'github: "bowerbird-app/flatpack", branch: "main"'
     refute_includes gemfile, 'tag: "v0.1.329"'
   end

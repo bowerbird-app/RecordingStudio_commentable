@@ -57,23 +57,24 @@ end %>
         <% end %>
       <% end %>
     <% end %>
-  <% end %>
-
-  <% if replies.any? %>
-    <%# Replies are rendered one level deep by passing an empty replies array.
-        This is a deliberate design choice: the engine supports one level of
-        threading (top-level comments and their direct replies). Deeper nesting
-        is avoided to keep the query strategy simple and the UI scannable. %>
-    <div class="ml-8 mt-4 flex flex-col gap-4 border-l-2 border-(--surface-border-color) pl-4">
-      <% replies.each do |reply_recording| %>
-        <%= render "recording_studio_commentable/comments/comment",
-              comment_recording: reply_recording,
-              parent_recording: parent_recording,
-              accessible: accessible,
-              allow_reply: false,
-              reply_button_resolver: reply_button_resolver,
-              replies: [] %>
+    <% if replies.any? %>
+      <%# One level of replies. Deeper nesting stays off so the query stays
+          simple and the list stays scannable. %>
+      <% item.replies do %>
+        <%= render FlatPack::Comments::Replies::Component.new(depth: 1) do |thread_replies| %>
+          <% replies.each do |reply_recording| %>
+            <% thread_replies.comment do %>
+              <%= render "recording_studio_commentable/comments/comment",
+                    comment_recording: reply_recording,
+                    parent_recording: parent_recording,
+                    accessible: accessible,
+                    allow_reply: false,
+                    reply_button_resolver: reply_button_resolver,
+                    replies: [] %>
+            <% end %>
+          <% end %>
+        <% end %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
 </div>

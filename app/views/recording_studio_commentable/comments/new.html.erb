@@ -18,7 +18,7 @@
     count: @comments_count,
     title: composer_title,
     empty_title: "",
-    empty_body: ""
+    empty_description: ""
   ) do |thread| %>
     <% thread.comment do %>
       <%= render RecordingStudioCommentable::CommentComposer::Component.new(

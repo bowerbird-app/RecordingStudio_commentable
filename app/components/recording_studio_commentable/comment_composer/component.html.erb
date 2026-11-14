@@ -16,21 +16,19 @@
     avatar: { name: actor_name }
   ) do |composer| %>
     <% if cancel_path.present? %>
-      <% composer.actions do %>
+      <% composer.slot do %>
         <div class="flex w-full items-center justify-end gap-2">
           <%= render FlatPack::Button::Component.new(
             text: RecordingStudio.t("recording_studio.commentable.common.cancel"),
             href: cancel_path,
             style: :ghost,
-            size: :sm,
-            class: "rounded-xl"
+            size: :sm
           ) %>
           <%= render FlatPack::Button::Component.new(
             text: submit_label,
             style: :primary,
             size: :sm,
-            type: "submit",
-            class: "rounded-xl"
+            type: "submit"
           ) %>
         </div>
       <% end %>

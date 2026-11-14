@@ -7,8 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-14
+
 ### Changed
-- Dummy `authorize_write` allows `AccessCreationContext` only for Access rows, so other writes still need Accessible `:edit` during bootstrap.
+- Version `0.8.0` → `0.9.0`.
+- The all-comments empty inbox renders `FlatPack::EmptyState` with the `chat-bubble-left-ellipsis` icon. The hand-built `_empty_state` partial is gone.
+- Comment threads pass `empty_description:` to `FlatPack::Comments::Thread`, so the translated empty sentence is the one on screen.
+- Reply lists render `FlatPack::Comments::Replies` one level deep. Replies still cannot start another reply.
+- The edit composer no longer forces `rounded-xl` on its Flatpack cancel and submit buttons. Those buttons go through `composer.slot`; Flatpack deprecates `composer.actions` for the same slot.
+- Dummy Tailwind uses Flatpack's `tailwind_config.css.tt` radii and drops the copied `--color-fp-*` tokens. Dummy and development apps pin FlatPack `v0.1.359`. That pull also moves lockfile `tailwind_merge` to `1.5.6`, `view_component` to `4.24.0`, `minitest` to `6.1.0`, and `irb` to `1.19.0`.
+
+### Upgrade notes
+- Install Commentable `0.9.0`. No migration.
+- Hosts that copied `_empty_state` should render `FlatPack::EmptyState` instead. The partial is not shipped.
+- Pass `empty_description:` (not `empty_body:`) if you build a thread yourself. `empty_body:` was ignored.
+- Dummy / development pin: FlatPack `v0.1.359`. Rebuild Tailwind. Do not copy `--color-fp-*` into the host Tailwind file. Load `flat_pack/variables` and keep the generator's `:root` radii.
+- The gemspec does not gain a Flatpack floor. These view calls exist in Flatpack `v0.1.341` and later. This repo's lockfiles use `v0.1.359`.
 
 ## [0.8.0] - 2026-11-06
 

@@ -51,6 +51,8 @@ What the install generator does:
 - creates `config/initializers/recording_studio_commentable.rb`
 - tries to add the engine views and FlatPack components to `app/assets/tailwind/application.css`
 
+The dummy Tailwind file follows Flatpack's `tailwind_config.css.tt`: scan the components, then set kit radii on unlayered `:root`. Color tokens come from `flat_pack/variables`. Do not copy `--color-fp-*` into the host file.
+
 ## Host app setup
 
 ### 1. Make a model commentable

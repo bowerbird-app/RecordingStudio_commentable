@@ -165,6 +165,25 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Admin-owned page sample comment"
   end
 
+  def test_empty_inbox_renders_flatpack_empty_copy
+    visitor = User.create!(
+      email: "empty-inbox@admin.com",
+      password: "Password",
+      password_confirmation: "Password",
+      name: "Empty Inbox"
+    )
+
+    sign_in!(visitor)
+    get recording_studio_commentable.root_path
+
+    assert_response :success
+    assert_includes response.body, "No comments yet"
+    assert_includes response.body, "Be the first to leave a comment."
+    assert_includes response.body, "chat-bubble-left-ellipsis"
+    assert_includes response.body, "fp-empty-state"
+    refute_includes response.body, "Be the first to share your thoughts."
+  end
+
   def test_failed_destroy_flashes_error_not_success
     comment_recording = seeded_welcome_comment_recording!
     failure = RecordingStudioCommentable::Services::BaseService::Result.new(
