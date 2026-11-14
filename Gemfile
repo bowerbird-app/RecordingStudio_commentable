@@ -8,7 +8,7 @@ gemspec
 # recording_studio is a hard dependency declared in the gemspec.
 # Because it is hosted on GitHub (not rubygems.org), it must also be listed
 # here so bundler can resolve it in the development/test environment.
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.341", require: false
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.359", require: false
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.5.0"
 gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.24.2"
 # Trashable gemspec deps are git-only; pin for Bundler resolution only.

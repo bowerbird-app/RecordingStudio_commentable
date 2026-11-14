@@ -18,6 +18,10 @@
             next_page: @next_page %>
     </div>
   <% else %>
-    <%= render "recording_studio_commentable/comments/empty_state" %>
+    <%= render FlatPack::EmptyState::Component.new(
+          title: RecordingStudio.t("recording_studio.commentable.empty.title"),
+          description: RecordingStudio.t("recording_studio.commentable.empty.body"),
+          icon: :"chat-bubble-left-ellipsis"
+        ) %>
   <% end %>
 </div>
