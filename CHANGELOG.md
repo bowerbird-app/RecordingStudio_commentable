@@ -7,24 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Dummy `authorize_write` allows `AccessCreationContext` only for Access rows, so other writes still need Accessible `:edit` during bootstrap.
-
-## [0.9.0] - 2026-11-12
+## [0.10.0] - 2026-11-14
 
 ### Added
 - Comments are a Recording Studio API recordable type. Create and reply wrap `CreateComment` after Accessible `:edit` and a `:commentable` check on the parent. Update wraps `UpdateComment` (`:admin` on the comment's parent). Destroy wraps `DestroyComment` (`:admin` on the comment's parent, trash). List and show include `comment_count` from `CommentCount.for_recording` and a `replies` children relationship. MCP uses the generic recordable path.
 
 ### Changed
-- Version `0.8.0` → `0.9.0`.
+- Version `0.9.0` → `0.10.0`.
 - Dummy and development apps pin Recording Studio API `v0.21.3`, with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0` so Bundler can resolve and boot the API gem.
 - Dummy `authorize_write` still requires Accessible `:edit` for comments. Inside `AccessCreationContext` it also lets `RecordingStudioApi::*` recordables through so tests can provision tokens. Dummy sets `api_management_authorization_required = false`. Both are dummy-only.
 - Dummy registers `RecordingStudioApi::AdminApi` and clears API `admin_root_recordable_type_names` so CI eager-load declaration checks match a comments host with no admin root.
 
 ### Upgrade notes
-- Install Commentable `0.9.0`. No migration in this gem. Hosts that expose comments over the API should add `recording_studio_api` and run that gem's install and migrations.
+- Install Commentable `0.10.0`. No migration in this gem. Hosts that expose comments over the API should add `recording_studio_api` and run that gem's install and migrations.
 - Grant Accessible `:edit` to post comments and `:admin` on the comment's parent to edit or delete them, same as the UI. Authors still have no edit/delete bypass.
 - Load `recording_studio_accessible`. Without it, HTML create/edit/delete and API write handlers are denied. Direct `UpdateComment` / `DestroyComment` calls still deny without `:admin`. Direct `CreateComment` is unchanged from `0.8.0`.
+
+## [0.9.0] - 2026-11-14
+
+### Changed
+- Version `0.8.0` → `0.9.0`.
+- The all-comments empty inbox renders `FlatPack::EmptyState` with the `chat-bubble-left-ellipsis` icon. The hand-built `_empty_state` partial is gone.
+- Comment threads pass `empty_description:` to `FlatPack::Comments::Thread`, so the translated empty sentence is the one on screen.
+- Reply lists render `FlatPack::Comments::Replies` one level deep. Replies still cannot start another reply.
+- The edit composer no longer forces `rounded-xl` on its Flatpack cancel and submit buttons. Those buttons go through `composer.slot`; Flatpack deprecates `composer.actions` for the same slot.
+- Dummy Tailwind uses Flatpack's `tailwind_config.css.tt` radii and drops the copied `--color-fp-*` tokens. Dummy and development apps pin FlatPack `v0.1.359`. That pull also moves lockfile `tailwind_merge` to `1.5.6`, `view_component` to `4.24.0`, `minitest` to `6.1.0`, and `irb` to `1.19.0`.
+- Dummy Tailwind `@source` paths for the local bundle now start at `test/dummy/vendor`. The previous `../../vendor/bundle` path pointed at `app/vendor`, so Flatpack size utilities (including the empty-state icon's `w-8 h-8`) were never emitted. That path was already wrong on `main`.
+
+### Upgrade notes
+- Install Commentable `0.9.0`. No migration.
+- Hosts that copied `_empty_state` should render `FlatPack::EmptyState` instead. The partial is not shipped.
+- Pass `empty_description:` (not `empty_body:`) if you build a thread yourself. `empty_body:` was ignored.
+- Dummy / development pin: FlatPack `v0.1.359`. Rebuild Tailwind. Do not copy `--color-fp-*` into the host Tailwind file. Load `flat_pack/variables` and keep the generator's `:root` radii.
+- The gemspec does not gain a Flatpack floor. These view calls exist in Flatpack `v0.1.341` and later. This repo's lockfiles use `v0.1.359`.
 
 ## [0.8.0] - 2026-11-06
 
@@ -256,7 +271,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.1...v0.7.2

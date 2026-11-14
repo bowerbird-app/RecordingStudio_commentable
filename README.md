@@ -18,7 +18,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.341`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), Recording Studio API `v0.21.3` (with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0`), sets `config.authorize_write` through Accessible `:edit` (AccessCreationContext for Access rows and `RecordingStudioApi::*` recordables; owner grants are seeded; no empty-tree allow; dummy-only `api_management_authorization_required = false`), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.359`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), Recording Studio API `v0.21.3` (with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0`), sets `config.authorize_write` through Accessible `:edit` (AccessCreationContext for Access rows and `RecordingStudioApi::*` recordables; owner grants are seeded; no empty-tree allow; dummy-only `api_management_authorization_required = false`), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -354,7 +354,7 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | RecordingStudioAccessible | v0.24.2 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | RecordingStudioTrashable | v0.12.3 (`require: false`; Accessible query-only companion) |
 | RecordingStudioMetrics | v0.7.3 (`require: false`; Trashable resolution companion) |
-| FlatPack        | v0.1.341 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| FlatPack        | v0.1.359 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | Devise          | latest  |
 
 ## Documentation

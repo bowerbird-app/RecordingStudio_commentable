@@ -189,10 +189,15 @@ class NestedRepliesTest < Minitest::Test
     assert_includes source, "reply_button_resolver: reply_button_resolver"
   end
 
-  def test_comment_partial_uses_indented_border_for_replies
+  def test_comment_partial_uses_flatpack_replies
     source = read_workspace_file("app/views/recording_studio_commentable/comments/_comment.html.erb")
 
-    assert_includes source, "border-l-2"
+    assert_includes source, "FlatPack::Comments::Replies::Component.new(depth: 1)"
+    assert_includes source, "item.replies do"
+    assert_includes source, "thread_replies.comment do"
+    assert_includes source, "allow_reply: false"
+    assert_includes source, "replies: []"
+    refute_includes source, "border-l-2"
   end
 
   # ------------------------------------------------------------------ #

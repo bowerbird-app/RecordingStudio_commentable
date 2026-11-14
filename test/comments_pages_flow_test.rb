@@ -236,6 +236,11 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.home.title")'
     assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.home.subtitle")'
     assert_includes view_source, 'render "comments_page"'
+    assert_includes view_source, "FlatPack::EmptyState::Component.new("
+    assert_includes view_source, 'icon: :"chat-bubble-left-ellipsis"'
+    assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.empty.title")'
+    assert_includes view_source, 'RecordingStudio.t("recording_studio.commentable.empty.body")'
+    refute_includes view_source, 'render "recording_studio_commentable/comments/empty_state"'
     assert_includes page_partial_source, 'turbo_frame_tag "comments_page_#{page}"'
     assert_includes page_partial_source, 'class: (page.to_i > 1 ? "mt-3" : nil)'
     assert_includes page_partial_source, "return_to: @external_back_path"
@@ -347,6 +352,8 @@ class CommentsPagesFlowTest < Minitest::Test
     refute_includes view_source,
                     "RecordingStudioCommentable::CommentsButton::Component.new(\n          recording: @parent_recording,\n          count: @comments_count"
     assert_includes view_source, "if @show_comments"
+    assert_includes view_source, "empty_description: RecordingStudio.t(\"recording_studio.commentable.empty.body\")"
+    refute_includes view_source, "empty_body:"
     assert_includes view_source, "show_comments: true,"
     assert_includes view_source, "inline_composer: true"
     assert_includes view_source, "commentable_recording_comments_path("
@@ -427,6 +434,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes component_template_source, 'render partial: "recording_studio_commentable/comments/feed_page"'
     assert_includes component_template_source, 'render partial: "recording_studio_commentable/comments/feed"'
     assert_includes feed_partial_source, "FlatPack::Comments::Thread::Component.new("
+    assert_includes feed_partial_source, "empty_description: RecordingStudio.t(\"recording_studio.commentable.empty.body\")"
+    refute_includes feed_partial_source, "empty_body:"
     assert_includes feed_partial_source, "RecordingStudioCommentable::CommentComposer::Component.new("
     assert_includes feed_partial_source, 'RecordingStudio.t("recording_studio.commentable.common.comments")'
     assert_includes feed_partial_source, "(<%= feed.comments_count %>)"
@@ -437,6 +446,7 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes composer_component_template_source, "hidden_field_tag :parent_comment_id, parent_comment_id"
     assert_includes composer_component_template_source, 'RecordingStudio.t("recording_studio.commentable.common.cancel")'
     assert_includes composer_component_template_source, 'text: submit_label'
+    refute_includes composer_component_template_source, "rounded-xl"
     assert_includes feed_page_partial_source, "turbo_frame_tag feed.page_frame_id(page)"
     assert_includes feed_page_partial_source, 'data-controller="infinite-scroll"'
     assert_includes feed_page_partial_source, 'data-infinite-scroll-url-value="<%= feed.page_path(next_page) %>"'
@@ -461,6 +471,8 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes new_view_source,
                     "back_path = @safe_return_to_path || (@comments_count.to_i.positive? ? @comments_collection_path : @summary_path)"
     assert_includes new_view_source, "FlatPack::Comments::Thread::Component.new("
+    assert_includes new_view_source, "empty_description: \"\""
+    refute_includes new_view_source, "empty_body:"
     refute_includes new_view_source, "thread.header do"
     assert_includes new_view_source, "thread.comment do"
     assert_includes new_view_source, "composer_title = @composer_title.presence"

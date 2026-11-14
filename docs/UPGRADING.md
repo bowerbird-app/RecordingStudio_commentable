@@ -1,6 +1,6 @@
 # Upgrade Guide
 
-## Upgrading to 0.9.0
+## Upgrading to 0.10.0
 
 No schema change in this gem. Comments are registered on Recording Studio API
 as the Comment recordable type. Create and reply go through `CreateComment`
@@ -12,7 +12,7 @@ behaviour; the HTML controller still gates create.
 
 ### Upgrade steps
 
-1. Install Commentable `0.9.0`. No Commentable migration.
+1. Install Commentable `0.10.0`. No Commentable migration.
 2. Add `recording_studio_api` when hosts should expose comments over the API,
    then run that gem's install and migrations. MCP picks comments up from the
    generic recordable path. Hosts without an admin root should set
@@ -24,6 +24,33 @@ behaviour; the HTML controller still gates create.
 4. Dummy / development companion pins add Recording Studio API `v0.21.3`, Admin
    `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0`. Recording
    Studio stays `v6.5.0`. This gem still does not ship Admin screens.
+
+## Upgrading to 0.9.0
+
+No schema change. Comment screens use Flatpack's empty state, thread empty
+copy, and replies list. The dummy Tailwind file no longer copies Flatpack
+color tokens.
+
+### Upgrade steps
+
+1. Install Commentable `0.9.0`. No migration.
+2. Delete any host override of
+   `recording_studio_commentable/comments/_empty_state`. The engine no longer
+   ships that partial. The inbox renders `FlatPack::EmptyState` with
+   `chat-bubble-left-ellipsis` and the same empty title and body strings.
+3. If a host builds `FlatPack::Comments::Thread` itself, pass
+   `empty_description:`. `empty_body:` is not a thread argument, so Flatpack
+   kept its own sentence.
+4. Reply lists are `FlatPack::Comments::Replies` at depth 1. A reply still
+   has no reply action.
+5. Dummy / development pin FlatPack `v0.1.359` and rebuild Tailwind. Use
+   Flatpack's `tailwind_config.css.tt` (`:root` radii only). Do not redefine
+   `--color-fp-*` or point `--color-primary` at those copies. Load
+   `flat_pack/variables`. From `app/assets/tailwind/application.css`, a
+   `vendor/bundle` `@source` is `../../../vendor/bundle` (the dummy root),
+   not `../../vendor/bundle` (`app/vendor`).
+6. The gemspec still does not depend on Flatpack. The view APIs used here
+   exist from Flatpack `v0.1.341`. This repo locks `v0.1.359`.
 
 ## Upgrading to 0.8.0
 
