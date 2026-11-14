@@ -1,5 +1,30 @@
 # Upgrade Guide
 
+## Upgrading to 0.10.0
+
+No schema change in this gem. Comments are registered on Recording Studio API
+as the Comment recordable type. Create and reply go through `CreateComment`
+after the API authorizes Accessible `:edit` and `:commentable` on the parent.
+Update and destroy stay Accessible `:admin` on the comment's parent. List and
+show use `CommentCount.for_recording` and child replies. Authors still have no
+edit/delete bypass. Direct `CreateComment` calls keep the previous service
+behaviour; the HTML controller still gates create.
+
+### Upgrade steps
+
+1. Install Commentable `0.10.0`. No Commentable migration.
+2. Add `recording_studio_api` when hosts should expose comments over the API,
+   then run that gem's install and migrations. MCP picks comments up from the
+   generic recordable path. Hosts without an admin root should set
+   `admin_root_recordable_type_names` to `[]` and still list
+   `RecordingStudioApi::AdminApi` in `config.recordable_types` so CI eager-load
+   declaration checks match the loaded model.
+3. Keep Accessible roles aligned with the UI: `:view` to list/show, `:edit` to
+   post or reply, `:admin` to update or destroy.
+4. Dummy / development companion pins add Recording Studio API `v0.21.3`, Admin
+   `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0`. Recording
+   Studio stays `v6.5.0`. This gem still does not ship Admin screens.
+
 ## Upgrading to 0.9.0
 
 No schema change. Comment screens use Flatpack's empty state, thread empty

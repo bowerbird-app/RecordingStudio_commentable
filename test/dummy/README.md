@@ -30,6 +30,13 @@ Then open the app and sign in with:
 - `/users/sign_in` - Devise sign-in page
 - `/up` - Rails health check
 
+## Recording Studio API (dummy-only)
+
+This dummy lets Recording Studio API clients provision so comment JSON tests can run.
+
+- `config.authorize_write` still requires Accessible `:edit` for host writes. Inside `AccessCreationContext` it also lets `RecordingStudioApi::*` recordables through, so token provisioning can write API client and credential rows without opening a comment write hole.
+- Dummy `RecordingStudioApi` config sets `api_management_authorization_required = false`. Hosts should keep the API gem default unless they intentionally skip that check.
+
 ## Why This App Exists
 
 Use this app to verify the generated addon experience before renaming the gem or copying patterns into another host app. If a layout, route, asset source, or Recording Studio initializer change breaks here, the template likely needs adjustment before reuse.

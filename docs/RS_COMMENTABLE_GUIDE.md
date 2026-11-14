@@ -201,10 +201,11 @@ The flow looks like this:
 2. it checks that comments are enabled for that recordable
 3. it checks create permission
 4. it passes the body and actor into `CreateComment`
-5. the service validates the body
-6. the service builds a `RecordingStudioCommentable::Comment`
-7. the service asks `RecordingStudio` to record that comment as a child of the parent recording, passing the same actor
-8. the controller redirects back to the feed
+5. the service checks the same Accessible `:edit` and `:commentable` gate
+6. the service validates the body
+7. the service builds a `RecordingStudioCommentable::Comment`
+8. the service asks `RecordingStudio` to record that comment as a child of the parent recording, passing the same actor
+9. the controller redirects back to the feed
 
 In plain terms: a new comment is created as a comment record, then wrapped by RecordingStudio as a child recording under the item you commented on.
 
@@ -485,6 +486,8 @@ The default role mapping is:
 - edit or delete a comment: `admin`
 
 Authors cannot edit or delete their own comments without `:admin` on the parent. If `RecordingStudioAccessible` is not installed, those checks deny. Accessible has no `:manage` role.
+
+When `recording_studio_api` is loaded, Comment is registered as a recordable type API. Create and reply wrap `CreateComment` after Accessible `:edit` and a `:commentable` check on the parent. Update wraps `UpdateComment` (`:admin` on the comment's parent). Destroy wraps `DestroyComment` (`:admin` on the comment's parent, trash). List and show include `comment_count` and child replies. MCP uses the generic path.
 
 ## Mental model to keep in mind
 
