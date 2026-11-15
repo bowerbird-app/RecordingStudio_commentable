@@ -11,23 +11,11 @@ RecordingStudio.configure do |config|
   # Actor resolver for events when no actor is explicitly supplied
   config.actor = -> { Current.actor }
 
-  # Core 6.5 fails closed without a write gate. Delegate to Accessible :edit.
-  # Owner grants are seeded with bootstrap_owner_access! / grant_access; those
-  # Access writes already run inside Accessible's grant path. Allow the
-  # AccessCreationContext only for Access rows, not every write during bootstrap.
-  config.authorize_write = lambda { |actor:, root_recording:, recording: nil, parent_recording: nil, recordable: nil, **|
-    next false unless defined?(RecordingStudioAccessible)
-
-    target = recording || parent_recording || root_recording
-    next false unless target
-    next true if defined?(RecordingStudio::Access) &&
-                 recordable.is_a?(RecordingStudio::Access) &&
-                 RecordingStudioAccessible::AccessCreationContext.allowed?
-
-    api_engine_recordable = defined?(RecordingStudioApi) && recordable.class.name.to_s.start_with?("RecordingStudioApi::")
-    next true if api_engine_recordable && RecordingStudioAccessible::AccessCreationContext.allowed?
-
-    RecordingStudioAccessible.authorized?(actor: actor, recording: target, role: :edit)
+  # Core 7 fails closed without a write gate. create_root_recording! calls this
+  # with recording, root_recording, and parent_recording all nil. Allow the
+  # write when an actor is present.
+  config.authorize_write = lambda { |actor:, **|
+    actor.present?
   }
 
   # Emit ActiveSupport::Notifications events

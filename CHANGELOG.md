@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-15
+
+### Changed
+- Version `0.10.0` → `0.11.0`.
+- Gemspec requires `recording_studio` `>= 7.0`, `< 8.0`.
+- Dummy and development apps pin Recording Studio `v7.0.0`, Accessible `v0.44.0`, Admin `v2.16.0`, API `v0.24.0`, Moveable `v5.0.0`, Trashable `v0.17.0`, Metrics `v0.9.0`, Icons `v0.2.1`, Logs `v0.8.0`, and FlatPack `v0.1.376`.
+- Dummy seeds create roots with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` only finds a root.
+- Dummy `config.authorize_write` allows a write when an actor is present. `create_root_recording!` calls it with no root yet.
+- Dummy comment lists use `Recording.kept`. Trashable `0.17` removed `recording_studio_trashable_kept_sql`.
+- Dummy copies core migration `20261114090000_add_root_recording_id_to_recording_studio_events`.
+- Dummy pins Puma `8.1.0` and `msgpack` `>= 1.8.7`.
+
+### Upgrade notes
+- Install Commentable `0.11.0` with Recording Studio `>= 7.0`, `< 8.0`. No migration in this gem.
+- Hosts that created a root with `root_recording_for` call `create_root_recording!(recordable, actor:)` instead. Lookups stay on `root_recording_for` and handle `nil`.
+- Set `config.authorize_write`. Root creation calls it with `recording`, `root_recording`, and `parent_recording` all `nil`.
+- Copy core migration `20261114090000_add_root_recording_id_to_recording_studio_events` if `recording_studio_events` has no `root_recording_id`.
+- Replace `recording_studio_trashable_kept_sql` with `Recording.kept`.
+- Admin `2.16` has no `site_admin_recording_resolver`. Name the admin root with `RecordingStudioAccessible.configuration.admin_root_resolver`. Screen context uses `RecordingStudioAdmin.configuration.access_recording_resolver`. This dummy does not mount Admin, so it sets neither.
+- Dummy / development pins: Recording Studio `v7.0.0`, Accessible `v0.44.0`, Admin `v2.16.0`, API `v0.24.0`, Logs `v0.8.0`, Moveable `v5.0.0`, Trashable `v0.17.0`, Metrics `v0.9.0`, Icons `v0.2.1`, FlatPack `v0.1.376`.
+
 ## [0.10.0] - 2026-11-14
 
 ### Added
@@ -271,7 +292,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.7.2...v0.8.0

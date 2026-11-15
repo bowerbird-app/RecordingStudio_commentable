@@ -34,7 +34,7 @@ Then open the app and sign in with:
 
 This dummy lets Recording Studio API clients provision so comment JSON tests can run.
 
-- `config.authorize_write` still requires Accessible `:edit` for host writes. Inside `AccessCreationContext` it also lets `RecordingStudioApi::*` recordables through, so token provisioning can write API client and credential rows without opening a comment write hole.
+- `config.authorize_write` allows a write when an actor is present. `create_root_recording!` calls it before a root exists. Token tests still provision `RecordingStudioApi::*` clients inside `AccessCreationContext`.
 - Dummy `RecordingStudioApi` config sets `api_management_authorization_required = false`. Hosts should keep the API gem default unless they intentionally skip that check.
 
 ## Why This App Exists

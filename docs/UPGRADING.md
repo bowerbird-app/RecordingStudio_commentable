@@ -1,5 +1,34 @@
 # Upgrade Guide
 
+## Upgrading to 0.11.0
+
+Commentable requires Recording Studio 7. `root_recording_for` only finds a
+root. Creating one goes through `create_root_recording!`. No schema change
+in this gem. Hosts still need core's events `root_recording_id` column.
+
+### Upgrade steps
+
+1. Install Commentable `0.11.0` with `recording_studio` `>= 7.0`, `< 8.0`.
+   No Commentable migration.
+2. Replace root creation that called `RecordingStudio.root_recording_for`
+   with `RecordingStudio.create_root_recording!(recordable, actor:)`. Leave
+   lookups on `root_recording_for` and handle `nil`.
+3. Set `config.authorize_write`. Root creation calls it with `recording`,
+   `root_recording`, and `parent_recording` all `nil`. A present actor is
+   enough for the dummy. Do not set `allow_unauthorized_writes`.
+4. Copy core migration
+   `20261114090000_add_root_recording_id_to_recording_studio_events` when
+   `recording_studio_events.root_recording_id` is missing, then migrate.
+5. Replace `Recording.recording_studio_trashable_kept_sql` with
+   `Recording.kept`. Trashable `0.17` removed that SQL helper.
+6. Admin `2.16` dropped `config.site_admin_recording_resolver`. Name the
+   admin root with `RecordingStudioAccessible.configuration.admin_root_resolver`.
+   Screen context uses `RecordingStudioAdmin.configuration.access_recording_resolver`.
+7. Dummy / development pins: Recording Studio `v7.0.0`, FlatPack `v0.1.376`,
+   Accessible `v0.44.0`, Trashable `v0.17.0`, Metrics `v0.9.0`, API `v0.24.0`,
+   Admin `v2.16.0`, Logs `v0.8.0`, Moveable `v5.0.0`, and Icons `v0.2.1`.
+   Dummy also pins Puma `8.1.0` and `msgpack` `>= 1.8.7`.
+
 ## Upgrading to 0.10.0
 
 No schema change in this gem. Comments are registered on Recording Studio API

@@ -540,6 +540,8 @@ class CommentsPagesFlowTest < Minitest::Test
     refute_includes seeds_source, "AccessCreationContext"
     refute_includes seeds_source, "record(RecordingStudio::Access"
     assert_includes seeds_source, "ensure_access_grant!(recording: public_page_recording, actor: viewer, role: :view"
+    assert_includes seeds_source, "RecordingStudio.create_root_recording!("
+    refute_includes seeds_source, "RecordingStudio.root_recording_for"
     assert_includes seeds_source, "RecordingStudioCommentable::Services::CreateComment.call("
     assert_includes seeds_source,
                     'body: "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."'

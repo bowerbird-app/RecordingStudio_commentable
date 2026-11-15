@@ -97,9 +97,8 @@ quinn = upsert_user(email: "quinn@admin.com", name: "Quinn Owner", avatar_url: n
 viewer = upsert_user(email: "view@admin.com", name: "View Only", avatar_url: "https://i.pravatar.cc/160?u=view@admin.com")
 
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
-root_recording = RecordingStudio.root_recording_for(workspace)
-
 Current.actor = user
+root_recording = RecordingStudio.create_root_recording!(workspace, actor: user)
 ensure_bootstrap_owner!(actor: user, recording: root_recording)
 ensure_access_grant!(recording: root_recording, actor: quinn, role: :edit, manager_actor: user)
 
@@ -127,10 +126,10 @@ public_page.reload
 
 purge_recordings!([folder, quinn_page, admin_page, public_page])
 
-folder_recording = RecordingStudio.root_recording_for(folder)
-quinn_page_recording = RecordingStudio.root_recording_for(quinn_page)
-admin_page_recording = RecordingStudio.root_recording_for(admin_page)
-public_page_recording = RecordingStudio.root_recording_for(public_page)
+folder_recording = RecordingStudio.create_root_recording!(folder, actor: user)
+quinn_page_recording = RecordingStudio.create_root_recording!(quinn_page, actor: user)
+admin_page_recording = RecordingStudio.create_root_recording!(admin_page, actor: user)
+public_page_recording = RecordingStudio.create_root_recording!(public_page, actor: user)
 
 ensure_bootstrap_owner!(actor: user, recording: folder_recording)
 ensure_access_grant!(recording: folder_recording, actor: quinn, role: :edit, manager_actor: user)
