@@ -51,7 +51,7 @@ class HomeController < ApplicationController
     @scenario_recordings = RecordingStudio::Recording.unscoped
       .where(parent_recording_id: nil)
       .where(recordable_type: ["Folder", "Page"])
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .kept
       .includes(:recordable)
       .select { |recording| scenario_titles.include?(recording.recordable&.try(:name) || recording.recordable&.try(:title)) }
       .sort_by do |recording|
@@ -63,7 +63,7 @@ class HomeController < ApplicationController
   def load_helper_catalog
     reply_target_comment_recording = RecordingStudio::Recording.unscoped
       .where(recordable_type: "RecordingStudioCommentable::Comment")
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .kept
       .order(created_at: :asc)
       .first
 
@@ -286,37 +286,37 @@ class HomeController < ApplicationController
       recording.recordable&.class && RecordingStudio.capability_enabled?(:commentable, for: recording.recordable.class)
     end || RecordingStudio::Recording.unscoped
       .where(recordable_type: "Page")
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .kept
       .order(created_at: :asc)
       .first
 
     paginated_feed_recording = RecordingStudio::Recording.unscoped
       .where(recordable_type: "Page")
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .kept
       .includes(:recordable)
       .find do |recording|
         RecordingStudio::Recording.unscoped
           .where(parent_recording: recording)
           .where(recordable_type: "RecordingStudioCommentable::Comment")
-          .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+          .kept
           .count > 1
       end || example_recording
 
     replies_showcase_recording = RecordingStudio::Recording.unscoped
       .where(recordable_type: "Page")
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .kept
       .includes(:recordable)
       .find do |recording|
         top_level_comment_ids = RecordingStudio::Recording.unscoped
           .where(parent_recording: recording)
           .where(recordable_type: "RecordingStudioCommentable::Comment")
-          .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+          .kept
           .pluck(:id)
 
         top_level_comment_ids.any? && RecordingStudio::Recording.unscoped
           .where(parent_recording_id: top_level_comment_ids)
           .where(recordable_type: "RecordingStudioCommentable::Comment")
-          .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+          .kept
           .exists?
       end || paginated_feed_recording
 
@@ -553,7 +553,7 @@ class HomeController < ApplicationController
     @recordings = RecordingStudio::Recording.unscoped
       .where(recordable_type: ["Folder", "Page"])
       .where(parent_recording_id: nil)
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .kept
       .includes(:recordable)
       .order(created_at: :asc)
     @recording_entries = @recordings.map do |recording|
@@ -627,7 +627,7 @@ class HomeController < ApplicationController
 
     RecordingStudio::Recording.unscoped
       .where(parent_recording: recording)
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .kept
       .order(created_at: :asc)
       .includes(:recordable)
       .map { |child_recording| recording_snapshot(child_recording) }

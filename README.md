@@ -18,7 +18,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v6.5.0`, FlatPack `v0.1.359`, Accessible `v0.24.2` (with Trashable `v0.12.3` and Metrics `v0.7.3` query-only companions), Recording Studio API `v0.21.3` (with Admin `v2.11.0`, Logs `v0.7.3`, Moveable `v4.1.0`, and Icons `v0.2.0`), sets `config.authorize_write` through Accessible `:edit` (AccessCreationContext for Access rows and `RecordingStudioApi::*` recordables; owner grants are seeded; no empty-tree allow; dummy-only `api_management_authorization_required = false`), runs Accessible `0.8`–`0.14` migrations (including audience constraint/rule tables from `0.14.0`), and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v7.0.0`, FlatPack `v0.1.376`, Accessible `v0.44.0` (with Trashable `v0.17.0` and Metrics `v0.9.0` query-only companions), Recording Studio API `v0.24.0` (with Admin `v2.16.0`, Logs `v0.8.0`, Moveable `v5.0.0`, and Icons `v0.2.1`), sets `config.authorize_write` to allow a present actor (roots are created with `create_root_recording!`; owner grants are seeded; dummy-only `api_management_authorization_required = false`), copies the core events `root_recording_id` migration, runs Accessible audience constraint/rule tables, and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -203,7 +203,7 @@ nested keys in their own `config/locales`. There is no dependency on
 When a shipped commentable key is missing in the active locale, fallback comes
 from the loaded English, host overrides included, then the gem-shipped table
 registered at boot via `RecordingStudio::Translation.register_shipped_english`.
-Requires `recording_studio` `>= 6.1.0` (dummy pin `v6.5.0`). A missing `_html` key with a non-interpolating
+Requires `recording_studio` `>= 7.0`, `< 8.0` (dummy pin `v7.0.0`). A missing `_html` key with a non-interpolating
 String caller `default:` stays unsafe like view `t`: a plain default with no
 interpolation is returned as a plain (non-html_safe) String, so views will
 escape it. An interpolating String caller `default:` escapes args and returns
@@ -350,11 +350,11 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 | Rails           | 8.1+    |
 | PostgreSQL      | 16      |
 | TailwindCSS     | 4       |
-| RecordingStudio | v6.5.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 6.1.0`) |
-| RecordingStudioAccessible | v0.24.2 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
-| RecordingStudioTrashable | v0.12.3 (`require: false`; Accessible query-only companion) |
-| RecordingStudioMetrics | v0.7.3 (`require: false`; Trashable resolution companion) |
-| FlatPack        | v0.1.359 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudio | v7.0.0 (pinned in `Gemfile` and `test/dummy/Gemfile`; gemspec `>= 7.0`, `< 8.0`) |
+| RecordingStudioAccessible | v0.44.0 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
+| RecordingStudioTrashable | v0.17.0 (`require: false`; Accessible query-only companion) |
+| RecordingStudioMetrics | v0.9.0 (`require: false`; Trashable resolution companion) |
+| FlatPack        | v0.1.376 (pinned in `Gemfile` and `test/dummy/Gemfile`) |
 | Devise          | latest  |
 
 ## Documentation
