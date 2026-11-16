@@ -28,7 +28,7 @@ class AccessiblePinTest < ActiveSupport::TestCase
   def test_root_and_dummy_gemfiles_pin_core_7_companions
     root = File.expand_path("..", __dir__)
     pins = {
-      'gem "recording_studio_api"' => 'tag: "v0.24.0"',
+      'gem "recording_studio_api"' => 'tag: "v0.26.0"',
       'gem "recording_studio_admin"' => 'tag: "v2.16.0"',
       'gem "recording_studio_moveable"' => 'tag: "v5.0.0"',
       'gem "recording_studio_icons"' => 'tag: "v0.2.1"',
