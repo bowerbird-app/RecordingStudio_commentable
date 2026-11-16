@@ -5,7 +5,7 @@ module RecordingStudioCommentable
     class Update < RecordingStudioApi::Services::ResourceOperations::Update
       def call
         reject_parent_id_input!
-        comment_recording = RecordingStudioCommentable::Api.member_recording(context)
+        comment_recording = context.recording
         parent_recording = comment_recording.parent_recording
         raise RecordingStudioApi::NotFoundError, "Resource was not found in this API scope" if parent_recording.nil?
 

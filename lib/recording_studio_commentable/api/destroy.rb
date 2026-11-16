@@ -4,7 +4,7 @@ module RecordingStudioCommentable
   module Api
     class Destroy < RecordingStudioApi::Services::ResourceOperations::Destroy
       def call
-        comment_recording = RecordingStudioCommentable::Api.member_recording(context, include_trashed: true)
+        comment_recording = context.recording
         parent_recording = comment_recording.parent_recording
         raise RecordingStudioApi::NotFoundError, "Resource was not found in this API scope" if parent_recording.nil?
 

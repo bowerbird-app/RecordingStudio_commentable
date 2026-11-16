@@ -487,7 +487,7 @@ The default role mapping is:
 
 Authors cannot edit or delete their own comments without `:admin` on the parent. If `RecordingStudioAccessible` is not installed, those checks deny. Accessible has no `:manage` role.
 
-When `recording_studio_api` is loaded, Comment is registered as a recordable type API. Create and reply wrap `CreateComment` after Accessible `:edit` and a `:commentable` check on the parent. Update wraps `UpdateComment` (`:admin` on the comment's parent). Destroy wraps `DestroyComment` (`:admin` on the comment's parent, trash). List and show include `comment_count` and child replies. MCP uses the generic path.
+When `recording_studio_api` is loaded, Comment is registered as a recordable type API. Create and reply wrap `CreateComment` after Accessible `:edit` and a `:commentable` check on the parent. Update wraps `UpdateComment` (`:admin` on the comment's parent). Destroy wraps `DestroyComment` (`:admin` on the comment's parent, trash). On API `0.26.0` or newer, destroy can load a comment that is already trashed. Create and update still return 404 for a trashed comment. List and show include `comment_count` and child replies. MCP uses the generic path.
 
 ## Mental model to keep in mind
 
