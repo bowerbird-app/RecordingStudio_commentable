@@ -426,6 +426,11 @@ class CommentsApiTest < ActionDispatch::IntegrationTest
                  RecordingStudioApi.resource_handler(RecordingStudioCommentable::Api::RECORDABLE_TYPE, :update)
     assert_equal RecordingStudioCommentable::Api::Destroy,
                  RecordingStudioApi.resource_handler(RecordingStudioCommentable::Api::RECORDABLE_TYPE, :destroy)
+
+    type_name = RecordingStudioCommentable::Api::RECORDABLE_TYPE
+    assert_equal true, RecordingStudioApi.resource_handler_registration(type_name, :destroy).include_trashed
+    assert_equal false, RecordingStudioApi.resource_handler_registration(type_name, :create).include_trashed
+    assert_equal false, RecordingStudioApi.resource_handler_registration(type_name, :update).include_trashed
   end
 
   def test_eager_loaded_api_admin_api_stays_on_the_host_recordable_type_list
@@ -553,6 +558,50 @@ class CommentsApiTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  def test_admin_can_destroy_an_already_trashed_comment
+    created_id = create_comment!("Already trashed comment")
+    trash_comment!(created_id)
+
+    delete "/recording_studio_api/api/v1/comments/#{created_id}", headers: bearer(@admin_token)
+
+    assert_response :success
+    assert_equal true, json_body.fetch("deleted")
+    assert_equal "trashed", json_body.fetch("deleted_via")
+    assert RecordingStudioCommentable::Comment.exists?(
+      body: "Welcome to the shared thread. Use this page to verify the default comments feed with seeded content."
+    )
+  end
+
+  def test_token_without_parent_access_cannot_destroy_a_trashed_comment
+    created_id = create_comment!("Hidden trashed comment")
+    trash_comment!(created_id)
+    other_token = issue_token(access_point: @admin_recording, manager: @admin, role: :admin, name: "Other page")
+
+    delete "/recording_studio_api/api/v1/comments/#{created_id}", headers: bearer(other_token)
+
+    assert_response :not_found
+    assert RecordingStudioCommentable::Comment.exists?(body: "Hidden trashed comment")
+  end
+
+  def test_create_and_update_on_a_trashed_comment_are_not_found
+    created_id = create_comment!("Keep this trashed comment")
+    trash_comment!(created_id)
+
+    patch "/recording_studio_api/api/v1/comments/#{created_id}",
+          params: { body: "Should not rewrite a trashed comment" },
+          headers: bearer(@admin_token),
+          as: :json
+    assert_response :not_found
+
+    post "/recording_studio_api/api/v1/comments",
+         params: { parent_id: created_id, body: "Reply on a trashed comment" },
+         headers: bearer(@admin_token),
+         as: :json
+    assert_response :not_found
+    assert_equal "Keep this trashed comment",
+                 RecordingStudioCommentable::Comment.find_by!(body: "Keep this trashed comment").body
+  end
+
   def test_blank_body_is_unprocessable
     post "/recording_studio_api/api/v1/comments",
          params: { parent_id: @public_recording.id, body: "" },
@@ -569,6 +618,22 @@ class CommentsApiTest < ActionDispatch::IntegrationTest
 
   def bearer(token)
     { "Authorization" => "Bearer #{token}" }
+  end
+
+  def create_comment!(body)
+    post "/recording_studio_api/api/v1/comments",
+         params: { parent_id: @public_recording.id, body: body },
+         headers: bearer(@edit_token),
+         as: :json
+    assert_response :created
+    json_body.fetch("id")
+  end
+
+  def trash_comment!(recording_id)
+    recording = RecordingStudio::Recording.unscoped.find(recording_id)
+    recording.recording_studio_trashable_void!
+    recording.reload
+    assert recording.trashed_at.present?
   end
 
   def seeded_welcome_comment_id

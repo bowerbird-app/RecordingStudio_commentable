@@ -18,7 +18,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Devise** authentication with a pre-seeded admin user
 - **Workspace** root recording set up following RecordingStudio's Quick Start pattern
 - **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v7.0.0`, FlatPack `v0.1.376`, Accessible `v0.44.0` (with Trashable `v0.17.0` and Metrics `v0.9.0` query-only companions), Recording Studio API `v0.24.0` (with Admin `v2.16.0`, Logs `v0.8.0`, Moveable `v5.0.0`, and Icons `v0.2.1`), sets `config.authorize_write` to allow a present actor (roots are created with `create_root_recording!`; owner grants are seeded; dummy-only `api_management_authorization_required = false`), copies the core events `root_recording_id` migration, runs Accessible audience constraint/rule tables, and seeds grants through `bootstrap_owner_access!` / `grant_access`.
+- **Dummy app** (`test/dummy/`) with a working login screen, Recording Studio default layout, and sample Page (commentable) and Folder (not commentable) recordables. The dummy pins Recording Studio `v7.0.0`, FlatPack `v0.1.376`, Accessible `v0.44.0` (with Trashable `v0.17.0` and Metrics `v0.9.0` query-only companions), Recording Studio API `v0.26.0` (with Admin `v2.16.0`, Logs `v0.8.0`, Moveable `v5.0.0`, and Icons `v0.2.1`), sets `config.authorize_write` to allow a present actor (roots are created with `create_root_recording!`; owner grants are seeded; dummy-only `api_management_authorization_required = false`), copies the core events `root_recording_id` migration, runs Accessible audience constraint/rule tables, and seeds grants through `bootstrap_owner_access!` / `grant_access`.
 
 ## Installation
 
@@ -120,7 +120,7 @@ Role checks go through `RecordingStudioAccessible` on the parent recording:
 
 Authors cannot edit or delete their own comments without Accessible `:admin` on the parent. If `RecordingStudioAccessible` is not loaded, those actions are denied. Accessible has no `:manage` role (`view` / `edit` / `admin` only).
 
-When `recording_studio_api` is loaded, this gem registers the Comment recordable type (`index`/`show` `:view`, `create` `:edit` plus `:commentable` on the parent, `update`/`destroy` `:admin` on the comment's parent). Create, reply, update, and destroy wrap the same services as the screens. List and show include `comment_count` and child `replies`.
+When `recording_studio_api` is loaded, this gem registers the Comment recordable type (`index`/`show` `:view`, `create` `:edit` plus `:commentable` on the parent, `update`/`destroy` `:admin` on the comment's parent). Create, reply, update, and destroy wrap the same services as the screens. List and show include `comment_count` and child `replies`. Destroy may load a comment that is already trashed (`recording_studio_api` `>= 0.26.0`). Create and update still return 404 for a trashed comment. Accessible `:admin` on the parent is still required to destroy.
 
 ## Comment Model
 

@@ -33,6 +33,11 @@ class ApiTest < Minitest::Test
                  RecordingStudioApi.resource_handler(RecordingStudioCommentable::Api::RECORDABLE_TYPE, :update)
     assert_equal RecordingStudioCommentable::Api::Destroy,
                  RecordingStudioApi.resource_handler(RecordingStudioCommentable::Api::RECORDABLE_TYPE, :destroy)
+
+    type_name = RecordingStudioCommentable::Api::RECORDABLE_TYPE
+    assert_equal true, RecordingStudioApi.resource_handler_registration(type_name, :destroy).include_trashed
+    assert_equal false, RecordingStudioApi.resource_handler_registration(type_name, :create).include_trashed
+    assert_equal false, RecordingStudioApi.resource_handler_registration(type_name, :update).include_trashed
   end
 
   def test_does_not_fake_recording_studio_api
@@ -66,6 +71,11 @@ class ApiTest < Minitest::Test
   private
 
   def api_available?
+    return true if RecordingStudioCommentable::Api.recording_studio_api_available?
+
+    require "recording_studio_api"
     RecordingStudioCommentable::Api.recording_studio_api_available?
+  rescue LoadError
+    false
   end
 end

@@ -12,9 +12,9 @@ gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.376", require: fal
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"
 gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.44.0"
 gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "v2.16.0", require: false
-gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "v0.24.0", require: false
+gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "v0.26.0", require: false
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.2.1", require: false
-# API 0.24 requires Logs >= 0.8.0, which itself requires Recording Studio 7.
+# API 0.26 requires Logs >= 0.8.0, which itself requires Recording Studio 7.
 gem "recording_studio_logs", github: "bowerbird-app/RecordingStudio_logs", tag: "v0.8.0", require: false
 # Trashable gemspec deps are git-only; pin for Bundler resolution only.
 gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.9.0", require: false

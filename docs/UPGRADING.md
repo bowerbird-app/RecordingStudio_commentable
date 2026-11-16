@@ -1,5 +1,25 @@
 # Upgrade Guide
 
+## Upgrading to 0.11.1
+
+No schema change. Comment rows, notifications, and the HTML screens stay as
+they are. Destroy of an already-trashed comment over the API needs Recording
+Studio API `0.26.0`, which resolves the route recording before the handler
+runs. A trashed recording is 404 unless the handler passes
+`include_trashed: true`. Destroy does. Create and update do not.
+
+### Upgrade steps
+
+1. Install Commentable `0.11.1`. No Commentable migration.
+2. Hosts that expose comments over the API need `recording_studio_api`
+   `>= 0.26.0` (tag `v0.26.0`). That release has no migration. Hosts that
+   do not mount the API can stay on their current API gem.
+3. Accessible roles stay the same. Destroy still needs `:admin` on the
+   comment's parent. A token with no access to that parent still gets 404,
+   including when the comment is already trashed.
+4. Dummy / development pin Recording Studio API `v0.26.0`. The gemspec
+   `recording_studio` range stays `>= 7.0`, `< 8.0`.
+
 ## Upgrading to 0.11.0
 
 Commentable requires Recording Studio 7. `root_recording_for` only finds a

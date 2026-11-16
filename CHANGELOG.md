@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-11-16
+
+### Fixed
+- Comment destroy on Recording Studio API can reach a comment that is already trashed. API `0.26.0` resolves the route recording before the handler runs, and a trashed recording is missing unless the handler passes `include_trashed: true`. Destroy does. Create and update do not, so those requests still return 404 for a trashed comment.
+- Destroy and update read `context.recording`. They no longer look the route id up again.
+
+### Changed
+- Version `0.11.0` → `0.11.1`.
+- Dummy and development apps pin Recording Studio API `v0.26.0`. The gemspec `recording_studio` range stays `>= 7.0`, `< 8.0`.
+
+### Upgrade notes
+- Install Commentable `0.11.1`. No migration in this gem. Comment rows, notifications, and the HTML screens are unchanged.
+- Hosts that expose comments over the API need `recording_studio_api` `>= 0.26.0` for destroy of an already-trashed comment. Older API gems still 404 that request before the handler runs.
+- Accessible checks are unchanged. Destroy still requires `:admin` on the comment's parent. A token with no access to that parent still gets 404.
+
 ## [0.11.0] - 2026-11-15
 
 ### Changed
@@ -292,7 +307,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.8.0...v0.9.0

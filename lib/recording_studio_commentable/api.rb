@@ -52,15 +52,6 @@ module RecordingStudioCommentable
         )
       end
 
-      def member_recording(context, include_trashed: false)
-        return context.recording if context.recording
-
-        found = context.access_grant.accessible_recordings(include_trashed: include_trashed).find_by(id: context.id)
-        raise RecordingStudioApi::NotFoundError, "Resource was not found in this API scope" if found.nil?
-
-        found
-      end
-
       private
 
       def register_type!
@@ -92,16 +83,17 @@ module RecordingStudioCommentable
       def register_handlers!
         register_handler(:create, Create)
         register_handler(:update, Update)
-        register_handler(:destroy, Destroy)
+        register_handler(:destroy, Destroy, include_trashed: true)
       end
 
-      def register_handler(action, handler)
+      def register_handler(action, handler, include_trashed: false)
         return if RecordingStudioApi.resource_handler(RECORDABLE_TYPE, action)
 
         RecordingStudioApi.register_resource_handler(
           RECORDABLE_TYPE,
           action,
-          handler: handler
+          handler: handler,
+          include_trashed: include_trashed
         )
       end
     end
