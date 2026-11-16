@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "hooks"
-
 module RecordingStudioCommentable
   class Configuration
     RICH_TEXT_COMMENT_MODES = {
@@ -16,7 +14,7 @@ module RecordingStudioCommentable
     }.freeze
 
     attr_accessor :timeout, :use_recording_studio_trashable_for_destroy
-    attr_reader :rich_text_comments, :hooks, :recordable_display_attributes, :author_display_attributes,
+    attr_reader :rich_text_comments, :recordable_display_attributes, :author_display_attributes,
                 :author_avatar_attributes, :layout, :route_anchor
 
     def initialize
@@ -28,7 +26,6 @@ module RecordingStudioCommentable
       @recordable_display_attributes = {}
       @author_display_attributes = {}
       @author_avatar_attributes = {}
-      @hooks = Hooks.new
     end
 
     def layout=(value)
@@ -81,8 +78,7 @@ module RecordingStudioCommentable
         route_anchor: route_anchor,
         recordable_display_attributes: recordable_display_attributes.dup,
         author_display_attributes: author_display_attributes.dup,
-        author_avatar_attributes: author_avatar_attributes.dup,
-        hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size)
+        author_avatar_attributes: author_avatar_attributes.dup
       }
     end
 

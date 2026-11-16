@@ -17,7 +17,7 @@ module RecordingStudioCommentable
     #   result.success? # => true
     #   result.value    # => the Comment instance
     #
-    class CreateComment < BaseService
+    class CreateComment < RecordingStudio::Services::BaseService
       def initialize(parent_recording:, body:, author: nil)
         @parent_recording = parent_recording
         @body = body

@@ -316,7 +316,7 @@ Put this on a model to opt it into comments.
 
 ### `RecordingStudioCommentable.configure`
 
-Use this in `config/initializers/recording_studio_commentable.rb` to set options and register hooks:
+Use this in `config/initializers/recording_studio_commentable.rb` to set options:
 
 ```ruby
 RecordingStudioCommentable.configure do |config|
@@ -336,144 +336,34 @@ If you are building your own custom UI or background workflow, these are the mai
 - `RecordingStudioCommentable::Services::UpdateComment.call`
 - `RecordingStudioCommentable::Services::DestroyComment.call`
 
-## Hooks you can use
+## Service hooks
 
-The gem exposes a small hook system through:
+`CreateComment`, `UpdateComment`, and `DestroyComment` inherit `RecordingStudio::Services::BaseService`. `.call` returns `RecordingStudio::Services::BaseService::Result`. The result answers `success?`, `failure?`, `value`, `error`, `errors`, `on_success`, `on_failure`, and `value!`.
+
+Register hooks on `RecordingStudio.configuration.hooks`. `before_service` and `after_service` receive the service class. `around_service` receives the service instance. Filter on the class so other Recording Studio services stay out of the block.
 
 ```ruby
-RecordingStudioCommentable.configure do |config|
-  config.hooks ...
+RecordingStudio.configuration.hooks.before_service do |service_class, args|
+  next unless service_class == RecordingStudioCommentable::Services::CreateComment
+
+  Rails.logger.info("Starting a comment with #{args.inspect}")
+end
+
+RecordingStudio.configuration.hooks.after_service do |service_class, result|
+  next unless service_class == RecordingStudioCommentable::Services::CreateComment
+
+  Rails.logger.info(result.success?)
+end
+
+RecordingStudio.configuration.hooks.around_service do |service, next_step|
+  next next_step.call unless service.instance_of?(RecordingStudioCommentable::Services::CreateComment)
+
+  Rails.logger.info("CreateComment starting")
+  next_step.call
 end
 ```
 
-These are the main hooks.
-
-### `before_initialize`
-
-Runs before the engine finishes its setup.
-
-Good for:
-
-- preparing configuration
-- registering behavior very early
-
-```ruby
-RecordingStudioCommentable.configure do |config|
-  config.hooks.before_initialize do
-    Rails.logger.info("RS Commentable is about to initialize")
-  end
-end
-```
-
-### `on_configuration`
-
-Runs after configuration values are loaded and merged.
-
-Good for:
-
-- reacting to final config values
-- applying host-app defaults
-
-```ruby
-RecordingStudioCommentable.configure do |config|
-  config.hooks.on_configuration do |final_config|
-    Rails.logger.info("Timeout is #{final_config.timeout}")
-  end
-end
-```
-
-### `after_initialize`
-
-Runs after the engine has finished its initialization phase.
-
-Good for:
-
-- startup logging
-- hooking in extra setup after the gem is ready
-
-### `before_service`
-
-Runs before a service object executes.
-
-Good for:
-
-- audit logging
-- instrumentation
-- lightweight validation around service usage
-
-The hook receives the service class and the service arguments.
-
-```ruby
-RecordingStudioCommentable.configure do |config|
-  config.hooks.before_service do |service_class, args|
-    Rails.logger.info("Starting #{service_class.name} with #{args.inspect}")
-  end
-end
-```
-
-### `after_service`
-
-Runs after a service finishes.
-
-Good for:
-
-- success or failure logging
-- metrics
-- notifications
-
-The hook receives the service class and the result object.
-
-```ruby
-RecordingStudioCommentable.configure do |config|
-  config.hooks.after_service do |service_class, result|
-    Rails.logger.info("#{service_class.name} success? #{result.success?}")
-  end
-end
-```
-
-### `around_service`
-
-Wraps service execution.
-
-Good for:
-
-- timing
-- tracing
-- error reporting wrappers
-- transaction-like wrappers if that fits your app
-
-```ruby
-RecordingStudioCommentable.configure do |config|
-  config.hooks.around_service do |_service, next_step|
-    started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    next_step.call
-  ensure
-    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
-    Rails.logger.info("Commentable service took #{elapsed.round(3)}s")
-  end
-end
-```
-
-## Extension hooks for models and controllers
-
-If you want to attach extra behavior to specific models or controllers, there are two more extension points:
-
-- `config.hooks.extend_model(:ModelName) { ... }`
-- `config.hooks.extend_controller(:ControllerName) { ... }`
-
-These are best when you want small host-app customizations without forking the gem.
-
-Example:
-
-```ruby
-RecordingStudioCommentable.configure do |config|
-  config.hooks.extend_model(:Page) do
-    def comments_enabled_for_ui?
-      true
-    end
-  end
-end
-```
+Commentable does not run `before_initialize`, `after_initialize`, `on_configuration`, or model and controller extension blocks.
 
 ## Authorization flow
 

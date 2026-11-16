@@ -11,7 +11,6 @@ class EngineTest < Minitest::Test
   end
 
   def teardown
-    RecordingStudioCommentable.configuration.hooks.clear!
     RecordingStudioCommentable.instance_variable_set(:@configuration, @original_configuration)
     RecordingStudio.configuration.recordable_types = @original_recordable_types
     RecordingStudio.registered_capabilities.clear
@@ -24,28 +23,16 @@ class EngineTest < Minitest::Test
     assert_includes component_paths, File.expand_path("../app/components", __dir__)
   end
 
-  def test_before_and_after_initialize_initializers_run_hooks
-    before_called = false
-    after_called = false
+  def test_engine_does_not_run_template_lifecycle_hooks
+    names = RecordingStudioCommentable::Engine.initializers.map(&:name)
 
-    RecordingStudioCommentable.configuration.hooks.before_initialize { |_engine| before_called = true }
-    RecordingStudioCommentable.configuration.hooks.after_initialize { |_engine| after_called = true }
-
-    find_initializer("recording_studio_commentable.before_initialize").block.call(Object.new)
-    find_initializer("recording_studio_commentable.after_initialize").block.call(Object.new)
-
-    assert before_called
-    assert after_called
+    refute_includes names, "recording_studio_commentable.before_initialize"
+    refute_includes names, "recording_studio_commentable.after_initialize"
+    refute_includes names, "recording_studio_commentable.apply_model_extensions"
+    refute_includes names, "recording_studio_commentable.apply_controller_extensions"
   end
 
-  def test_load_config_merges_config_sources_and_runs_on_configuration_hook
-    hook_called = false
-    hook_payload = nil
-    RecordingStudioCommentable.configuration.hooks.on_configuration do |cfg|
-      hook_called = true
-      hook_payload = cfg
-    end
-
+  def test_load_config_merges_config_sources
     xcfg = Struct.new(:recording_studio_commentable).new(
       {
         timeout: 12,
@@ -74,8 +61,6 @@ class EngineTest < Minitest::Test
 
     find_initializer("recording_studio_commentable.load_config").block.call(app)
 
-    assert hook_called
-    assert_equal RecordingStudioCommentable.configuration, hook_payload
     assert_equal 12, RecordingStudioCommentable.configuration.timeout
     assert_equal true, RecordingStudioCommentable.configuration.use_recording_studio_trashable_for_destroy
     assert_equal "flat_pack_pseudo_top_nav", RecordingStudioCommentable.configuration.layout
@@ -140,60 +125,6 @@ class EngineTest < Minitest::Test
     assert_equal false, RecordingStudioCommentable.configuration.use_recording_studio_trashable_for_destroy
     assert_nil RecordingStudioCommentable.configuration.layout
     assert_equal false, RecordingStudioCommentable.configuration.rich_text_comments
-  end
-
-  def test_apply_extension_initializers_register_active_support_on_load_callbacks
-    to_prepare_blocks = []
-    config_stub = Object.new
-    config_stub.define_singleton_method(:to_prepare) do |&block|
-      to_prepare_blocks << block
-    end
-
-    RecordingStudioCommentable::Engine.stub(:config, config_stub) do
-      find_initializer("recording_studio_commentable.apply_model_extensions").block.call
-      find_initializer("recording_studio_commentable.apply_controller_extensions").block.call
-    end
-
-    assert_equal 2, to_prepare_blocks.size
-  end
-
-  def test_apply_model_extensions_adds_registered_methods_once
-    model_class = Class.new do
-      def self.name
-        "ExampleRecord"
-      end
-    end
-
-    RecordingStudioCommentable.configuration.hooks.extend_model(:ExampleRecord) do
-      def commentable_extension_method
-        :applied
-      end
-    end
-
-    RecordingStudioCommentable::Engine.apply_model_extensions(model_class)
-    RecordingStudioCommentable::Engine.apply_model_extensions(model_class)
-
-    instance = model_class.new
-    assert_equal :applied, instance.commentable_extension_method
-  end
-
-  def test_apply_controller_extensions_matches_demodulized_name
-    controller_class = Class.new do
-      def self.name
-        "Admin::DashboardController"
-      end
-    end
-
-    RecordingStudioCommentable.configuration.hooks.extend_controller(:DashboardController) do
-      def commentable_controller_extension
-        :applied
-      end
-    end
-
-    RecordingStudioCommentable::Engine.apply_controller_extensions(controller_class)
-
-    instance = controller_class.new
-    assert_equal :applied, instance.commentable_controller_extension
   end
 
   def test_register_recording_studio_capability_initializer_registers_comment_child_type

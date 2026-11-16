@@ -1,5 +1,31 @@
 # Upgrade Guide
 
+## Upgrading to 0.12.0
+
+Commentable no longer ships its own hook registry or service base class.
+`CreateComment`, `UpdateComment`, and `DestroyComment` still return an object
+with `success?`, `failure?`, `value`, `error`, `errors`, `on_success`,
+`on_failure`, and `value!`. That object is
+`RecordingStudio::Services::BaseService::Result`. Comment storage, access
+rules, API handlers, HTML screens, and notifications stay as they are. No
+schema change.
+
+### Upgrade steps
+
+1. Install Commentable `0.12.0`. No Commentable migration. The gemspec
+   `recording_studio` range stays `>= 7.0`, `< 8.0`.
+2. Delete references to `RecordingStudioCommentable::Hooks`,
+   `RecordingStudioCommentable::Services::BaseService`, and
+   `RecordingStudioCommentable.configuration.hooks`.
+3. Register service hooks on `RecordingStudio.configuration.hooks`. Filter
+   on `RecordingStudioCommentable::Services::CreateComment`, `UpdateComment`,
+   or `DestroyComment`. `before_service` and `after_service` receive the
+   service class. `around_service` receives the service instance.
+4. Stop reading `:hooks_registered` from
+   `RecordingStudioCommentable.configuration.to_h`.
+5. The engine no longer runs `before_initialize`, `after_initialize`,
+   `on_configuration`, or model and controller extension blocks.
+
 ## Upgrading to 0.11.1
 
 No schema change. Comment rows, notifications, and the HTML screens stay as

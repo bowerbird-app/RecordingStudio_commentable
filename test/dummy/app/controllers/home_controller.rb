@@ -148,7 +148,7 @@ class HomeController < ApplicationController
       {
         title: "CreateComment.call",
         source: "RecordingStudioCommentable::Services::CreateComment",
-        summary: "Creates a new comment under a parent recording and returns a BaseService::Result.",
+        summary: "Creates a new comment under a parent recording and returns a Recording Studio service result.",
         signature: 'RecordingStudioCommentable::Services::CreateComment.call(parent_recording:, body:, author: nil)',
         examples: [
           {
@@ -174,7 +174,7 @@ class HomeController < ApplicationController
       {
         title: "DestroyComment.call",
         source: "RecordingStudioCommentable::Services::DestroyComment",
-        summary: "Trashes or destroys a comment recording and returns a BaseService::Result.",
+        summary: "Trashes or destroys a comment recording and returns a Recording Studio service result.",
         signature: 'RecordingStudioCommentable::Services::DestroyComment.call(comment_recording:, root_recording:, actor: nil)',
         examples: [
           {
@@ -186,8 +186,8 @@ class HomeController < ApplicationController
       },
       {
         title: "BaseService::Result",
-        source: "RecordingStudioCommentable::Services::BaseService::Result",
-        summary: "Common response object returned by the public service entrypoints.",
+        source: "RecordingStudio::Services::BaseService::Result",
+        summary: "Response object returned by CreateComment, UpdateComment, and DestroyComment.",
         signature: "result.success? / result.failure? / result.value / result.error / result.errors / result.on_success / result.on_failure / result.value!",
         examples: [
           {
@@ -253,15 +253,15 @@ class HomeController < ApplicationController
         ]
       },
       {
-        title: "Hooks API",
-        source: "RecordingStudioCommentable::Hooks",
-        summary: "Host hooks for initialization, service instrumentation, and model/controller extensions.",
-        signature: "config.hooks.before_initialize / after_initialize / on_configuration / before_service / after_service / around_service / extend_model / extend_controller",
+        title: "Service hooks",
+        source: "RecordingStudio.configuration.hooks",
+        summary: "CreateComment, UpdateComment, and DestroyComment run on Recording Studio's service hooks. Filter on the service class.",
+        signature: "RecordingStudio.configuration.hooks.before_service / after_service / around_service",
         examples: [
           {
-            label: "Instrument services",
-            input: 'RecordingStudioCommentable.configure do |config|\n  config.hooks.after_service do |service_class, result|\n    Rails.logger.info("#{service_class.name}: #{result.success?}")\n  end\nend',
-            output: "Registers a host hook against the shared hooks registry"
+            label: "Log comment creates",
+            input: 'RecordingStudio.configuration.hooks.after_service do |service_class, result|\n  next unless service_class == RecordingStudioCommentable::Services::CreateComment\n  Rails.logger.info(result.success?)\nend',
+            output: "Runs for CreateComment. Other Recording Studio services stay outside this block."
           }
         ]
       },

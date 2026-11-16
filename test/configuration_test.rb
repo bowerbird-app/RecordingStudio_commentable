@@ -151,15 +151,12 @@ class ConfigurationTest < Minitest::Test
     assert_equal({ "User" => :avatar_url, "Bot" => :image_url }, @configuration.author_avatar_attributes)
   end
 
-  def test_to_h_reports_registered_hook_counts
-    @configuration.hooks.before_initialize { nil }
-    @configuration.hooks.before_initialize { nil }
-    @configuration.hooks.after_service { nil }
-
+  def test_to_h_lists_host_settings_without_a_hook_registry
     result = @configuration.to_h
 
-    assert_equal 2, result.fetch(:hooks_registered).fetch(:before_initialize)
-    assert_equal 1, result.fetch(:hooks_registered).fetch(:after_service)
+    assert_equal 5, result.fetch(:timeout)
+    refute result.key?(:hooks_registered)
+    refute_respond_to @configuration, :hooks
   end
 
   def test_configure_without_block_is_safe
@@ -171,11 +168,9 @@ class ConfigurationTest < Minitest::Test
   def test_configuration_upgrades_legacy_instance_missing_new_accessors
     legacy_config = Class.new do
       attr_accessor :timeout
-      attr_reader :hooks
 
       def initialize
         @timeout = 11
-        @hooks = RecordingStudioCommentable::Hooks.new
       end
     end.new
 
@@ -191,6 +186,6 @@ class ConfigurationTest < Minitest::Test
     assert_equal({}, upgraded.recordable_display_attributes)
     assert_equal({}, upgraded.author_display_attributes)
     assert_equal({}, upgraded.author_avatar_attributes)
-    assert_same legacy_config.hooks, upgraded.hooks
+    refute_respond_to upgraded, :hooks
   end
 end

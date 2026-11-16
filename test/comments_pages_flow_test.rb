@@ -109,7 +109,9 @@ class CommentsPagesFlowTest < Minitest::Test
     assert_includes controller_source, 'title: "RecordingStudioCommentable.configuration"'
     assert_includes controller_source, 'title: "Commentable.to"'
     assert_includes controller_source, 'title: "Comment author methods"'
-    assert_includes controller_source, 'title: "Hooks API"'
+    assert_includes controller_source, 'title: "Service hooks"'
+    assert_includes controller_source, 'source: "RecordingStudio::Services::BaseService::Result"'
+    assert_includes controller_source, 'source: "RecordingStudio.configuration.hooks"'
     assert_includes controller_source, 'title: "Mounted routes"'
     assert_includes controller_source,
                     "RecordableDisplayHelper is included in both the dummy app controller and the engine controller."

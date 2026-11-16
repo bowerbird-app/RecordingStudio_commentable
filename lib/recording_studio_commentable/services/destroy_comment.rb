@@ -14,7 +14,7 @@ module RecordingStudioCommentable
     #     actor: current_user
     #   )
     #
-    class DestroyComment < BaseService
+    class DestroyComment < RecordingStudio::Services::BaseService
       include AccessibleAdminGuard
 
       def initialize(comment_recording:, root_recording:, actor: nil)
