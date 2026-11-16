@@ -128,10 +128,12 @@ class EngineTest < Minitest::Test
   end
 
   def test_register_recording_studio_capability_initializer_registers_comment_child_type
-    RecordingStudio.configuration.recordable_types = ["Page"]
+    RecordingStudio.configuration.recordable_types = []
     RecordingStudio.registered_capabilities.clear
 
-    find_initializer("recording_studio_commentable.register_recording_studio_capability").block.call
+    RecordingStudio.stub(:validate_recordable_declarations!, true) do
+      find_initializer("recording_studio_commentable.register_recording_studio_capability").block.call
+    end
 
     assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioCommentable::Comment"
 
