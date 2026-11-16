@@ -9,7 +9,6 @@ require "recording_studio_commentable/display_attribute_resolver"
 require "recording_studio_commentable/path_safety"
 require "recording_studio_commentable/recordable_display_helper"
 require "recording_studio_commentable/capability"
-require "recording_studio_commentable/services/base_service"
 require "recording_studio_commentable/services/accessible_admin_guard"
 require "recording_studio_commentable/services/create_comment"
 require "recording_studio_commentable/api"
@@ -51,7 +50,6 @@ module RecordingStudioCommentable
 
         upgraded.public_send(:"#{attr}=", config.public_send(attr))
       end
-      upgraded.instance_variable_set(:@hooks, config.hooks) if config.respond_to?(:hooks)
       upgraded
     end
   end

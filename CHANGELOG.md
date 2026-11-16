@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-16
+
+### Breaking
+- `RecordingStudioCommentable::Hooks` is gone.
+- `RecordingStudioCommentable::Services::BaseService` is gone.
+- `RecordingStudioCommentable.configuration.hooks` is gone.
+- `configuration.to_h` no longer includes `:hooks_registered`.
+- The engine no longer runs `before_initialize`, `on_configuration`, `after_initialize`, or model and controller extension blocks.
+
+### Changed
+- Version `0.11.1` → `0.12.0`.
+- `CreateComment`, `UpdateComment`, and `DestroyComment` inherit `RecordingStudio::Services::BaseService`.
+- `.call` still returns an object with `success?`, `failure?`, `value`, `error`, `errors`, `on_success`, `on_failure`, and `value!`. That object is `RecordingStudio::Services::BaseService::Result`.
+- Those services run `before_service`, `after_service`, and `around_service` on `RecordingStudio.configuration.hooks`. Filter on the service class.
+- The gemspec `recording_studio` range stays `>= 7.0`, `< 8.0`.
+
+### Upgrade notes
+- Install Commentable `0.12.0`. No migration. See [docs/UPGRADING.md](docs/UPGRADING.md).
+- Delete references to `RecordingStudioCommentable::Hooks`, `RecordingStudioCommentable::Services::BaseService`, and `RecordingStudioCommentable.configuration.hooks`.
+- Register hooks on `RecordingStudio.configuration.hooks` and filter on the Commentable service class.
+- Stop reading `:hooks_registered` from `configuration.to_h`.
+- Comment storage, access rules, API handlers, HTML screens, and notifications are unchanged.
+
 ## [0.11.1] - 2026-11-16
 
 ### Fixed
@@ -307,7 +330,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.9.0...v0.10.0

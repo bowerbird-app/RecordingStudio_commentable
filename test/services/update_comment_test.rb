@@ -133,12 +133,14 @@ class UpdateCommentTest < Minitest::Test
     root = FakeRootRecording.new
     comment_recording = FakeCommentRecording.new("original")
 
-    result = RecordingStudioCommentable::Services::UpdateComment.call(
-      comment_recording: comment_recording,
-      root_recording: root,
-      body: "Updated body",
-      actor: Object.new
-    )
+    result = without_accessible_admin do
+      RecordingStudioCommentable::Services::UpdateComment.call(
+        comment_recording: comment_recording,
+        root_recording: root,
+        body: "Updated body",
+        actor: Object.new
+      )
+    end
 
     assert result.failure?
     assert_equal "You are not allowed to edit this comment.", result.error
@@ -172,5 +174,11 @@ class UpdateCommentTest < Minitest::Test
 
   def allow_accessible_admin(service)
     service.define_singleton_method(:accessible_admin?) { true }
+  end
+
+  def without_accessible_admin(&block)
+    return block.call unless defined?(RecordingStudioAccessible)
+
+    RecordingStudioAccessible.stub(:authorized?, false, &block)
   end
 end

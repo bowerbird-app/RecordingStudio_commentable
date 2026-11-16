@@ -10,7 +10,7 @@ A Rails engine that adds threaded comment feeds to any [RecordingStudio](https:/
 - **Recording Studio API** — registers `RecordingStudioCommentable::Comment` so JSON clients and MCP can list, show, create, reply, update, and trash comments through the generic recordable path
 - **FlatPack UI** — all views built with FlatPack components; no raw HTML needed
 - **Service objects** — `CreateComment`, `UpdateComment`, `DestroyComment` encapsulate business logic
-- **Hook system** — lifecycle hooks (`before_initialize`, `after_initialize`, `on_configuration`, `before_service`, `after_service`, `around_service`) for host-app customisation
+- **Service hooks.** `CreateComment`, `UpdateComment`, and `DestroyComment` run on `RecordingStudio.configuration.hooks`. Filter on the service class.
 
 ## What's Included
 
@@ -179,12 +179,12 @@ RecordingStudioCommentable.configure do |config|
   config.author_avatar_attributes = {
     "User" => :avatar_url
   }
+end
 
-  # Lifecycle hooks
-  config.hooks.after_initialize { Rails.logger.info "Commentable ready!" }
-  config.hooks.around_service do |_service, block|
-    Sentry.with_scope { block.call }
-  end
+RecordingStudio.configuration.hooks.after_service do |service_class, result|
+  next unless service_class == RecordingStudioCommentable::Services::CreateComment
+
+  Rails.logger.info(result.success?)
 end
 ```
 
@@ -359,6 +359,6 @@ See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full do
 
 ## Documentation
 
-For a host-app focused walkthrough of installation, request flow, service methods, and hooks, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md). Upgrade notes live in [docs/UPGRADING.md](docs/UPGRADING.md). Cloud Agent boot and the fetched skill pack are in [docs/cursor-skills.md](docs/cursor-skills.md).
+For a host-app focused walkthrough of installation, request flow, and service methods, see [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md). Upgrade notes live in [docs/UPGRADING.md](docs/UPGRADING.md). Cloud Agent boot and the fetched skill pack are in [docs/cursor-skills.md](docs/cursor-skills.md).
 
 The README, [docs/RS_COMMENTABLE_GUIDE.md](docs/RS_COMMENTABLE_GUIDE.md), and the dummy app are the source of truth for the Recording Studio addon workflow.

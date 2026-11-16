@@ -186,7 +186,7 @@ class RecordingStudioCommentableSmokeTest < ActionDispatch::IntegrationTest
 
   def test_failed_destroy_flashes_error_not_success
     comment_recording = seeded_welcome_comment_recording!
-    failure = RecordingStudioCommentable::Services::BaseService::Result.new(
+    failure = RecordingStudio::Services::BaseService::Result.new(
       success: false,
       error: "boom"
     )

@@ -31,7 +31,6 @@ Layout/LineLength:
 Metrics/ClassLength:
   Exclude:
     - "test/**/*"
-    - "lib/recording_studio_commentable/hooks.rb"
 
 Metrics/MethodLength:
   Exclude:
