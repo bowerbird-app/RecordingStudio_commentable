@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-11-18
+
+### Changed
+- Version `0.12.0` → `0.12.1`.
+- Dummy and development apps pin Recording Studio `v7.7.1`, FlatPack `v0.1.378`, Accessible `v0.54.0`, Trashable `v1.2.0`, Metrics `v0.9.1`, API `v1.15.0`, Admin `v2.19.0`, Logs `v0.8.1`, Moveable `v6.0.1`, and Icons `v0.4.1`.
+- The gemspec `recording_studio` range stays `>= 7.0`, `< 8.0`.
+- The dummy no longer lists `RecordingStudioApi::AdminApi` in `config.recordable_types`. API `1.15` declares that model only when an admin root type is configured, and this dummy has none.
+- Dummy copies API `1.15.0` migration `20261117000024_add_owner_to_recording_studio_api_api_clients` so API client provisioning can store `owner_id`.
+
+### Upgrade notes
+- Install Commentable `0.12.1`. No Commentable migration. See [docs/UPGRADING.md](docs/UPGRADING.md).
+- Hosts that take Accessible `0.54` or API `1.15` need Recording Studio `>= 7.7` in the same change. These pins use `v7.7.1`.
+- API `1.12` and later raise at boot when `config/recording_studio_api.yml` is missing. The dummy ships a minimal `shared: {}` file.
+- Recording Studio `7.4`, `7.5`, and `7.7` root-index migrations stay out of the dummy.
+- Hosts with no admin root should drop `RecordingStudioApi::AdminApi` from `config.recordable_types`. Listing it with an empty `admin_root_recordable_type_names` raises `MissingRecordableDeclaration` at boot on API `1.15`.
+
 ## [0.12.0] - 2026-11-16
 
 ### Breaking
@@ -330,7 +346,8 @@ See [docs/UPGRADING.md](docs/UPGRADING.md).
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/bowerbird-app/RecordingStudio_commentable/compare/v0.10.0...v0.11.0

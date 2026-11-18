@@ -433,10 +433,10 @@ class CommentsApiTest < ActionDispatch::IntegrationTest
     assert_equal false, RecordingStudioApi.resource_handler_registration(type_name, :update).include_trashed
   end
 
-  def test_eager_loaded_api_admin_api_stays_on_the_host_recordable_type_list
+  def test_eager_loaded_api_admin_api_stays_off_the_host_list_without_an_admin_root
     require "recording_studio_api/admin_api" unless defined?(RecordingStudioApi::AdminApi)
 
-    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioApi::AdminApi"
+    refute_includes RecordingStudio.configuration.recordable_types, "RecordingStudioApi::AdminApi"
     assert_empty RecordingStudioApi.configuration.admin_root_recordable_type_names
     assert RecordingStudio.validate_recordable_declarations!
   end
