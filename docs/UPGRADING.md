@@ -21,11 +21,13 @@ Studio `>= 7.7` in the same install.
    `20261117000024_add_owner_to_recording_studio_api_api_clients` when
    `recording_studio_api_api_clients` has no `owner_type` / `owner_id`.
    Provisioning an API client writes those columns.
-6. Leave Recording Studio `7.4`, `7.5`, and `7.7` root-index migrations out
-   of apps that were not given those migrations. This dummy does not copy
-   `add_..._root_type_creation_index`,
-   `enforce_recording_studio_recording_root_invariant`, or
+6. Hosts moving to Recording Studio 7.7 must run the 7.4, 7.5, and 7.7
+   root-index migrations. Recording Studio 7.5 and 7.7, and API 1.4 and
+   1.7, require them:
+   `add_recording_studio_recordings_root_type_creation_index`,
+   `enforce_recording_studio_recording_root_invariant`, and
    `replace_recording_studio_recordings_root_index`.
+   Only this repo's dummy app leaves those three out.
 7. Hosts with no admin root should stop listing `RecordingStudioApi::AdminApi`
    in `config.recordable_types`. API `1.15` declares that model only when
    `admin_root_recordable_type_names` is non-empty. An empty list plus a
