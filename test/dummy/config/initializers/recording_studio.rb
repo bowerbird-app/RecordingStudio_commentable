@@ -2,9 +2,10 @@
 
 RecordingStudio.configure do |config|
   # Registered delegated_type recordables (strings or classes).
-  # AdminApi declares on eager load; register it so CI declaration checks pass.
+  # API 1.15 declares AdminApi only when an admin root type is configured.
+  # This dummy has none, so AdminApi stays off the list. Listing it raises
+  # MissingRecordableDeclaration at boot.
   host_types = [ "Workspace", "Folder", "Page", "RecordingStudioCommentable::Comment" ]
-  host_types << "RecordingStudioApi::AdminApi" if defined?(RecordingStudioApi)
   config.recordable_types = host_types
   config.app_name = "Comments" if config.respond_to?(:app_name=)
 

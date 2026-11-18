@@ -3,16 +3,16 @@
 require_relative "../test_helper"
 
 class AccessiblePinTest < ActiveSupport::TestCase
-  test "pins Accessible 0.44.0 with trashable query deps and audience tables" do
-    assert_equal "0.44.0", RecordingStudioAccessible::VERSION
+  test "pins Accessible 0.54.0 with trashable query deps and audience tables" do
+    assert_equal "0.54.0", RecordingStudioAccessible::VERSION
 
     gemfile = File.read(Rails.root.join("Gemfile"))
     assert_includes gemfile, 'gem "recording_studio_accessible"'
-    assert_includes gemfile, 'tag: "v0.44.0"'
+    assert_includes gemfile, 'tag: "v0.54.0"'
     assert_includes gemfile, 'gem "recording_studio_trashable"'
-    assert_includes gemfile, 'tag: "v0.17.0"'
+    assert_includes gemfile, 'tag: "v1.2.0"'
     assert_includes gemfile, 'gem "recording_studio_metrics"'
-    assert_includes gemfile, 'tag: "v0.9.0"'
+    assert_includes gemfile, 'tag: "v0.9.1"'
 
     assert ActiveRecord::Base.connection.table_exists?(:recording_studio_access_constraints)
     assert ActiveRecord::Base.connection.table_exists?(:recording_studio_access_rules)

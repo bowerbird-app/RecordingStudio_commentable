@@ -1,5 +1,36 @@
 # Upgrade Guide
 
+## Upgrading to 0.12.1
+
+No schema change in this gem. Dummy and development pins move to the
+18 November 2026 Recording Studio tags. The gemspec `recording_studio` range
+stays `>= 7.0`, `< 8.0`. Accessible `0.54` and API `1.15` need Recording
+Studio `>= 7.7` in the same install.
+
+### Upgrade steps
+
+1. Install Commentable `0.12.1`. No Commentable migration.
+2. Move Recording Studio to `v7.7.1` when you take Accessible `v0.54.0` or
+   API `v1.15.0`. FlatPack pin is `v0.1.378`.
+3. Companion pins: Accessible `v0.54.0`, Trashable `v1.2.0`, Metrics
+   `v0.9.1`, API `v1.15.0`, Admin `v2.19.0`, Logs `v0.8.1`, Moveable
+   `v6.0.1`, Icons `v0.4.1`.
+4. API `1.12` and later raise at boot when `config/recording_studio_api.yml`
+   is missing. A minimal file with `shared: {}` is enough to boot.
+5. Copy API `1.15.0` migration
+   `20261117000024_add_owner_to_recording_studio_api_api_clients` when
+   `recording_studio_api_api_clients` has no `owner_type` / `owner_id`.
+   Provisioning an API client writes those columns.
+6. Leave Recording Studio `7.4`, `7.5`, and `7.7` root-index migrations out
+   of apps that were not given those migrations. This dummy does not copy
+   `add_..._root_type_creation_index`,
+   `enforce_recording_studio_recording_root_invariant`, or
+   `replace_recording_studio_recordings_root_index`.
+7. Hosts with no admin root should stop listing `RecordingStudioApi::AdminApi`
+   in `config.recordable_types`. API `1.15` declares that model only when
+   `admin_root_recordable_type_names` is non-empty. An empty list plus a
+   registered AdminApi raises `MissingRecordableDeclaration` at boot.
+
 ## Upgrading to 0.12.0
 
 Commentable no longer ships its own hook registry or service base class.

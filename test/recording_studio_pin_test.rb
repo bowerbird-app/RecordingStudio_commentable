@@ -3,15 +3,15 @@
 require "test_helper"
 
 class RecordingStudioPinTest < ActiveSupport::TestCase
-  def test_root_and_dummy_gemfiles_pin_recording_studio_v7_0_0
+  def test_root_and_dummy_gemfiles_pin_recording_studio_v7_7_1
     root = File.expand_path("..", __dir__)
 
     [File.join(root, "Gemfile"), File.join(root, "test/dummy/Gemfile")].each do |path|
       contents = File.read(path)
       assert_match(
-        %r{gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7\.0\.0"},
+        %r{gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7\.7\.1"},
         contents,
-        "#{path} should pin Recording Studio v7.0.0"
+        "#{path} should pin Recording Studio v7.7.1"
       )
       refute_includes contents, 'tag: "v6.5.0"', "#{path} should not keep the prior Recording Studio pin"
       refute_includes contents, 'tag: "v6.3.0"', "#{path} should not keep the prior Recording Studio pin"
@@ -44,13 +44,13 @@ class RecordingStudioPinTest < ActiveSupport::TestCase
     assert_includes migration, "change_column_null :recording_studio_events, :root_recording_id, false"
   end
 
-  def test_root_and_dummy_gemfiles_pin_flat_pack_v0_1_376
+  def test_root_and_dummy_gemfiles_pin_flat_pack_v0_1_378
     root = File.expand_path("..", __dir__)
     dummy = File.read(File.join(root, "test/dummy/Gemfile"))
     gemfile = File.read(File.join(root, "Gemfile"))
 
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.376"'
-    assert_includes dummy, 'github: "bowerbird-app/flatpack", tag: "v0.1.376"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.378"'
+    assert_includes dummy, 'github: "bowerbird-app/flatpack", tag: "v0.1.378"'
     refute_includes gemfile, 'tag: "v0.1.359"'
     refute_includes dummy, 'tag: "v0.1.359"'
     refute_includes gemfile, 'tag: "v0.1.341"'

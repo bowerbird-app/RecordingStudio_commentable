@@ -1,0 +1,3 @@
+# Minimal Recording Studio API config. API 1.12 and later refuse to boot
+# without this file. Hosts replace the shared settings with their own.
+shared: {}
